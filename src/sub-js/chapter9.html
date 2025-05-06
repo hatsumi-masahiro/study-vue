@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第9章: 非同期処理とPromise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第9章: 非同期処理とPromise</h1>
+        </div>
+    </header>
+    <div class="container">
+
+        <section id="chapter9">
+            <h2 id="chapter9" class="chapter-heading">第9章: 非同期処理とPromise</h2>
+
+            <h3>概要</h3>
+            <p>JavaScriptは基本的にシングルスレッドで実行されるため、長時間かかる処理やI/O待ちの処理を行う際には非同期処理の仕組みが重要になります。ES6で標準化された<strong>Promise</strong>オブジェクトは、非同期処理の完了や失敗を表現するためのオブジェクトです。Promiseを使うと、コールバック関数地獄（いわゆる「Callback
+                Hell」）を回避し、読みやすい非同期コードを書くことができます。</p>
+            <p>Promiseオブジェクトは最初は「保留（pending）」状態ですが、処理が完了すると「fulfilled（履行）」状態になり結果の値を保持します。エラーが起きれば「rejected（拒否）」状態になりエラー理由を保持します。Promiseには<code>.then()</code>メソッドと<code>.catch()</code>メソッドが用意されており、成功時の処理と失敗時の処理をそれぞれチェーン（連結）して書くことが可能です。
+            </p>
+            <p>本章では、Promiseの基本的な使い方として、新たにPromiseを作成する方法と、既存の非同期関数から返されるPromiseを扱う方法を学びます。</p>
+
+            <h3>コードと解説</h3>
+            <p>JavaScriptでPromiseを使用する例を示します。<code>fetchData</code>という擬似的な非同期関数を作り、1秒後にデータを返すようにしてみます。そのPromiseを<code>.then</code>で受け取り、結果を処理します。
+            </p>
+
+            <pre><code class="language-javascript">
+function fetchData() {
+    return new Promise((resolve, reject) => {
+        console.log("データ取得中...");
+        setTimeout(() => {
+            const success = true;  // 成功/失敗を決めるフラグ
+            if (success) {
+                resolve({ message: "データ取得成功", data: [1, 2, 3] });
+            } else {
+                reject(new Error("データ取得失敗"));
+            }
+        }, 1000);
+    });
+}
+
+// Promiseを利用した非同期処理の実行
+fetchData()
+    .then(result => {
+        console.log(result.message);       // "データ取得成功"
+        console.log(result.data);          // [1, 2, 3]
+    })
+    .catch(error => {
+        console.error(error);              // エラー時はこちらが実行される
+    })
+    .finally(() => {
+        console.log("非同期処理が完了しました。");
+    });</code></pre>
+
+            <p><strong>解説:</strong>
+                <code>fetchData</code>関数では<code>new Promise(...)</code>を返しています。コンストラクタに渡した関数は「executor（実行者）」と呼ばれ、<code>resolve</code>と<code>reject</code>という2つのコールバックを引数に取ります。非同期処理が成功した際には<code>resolve(結果)</code>を呼び出し、失敗した際には<code>reject(エラー)</code>を呼び出します。上記では<code>setTimeout</code>で1秒待った後、<code>success</code>フラグに応じて成功ならオブジェクトを<code>resolve</code>し、失敗ならエラーメッセージを<code>reject</code>しています。
+            </p>
+            <p><code>fetchData()</code>の呼び出し側では、返されたPromiseに対して<code>.then()</code>で成功時の処理、<code>.catch()</code>で失敗時の処理、<code>.finally()</code>で最終的に常に行いたい処理を指定しています。<code>.then()</code>の中の<code>result</code>は<code>resolve</code>で渡された値（ここでは<code>{ message: ..., data: ... }</code>オブジェクト）が渡ってきます。一方<code>.catch()</code>の<code>error</code>には<code>reject</code>で渡された<code>Error</code>オブジェクトが渡ります。<code>.finally()</code>は成功・失敗に関わらず一度だけ実行されるブロックですので、後処理などに利用できます。
+            </p>
+            <p>なお、Promiseチェーンでは<code>.then</code>を続けて書くことで非同期処理の結果を次の<code>.then</code>に渡していくこともできます。例えば<code>.then(result => { return 加工した新しい結果; })</code>のように<code>return</code>すると、新たなPromiseとして次の<code>.then</code>に渡されます。この仕組みにより、非同期処理を順序立てて書き進めることができます。
+            </p>
+        </section>
+
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

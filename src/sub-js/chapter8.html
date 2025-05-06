@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第8章: モジュールシステム (ES Modules と CommonJS)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第8章: モジュールシステム (ES Modules と CommonJS)</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter8">
+            <h2 id="chapter8" class="chapter-heading">第8章: モジュールシステム (ES Modules と CommonJS)</h2>
+
+            <h3>概要</h3>
+            <p>JavaScriptにおけるモジュールとは、コードをファイル単位などで分割し、必要な部分をインポート(import)・エクスポート(export)できる仕組みです。ES6では<strong>ES Modules
+                    (ESM)</strong>と呼ばれる標準モジュールシステムが導入され、<code>import</code>/<code>export</code>文が使えるようになりました。それ以前から、Node.jsでは<code>require</code>関数と<code>module.exports</code>を使うCommonJSと呼ばれるモジュールシステムが使われており、現在も双方が存在しています。
+            </p>
+            <p>ES
+                Modulesでは<code>import</code>/<code>export</code>構文によりモジュール間で関数や変数をやり取りします。一方、CommonJSでは<code>require()</code>でモジュールを読み込み、<code>module.exports</code>で外部に公開します。技術的な違いとして、CommonJSはモジュールを同期的にロードしますが、ESMでは基本的に非同期にモジュールを読み込みます。またブラウザではESMがネイティブにサポートされているのに対し、CommonJSモジュールをそのまま読み込むことはできず、Webpackなどのバンドラを使って束ねる必要があります。
+            </p>
+            <p>Node.js環境でも近年はESMがサポートされており、<code>.mjs</code>拡張子や<code>package.json</code>に<code>"type": "module"</code>を指定することで<code>import</code>/<code>export</code>が使えます。新規プロジェクトではES
+                Modulesの使用が推奨されており、既存のCommonJSとの相互運用も可能ですが、モジュールの種類を混在させる際には注意が必要です。</p>
+
+            <h3>コードと解説</h3>
+            <p>まずES
+                Modulesの例として、モジュールを二つ用意し、一方で変数や関数を<code>export</code>し、他方で<code>import</code>して利用します（ブラウザ環境で実行する場合、<code>&lt;script type="module"&gt;</code>タグ内で動作します）。
+            </p>
+
+            <pre><code class="language-javascript">/*** utils.js - モジュールファイル ***/
+export const pi = 3.14159;
+export function circleArea(radius) {
+    return pi * radius * radius;
+}
+
+/*** main.js - エントリポイント ***/
+import { pi, circleArea } from "./utils.js";
+
+console.log(pi);                // 3.14159
+console.log(circleArea(5));     // 78.53975
+
+// デフォルトエクスポートの例
+// utils.js 側で: export default function greet() { ... }
+// main.js 側で: import greet from "./utils.js";</code></pre>
+
+            <p>次に、Node.jsで従来使われていたCommonJSの書き方の例を示します。<code>require</code>と<code>module.exports</code>を用いて同様の機能を実現しています。
+            </p>
+
+            <pre><code class="language-javascript">/*** utils.cjs ***/
+const pi = 3.14159;
+function circleArea(radius) {
+    return pi * radius * radius;
+}
+// 複数の値をモジュールの外に公開
+module.exports = { pi, circleArea };
+
+/*** main.cjs ***/
+const { pi, circleArea } = require("./utils.cjs");
+
+console.log(pi);            // 3.14159
+console.log(circleArea(5)); // 78.53975</code></pre>
+
+            <p><strong>解説:</strong> ES
+                Modules形式では、<code>utils.js</code>で<code>export</code>された定数<code>pi</code>や関数<code>circleArea</code>を、<code>main.js</code>側で<code>import</code>によって読み込んで使用しています。このとき、読み込む側では<code>import { 名前 }</code>で対応する名前を指定します。デフォルトエクスポートを使った場合（例ではコメントで記載）、<code>import 任意の名前 from "..."</code>という書式で読み込みます。ES
+                Modulesではこれら<code>import</code>文はファイル先頭で静的に記述され、モジュールを非同期にロードします。</p>
+            <p>CommonJS形式では、<code>utils.cjs</code>側で<code>module.exports = { pi, circleArea };</code>とまとめてエクスポートし、<code>main.cjs</code>側で<code>require("./utils.cjs")</code>により同期的にモジュールをロードしています。CommonJSの<code>require</code>は関数呼び出しなので任意の場所で実行できる一方、ES
+                Modulesの<code>import</code>はファイルロード時に行われる点が異なります。また、上記の例では拡張子<code>.cjs</code>を使用していますが、Node.jsでESMを使う場合には<code>.mjs</code>拡張子にするか、<code>package.json</code>でモジュールタイプを指定する必要があります。
+            </p>
+            <p>まとめると、</p>
+            <ul>
+                <li>ES Modules (ESM):
+                    <code>import</code>/<code>export</code>を使用。モジュールは非同期ロード。ブラウザとNode.js(設定有)で使用可能。新規プロジェクトで推奨。</li>
+                <li>CommonJS (CJS):
+                    <code>require</code>/<code>module.exports</code>を使用。モジュールは同期ロード。Node.jsでデフォルト使用。ブラウザでは直接使用不可（バンドラが必要）。
+                </li>
+            </ul>
+            <p>現在では多くの場合ES
+                Modulesを使う方向に統一されつつありますが、Node.jsの既存環境や一部ツールではCommonJSが根強く残っています。両者の違いを理解しつつ、必要に応じて変換や互換性設定を行うことで、モダンなモジュール構成で開発を進めることができます。
+            </p>
+        </section>
+
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

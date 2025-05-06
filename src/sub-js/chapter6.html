@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第6章: 分割代入 (デストラクチャリング)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第6章: 分割代入 (デストラクチャリング)</h1>
+        </div>
+    </header>
+    <div class="container">
+
+
+        <section id="chapter6">
+            <h2 id="chapter6" class="chapter-heading">第6章: 分割代入 (デストラクチャリング)</h2>
+
+            <h3>概要</h3>
+            <p>分割代入（destructuring
+                assignment）を使うと、配列やオブジェクトから複数の値を一度に取り出して変数に代入することができます。ES6で導入されたこの構文により、従来は個別に値を取り出していた処理を簡潔に書けます。配列に対しては角括弧<code>[]</code>を使い、オブジェクトに対しては波括弧<code>{}</code>を使った構文で対応する位置やキーの値を抽出します。
+            </p>
+            <p>配列の分割代入では、左辺で例えば<code>[a, b]</code>のように書くと、配列の最初の2要素がそれぞれ<code>a</code>と<code>b</code>に代入されます。また<code>[x, ...rest]</code>のように書けば先頭の要素を<code>x</code>に、それ以降全てを<code>rest</code>（レスト要素）としてまとめて配列にできます。オブジェクトの場合は、取り出したいプロパティ名をそのまま左辺に書いて同名の変数に代入できます。別名の変数に代入したい場合は<code>名前: 別名</code>という書き方をします。存在しないプロパティに対してデフォルト値を設定することも可能です。
+            </p>
+
+            <h3>コードと解説</h3>
+            <p>JavaScriptでの分割代入の例です。配列から値を取り出すケースと、オブジェクトからプロパティを取り出すケースを順に示します。</p>
+
+            <pre><code class="language-javascript">// 配列の分割代入
+const scores = [80, 90, 70, 60];
+const [first, second, ...others] = scores;
+console.log(first);   // 80
+console.log(second);  // 90
+console.log(others);  // [70, 60]
+
+// オブジェクトの分割代入
+const userInfo = { id: 501, name: "Eve", age: 28 };
+const { id, name, age } = userInfo;
+console.log(name); // "Eve"
+console.log(age);  // 28
+
+// オブジェクト分割代入: 別名とデフォルト値
+const { id: userId, name: userName, nickname = "名無し" } = userInfo;
+console.log(userId);   // 501
+console.log(userName); // "Eve"
+console.log(nickname); // "名無し" （userInfoにnicknameプロパティが無いのでデフォルト値適用）</code></pre>
+
+            <p>次にTypeScriptで同じ内容を示します。型情報として配列の要素型やオブジェクトのプロパティ型を指定しています。</p>
+
+            <pre><code class="language-typescript">const scores: number[] = [80, 90, 70, 60];
+const [first, second, ...others]: [number, number, ...number[]] = scores;
+console.log(first);   // 80
+console.log(second);  // 90
+console.log(others);  // [70, 60]
+
+interface UserInfo { id: number; name: string; age: number; nickname?: string; }
+const userInfo: UserInfo = { id: 501, name: "Eve", age: 28 };
+const { id, name, age }: UserInfo = userInfo;
+console.log(name); // "Eve"
+console.log(age);  // 28
+
+const { id: userId, name: userName, nickname = "名無し" }: UserInfo = userInfo;
+console.log(userId);   // 501
+console.log(userName); // "Eve"
+console.log(nickname); // "名無し"</code></pre>
+
+            <p><strong>解説:</strong>
+                配列<code>scores</code>に対する<code>[first, second, ...others]</code>という分割代入により、<code>scores[0]</code>が<code>first</code>に、<code>scores[1]</code>が<code>second</code>にそれぞれ代入され、残りの要素<code>[70, 60]</code>が<code>others</code>配列にまとめられます。これにより、一度の代入で複数の変数に値を割り当てることができます。
+            </p>
+            <p>オブジェクト<code>userInfo</code>に対する<code>{ id, name, age }</code>の分割代入では、右辺オブジェクトの<code>id</code>,
+                <code>name</code>, <code>age</code>プロパティの値が同名の変数<code>id</code>, <code>name</code>,
+                <code>age</code>にそれぞれ取り出されています。次の例では、<code>id: userId</code>と記述することで<code>id</code>プロパティの値を<code>userId</code>という変数に代入しています。同様に<code>name</code>は<code>userName</code>という別名変数に、存在しない<code>nickname</code>プロパティにはデフォルト値<code>"名無し"</code>を与えて<code>nickname</code>変数に代入しています。このように、分割代入を用いるとオブジェクトから必要な値を抜き出しつつ、自由に変数名を付けたり初期値を設定したりできます。
+            </p>
+        </section>
+
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

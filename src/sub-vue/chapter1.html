@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第1章: Vue.js とは</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第1章: Vue.js とは</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter1">
+            <section id="chapter1">
+                <h2 id="chapter1" class="chapter-heading">第1章: Vue.js とは</h2>
+    
+                <h3>概要</h3>
+                <p>
+                    Vue.js は、ユーザーインターフェースを構築するための、プログレッシブJavaScriptフレームワークです。コアライブラリはビューレイヤーにフォーカスし、他のライブラリやプロジェクトと簡単に統合できる設計になっています。Vue.jsは、シンプルな応用から複雑なSPA（シングルページアプリケーション）まで、様々な規模のプロジェクトに適しています。
+                </p>
+                
+                <h3>Vue.jsの特徴</h3>
+                <p>Vue.jsには以下のような特徴があります：</p>
+                <ul>
+                    <li><strong>リアクティブなデータバインディング</strong>：データの変更を検知して、DOM（Document Object Model）を自動的に更新します。</li>
+                    <li><strong>コンポーネントベースの設計</strong>：再利用可能な独立したコンポーネントを作成できます。</li>
+                    <li><strong>学習曲線が緩やか</strong>：他のフレームワークに比べて、学習が比較的容易です。</li>
+                    <li><strong>軽量</strong>：コアライブラリが軽量で、高速に動作します。</li>
+                    <li><strong>柔軟性</strong>：プロジェクトの一部だけにVueを導入することも、フルスタックのフレームワークとして使用することも可能です。</li>
+                </ul>
+    
+                <h3>Vue.jsのバージョン</h3>
+                <p>
+                    2023年現在、Vueの最新の安定版はVue 3です。Vue 3は、Vue 2から大幅に改良され、パフォーマンスが向上し、TypeScriptのサポートが強化されています。また、Composition APIという新しいAPIも導入されました。
+                </p>
+    
+                <h3>Options API と Composition API</h3>
+                <p>
+                    Vue.jsには、コンポーネントを構築するための2つの主要なAPIがあります：
+                </p>
+    
+                <h4>Options API</h4>
+                <p>
+                    Options APIは、Vue 2から存在する従来のAPIで、コンポーネントのオプションオブジェクト（data, methods, computed など）を定義します。
+                </p>
+                <pre><code class="language-javascript">
+export default {
+    data() {
+        return {
+            count: 0
+        }
+    },
+    methods: {
+        increment() {
+            this.count++
+        }
+    },
+    computed: {
+        doubleCount() {
+            return this.count * 2
+        }
+    }
+}</code></pre>
+    
+                <h4>Composition API</h4>
+                <p>
+                    Composition APIはVue 3で導入された新しいAPIで、関数ベースでより柔軟なコード構成が可能になります。関連する機能をグループ化し、コンポーネント間で再利用しやすい設計になっています。<strong>本教材では、この Composition API を使用して Vue.js を学習します。</strong>
+                </p>
+                <pre><code class="language-javascript">import { ref, computed } from 'vue'
+    
+export default {
+    setup() {
+    const count = ref(0)
+    
+    function increment() {
+        count.value++
+    }
+    
+    const doubleCount = computed(() => count.value * 2)
+    
+    return {
+        count,
+        increment,
+        doubleCount
+    }
+    }
+}</code></pre>
+    
+                <p>
+                    さらに、Vue 3では<code>&lt;script setup&gt;</code>構文が導入されており、より簡潔にComposition APIを記述できます：
+                </p>
+                <pre><code class="language-javascript">
+&lt;script setup&gt;
+import { ref, computed } from 'vue'
+
+const count = ref(0)
+
+function increment() {
+    count.value++
+}
+
+const doubleCount = computed(() => count.value * 2)
+&lt;/script&gt;
+    
+&lt;template&gt;
+    &lt;button @click="increment"&gt;Count: {{ count }}&lt;/button&gt;
+    &lt;p&gt;Double: {{ doubleCount }}&lt;/p&gt;
+&lt;/template&gt;</code></pre>
+    
+                <h3>Composition APIの利点</h3>
+                <p>
+                    Composition APIには以下のような利点があります：
+                </p>
+                <ul>
+                    <li><strong>コードの再利用性</strong>：関連する機能をカスタムフックとして抽出し、複数のコンポーネントで再利用できます。</li>
+                    <li><strong>型推論の改善</strong>：TypeScriptとの相性が良く、型推論が優れています。</li>
+                    <li><strong>ロジックの整理</strong>：機能単位でコードをグループ化できるため、大規模なコンポーネントでも整理しやすくなります。</li>
+                    <li><strong>テスト容易性</strong>：独立した関数として抽出できるため、ユニットテストが容易です。</li>
+                </ul>
+    
+                <h3>Vueエコシステム</h3>
+                <p>
+                    Vue.jsには、アプリケーション開発を支援する豊富なエコシステムがあります：
+                </p>
+                <ul>
+                    <li><strong>Vue Router</strong>：SPAのルーティングを管理するための公式ライブラリです。</li>
+                    <li><strong>Pinia</strong>：Vue 3向けの状態管理ライブラリで、Vuexの後継です。</li>
+                    <li><strong>Nuxt.js</strong>：Vue.jsベースのフレームワークで、サーバーサイドレンダリング（SSR）やスタティックサイト生成（SSG）をサポートします。</li>
+                    <li><strong>Vite</strong>：モダンなフロントエンド開発ツールで、高速な開発サーバーとビルドツールを提供します。</li>
+                    <li><strong>Vue DevTools</strong>：Vueアプリケーションのデバッグとプロファイリングのためのブラウザ拡張機能です。</li>
+                </ul>
+    
+                <h3>Vue.jsが適しているプロジェクト</h3>
+                <p>
+                    Vue.jsは以下のようなプロジェクトに適しています：
+                </p>
+                <ul>
+                    <li>プログレッシブ強化が必要な既存のウェブサイト</li>
+                    <li>単一ページアプリケーション（SPA）</li>
+                    <li>ダッシュボードやコントロールパネルなどの対話的なUI</li>
+                    <li>中小規模のWebアプリケーション</li>
+                    <li>大規模なエンタープライズアプリケーション</li>
+                </ul>
+    
+                <h3>まとめ</h3>
+                <p>
+                    Vue.jsは、シンプルでありながら強力なJavaScriptフレームワークで、コンポーネントベースのUI開発を効率的に行うことができます。本教材では、最新のVue 3とComposition APIを使用して、Vueの基本から応用までを学んでいきます。次の章では、Vue.jsの開発環境を構築し、最初のプロジェクトを作成します。
+                </p>
+            </section>        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

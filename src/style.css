@@ -1,0 +1,251 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2980b9;
+  --accent-color: #e74c3c;
+  --text-color: #333333;
+  --light-text: #666666;
+  --light-bg: #ffffff;
+  --code-bg: #1e1e1e;
+  --border-color: #eaeaea;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--light-bg);
+  font-size: 16px;
+  padding-bottom: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+header {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header .container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+header p {
+  font-size: 1.1rem;
+  max-width: 700px;
+  opacity: 0.9;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--secondary-color);
+}
+
+h3 {
+  font-size: 1.4rem;
+  margin: 1.5rem 0 1rem;
+  color: var(--primary-color);
+}
+
+p, ul, ol {
+  margin-bottom: 1.2rem;
+}
+
+ul, ol {
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+strong {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.chapter-list {
+  background-color: var(--light-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chapter-list ol {
+  margin-bottom: 0;
+}
+
+.chapter-list li {
+  font-weight: 500;
+}
+
+.chapter-list em {
+  font-weight: normal;
+  color: var(--light-text);
+}
+
+pre {
+  background-color: var(--code-bg);
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  overflow: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+code {
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+:not(pre) > code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  color: var(--accent-color);
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 2.5rem 0;
+}
+
+.note {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left: 4px solid var(--primary-color);
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.references {
+  background-color: var(--light-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: var(--light-text);
+}
+
+.toc-link {
+  display: block;
+  margin-top: 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.toc-link:hover {
+  background-color: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+  h1 {
+      font-size: 2rem;
+  }
+  h2 {
+      font-size: 1.5rem;
+  }
+  h3 {
+      font-size: 1.2rem;
+  }
+  .container {
+      padding: 0 1rem;
+  }
+  header {
+      padding: 2rem 0;
+  }
+}
+/* スクロールに対応したアンカーリンク位置調整 */
+html {
+  scroll-behavior: smooth; /* スムーズスクロール */
+  scroll-padding-top: 80px; /* アンカーリンクのずれを調整 */
+}
+
+.chapter-heading {
+  padding-top: 80px;
+  margin-top: -50px;
+}
+
+.directive-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  /* Cool and readable table style */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.directive-table thead {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.directive-table th, .directive-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.directive-table th {
+  color: white;
+  font-weight: 600;
+}
+
+.directive-table tbody tr:nth-child(odd) {
+  background-color: var(--light-bg);
+}
+
+.directive-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.directive-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.directive-table td {
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.directive-table caption {
+  caption-side: bottom;
+  padding-top: 0.5rem;
+  font-style: italic;
+  color: var(--light-text);
+}

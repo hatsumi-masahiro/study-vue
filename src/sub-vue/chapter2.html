@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第2章: 開発環境の構築</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第2章: 開発環境の構築</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter2">
+            <h2 id="chapter2" class="chapter-heading">第2章: 開発環境の構築</h2>
+
+            <h3>概要</h3>
+            <p>
+                本章では、Vue.jsアプリケーション開発に必要な環境を構築し、勉強用のプロジェクトを作成します。開発環境としてVisual Studio Code（VS Code）を使用し、Vue.js 3のプロジェクトをViteを用いて作成します。
+            </p>
+            
+            <h3>必要なソフトウェア</h3>
+            <p>Vue.js開発環境の構築には、以下のソフトウェアが必要です：</p>
+            <ul>
+                <li><strong>Node.js</strong>：JavaScriptのランタイム環境</li>
+                <li><strong>npm</strong>またはYarn：パッケージマネージャー（Node.jsと一緒にインストールされます）</li>
+                <li><strong>Visual Studio Code</strong>：コードエディタ</li>
+                <li><strong>Vue 3</strong>：本教材で使用するフレームワーク</li>
+                <li><strong>Vite</strong>：高速な開発サーバーとビルドツール</li>
+            </ul>
+
+            <h3>1. Node.jsのインストール</h3>
+            <p>
+                まず、Node.jsとnpmをインストールします。Node.jsの公式サイトから最新のLTS（Long Term Support）バージョンをダウンロードしてインストールすることをお勧めします。
+            </p>
+            <div class="note">
+                <p><strong>インストール手順：</strong></p>
+                <ol>
+                    <li><a href="https://nodejs.org/" target="_blank">Node.js公式サイト</a>にアクセスします。</li>
+                    <li>LTSバージョンをダウンロードします。</li>
+                    <li>インストーラーを実行し、指示に従ってインストールを完了します。</li>
+                </ol>
+            </div>
+            <p>
+                インストールが完了したら、コマンドラインから以下のコマンドを実行して、正しくインストールされているか確認します：
+            </p>
+            <pre><code class="language-bash">node -v
+npm -v</code></pre>
+            <p>
+                これにより、インストールされたNode.jsとnpmのバージョンが表示されます。
+            </p>
+
+            <h3>2. Visual Studio Codeのインストール</h3>
+            <p>
+                次に、Visual Studio Code（VS Code）をインストールします。VS Codeは、Vue.js開発に適した軽量で高機能なコードエディタです。
+            </p>
+            <div class="note">
+                <p><strong>インストール手順：</strong></p>
+                <ol>
+                    <li><a href="https://code.visualstudio.com/" target="_blank">VS Code公式サイト</a>にアクセスします。</li>
+                    <li>お使いのOSに適したインストーラーをダウンロードします。</li>
+                    <li>インストーラーを実行し、指示に従ってインストールを完了します。</li>
+                </ol>
+            </div>
+
+            <h3>3. VS Code拡張機能のインストール</h3>
+            <p>
+                Vue.js開発に役立つVS Code拡張機能をインストールします。以下の拡張機能を推奨します：
+            </p>
+            <ul>
+                <li><strong>Volar</strong>：Vue 3のシンタックスハイライト、自動補完、TypeScriptのサポートなど</li>
+                <li><strong>ESLint</strong>：コード品質とスタイルの検証</li>
+                <li><strong>Prettier</strong>：コードフォーマッター</li>
+                <li><strong>Auto Rename Tag</strong>：開始タグと終了タグの自動リネーム</li>
+                <li><strong>Path Intellisense</strong>：ファイルパスの自動補完</li>
+            </ul>
+            <div class="note">
+                <p><strong>拡張機能のインストール手順：</strong></p>
+                <ol>
+                    <li>VS Codeを起動します。</li>
+                    <li>左側のサイドバーから拡張機能アイコンをクリックします。</li>
+                    <li>検索ボックスに拡張機能名を入力します。</li>
+                    <li>該当する拡張機能のインストールボタンをクリックします。</li>
+                </ol>
+            </div>
+            <p>
+                特に重要なのは「Volar」拡張機能です。これはVue 3専用の拡張機能で、以前のVue 2用の「Vetur」に代わるものです。
+            </p>
+            <pre><code class="language-plaintext">Note: Vue 3を使用する場合、以前のVetur拡張機能をアンインストールし、代わりにVolarをインストールすることをお勧めします。</code></pre>
+
+            <h3>4. Vueプロジェクトの作成（Vite使用）</h3>
+            <p>
+                Vue 3プロジェクトを作成するために、Viteを使用します。Viteは、高速な開発サーバーとビルドツールを提供します。
+            </p>
+            <p>
+                コマンドラインを開き、以下のコマンドを実行してVueプロジェクトを作成します：
+            </p>
+            <pre><code class="language-bash">npm create vite@latest my-vue-app -- --template vue</code></pre>
+            <p>
+                このコマンドは、「my-vue-app」という名前のVue 3プロジェクトを作成します。プロンプトが表示されたら、以下のように選択します：
+            </p>
+            <ul>
+                <li>フレームワーク選択で「Vue」を選択</li>
+                <li>バリアント選択で「JavaScript」または「TypeScript」を選択（本教材ではまずJavaScriptを使用し、後にTypeScriptを導入します）</li>
+            </ul>
+            <p>
+                プロジェクトが作成されたら、以下のコマンドを実行して依存関係をインストールし、開発サーバーを起動します：
+            </p>
+            <pre><code class="language-bash">cd my-vue-app
+npm install
+npm run dev</code></pre>
+            <p>
+                これにより、ローカル開発サーバーが起動し、通常はhttp://localhost:5173/でアプリケーションにアクセスできます。
+            </p>
+
+            <h3>5. プロジェクト構造の確認</h3>
+            <p>
+                作成されたプロジェクトの基本構造を確認しましょう：
+            </p>
+            <pre><code class="language-plaintext">my-vue-app/
+├── node_modules/     # インストールされたパッケージ
+├── public/           # 静的アセット
+├── src/              # ソースコード
+│   ├── assets/       # 画像やスタイルなどのアセット
+│   ├── components/   # Vueコンポーネント
+│   ├── App.vue       # ルートコンポーネント
+│   └── main.js       # アプリケーションのエントリーポイント
+├── index.html        # HTMLエントリーポイント
+├── package.json      # プロジェクトの依存関係と設定
+├── vite.config.js    # Viteの設定ファイル
+└── README.md         # プロジェクトの説明</code></pre>
+
+            <h3>6. VS Codeでプロジェクトを開く</h3>
+            <p>
+                VS Codeを起動し、以下の手順でプロジェクトを開きます：
+            </p>
+            <div class="note">
+                <p><strong>手順：</strong></p>
+                <ol>
+                    <li>VS Codeを起動します。</li>
+                    <li>「ファイル」→「フォルダーを開く」を選択します。</li>
+                    <li>作成したプロジェクトフォルダ（my-vue-app）を選択します。</li>
+                </ol>
+            </div>
+            <p>
+                これにより、VS CodeでVueプロジェクトが開かれ、ファイル構造が左側のエクスプローラーに表示されます。
+            </p>
+
+            <h3>7. Hello Worldアプリの確認</h3>
+            <p>
+                Viteで作成されたVueプロジェクトには、すでに簡単なHello Worldアプリが含まれています。App.vueファイルを開いて確認してみましょう。
+            </p>
+            <p>
+                src/App.vueの内容を以下のように変更して、Composition APIを使用したシンプルなアプリケーションを作成します：
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const message = ref('Hello Vue 3!')
+const count = ref(0)
+
+function incrementCount() {
+  count.value++
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="app-container"&gt;
+    &lt;h1&gt;{{ message }}&lt;/h1&gt;
+    &lt;p&gt;カウント: {{ count }}&lt;/p&gt;
+    &lt;button @click="incrementCount"&gt;増やす&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  color: #42b983;
+}
+
+button {
+  background-color: #42b983;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #36a373;
+}
+&lt;/style&gt;</code></pre>
+            <p>
+                このコードは、Composition APIの<code>&lt;script setup&gt;</code>構文を使用しています。<code>ref</code>関数を使用して、リアクティブな状態変数（message、count）を作成しています。
+            </p>
+
+            <h3>8. main.jsファイルの確認</h3>
+            <p>
+                src/main.jsファイルは、Vueアプリケーションのエントリーポイントです。このファイルの内容を確認しましょう：
+            </p>
+            <pre><code class="language-javascript">import { createApp } from 'vue'
+import App from './App.vue'
+
+// 必要に応じてCSSをインポート
+import './assets/main.css'
+
+// Vueアプリケーションを作成し、マウント
+createApp(App).mount('#app')</code></pre>
+            <p>
+                この短いコードで、Vueアプリケーションを初期化し、index.htmlファイル内の<code>id="app"</code>要素にマウントしています。
+            </p>
+
+            <h3>9. index.htmlファイルの確認</h3>
+            <p>
+                Viteでは、index.htmlファイルがプロジェクトのルートディレクトリにあります。このファイルを確認しましょう：
+            </p>
+            <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;link rel="icon" type="image/svg+xml" href="/vite.svg" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;title&gt;Vite + Vue&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="app"&lt;&gt;/div&gt;
+    &lt;script type="module" src="/src/main.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            <p>
+                このHTMLファイルには、Vueアプリケーションがマウントされる<code>id="app"</code>の<code>div</code>要素があります。また、<code>type="module"</code>属性を持つスクリプトタグで、main.jsファイルをモジュールとしてインポートしています。
+            </p>
+
+            <h3>まとめ</h3>
+            <p>
+                本章では、Vue.js開発に必要な開発環境を構築しました。Node.js、npm、VS Code、および推奨拡張機能をインストールし、Viteを使用してVue 3プロジェクトを作成しました。また、作成されたプロジェクトの基本構造と主要ファイルの内容を確認しました。
+            </p>
+            <p>
+                次の章では、Vueプロジェクトの構成をより詳しく理解し、Composition APIを使ったVueアプリケーション開発の基礎を学びます。
+            </p>
+        </section>        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第11章: Vite ビルド & デプロイ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第11章: Vite ビルド & デプロイ</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter11">
+            <h2 id="chapter11" class="chapter-heading">第11章: Vite ビルド & デプロイ</h2>
+
+            <h3>概要</h3>
+            <p>
+                Viteは高速な開発サーバーと最適化されたビルドプロセスを提供するビルドツールです。Vue.jsプロジェクトをViteでビルドし、様々なプラットフォームにデプロイする方法を学びましょう。この章では、ビルド設定のカスタマイズからサーバーへのデプロイまで、本番環境に向けた準備を詳しく解説します。
+            </p>
+
+            <h3>1. Viteとは</h3>
+            <p>
+                Viteは、Vue.jsの作者であるEvan Youが開発した次世代フロントエンドビルドツールです。ES Modulesを活用した高速な開発サーバーと、Rollupを使用した最適化されたビルドプロセスが特徴です。従来のwebpackベースのビルドツールと比較して、開発時の起動速度やHMR（Hot Module Replacement）のパフォーマンスが大幅に向上しています。
+            </p>
+
+            <h3>2. ビルドプロセスの基本</h3>
+            <p>
+                Viteプロジェクトのビルドは非常にシンプルです。以下のコマンドでプロダクション用のビルドを実行できます：
+            </p>
+
+            <pre><code class="language-bash"># プロジェクトをビルド
+npm run build</code></pre>
+
+            <p>
+                このコマンドは、プロジェクトルートの<code>dist</code>ディレクトリに最適化されたファイルを生成します。ビルド後のファイル構造は次のようになります：
+            </p>
+
+            <pre><code class="language-text">dist/
+  ├── assets/
+  │   ├── index-a1b2c3d4.js      # メインのJSバンドル（ハッシュ付き）
+  │   ├── vendor-e5f6g7h8.js     # 外部ライブラリのJS
+  │   └── index-i9j0k1l2.css     # CSSファイル（ハッシュ付き）
+  ├── favicon.ico                # ファビコン
+  └── index.html                 # エントリーポイントのHTML</code></pre>
+
+            <p>
+                ビルド結果をローカルでプレビューするには：
+            </p>
+
+            <pre><code class="language-bash"># ビルド結果をプレビュー
+npm run preview</code></pre>
+
+            <h3>3. ビルド設定のカスタマイズ</h3>
+            <p>
+                Viteのビルド設定は<code>vite.config.js</code>（またはTypeScriptを使用している場合は<code>vite.config.ts</code>）ファイルでカスタマイズできます。
+            </p>
+
+            <pre><code class="language-javascript">// vite.config.js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [vue()],
+  
+  // ベースパスの設定（サブディレクトリにデプロイする場合に便利）
+  base: '/my-app/',
+  
+  // ビルド設定のカスタマイズ
+  build: {
+    // 出力ディレクトリ
+    outDir: 'dist',
+    
+    // アセットファイルのサイズ警告閾値（デフォルト: 500kB）
+    chunkSizeWarningLimit: 1000,
+    
+    // CSS コード分割の有効/無効
+    cssCodeSplit: true,
+    
+    // ソースマップ生成
+    sourcemap: false,
+    
+    // Rollupオプション
+    rollupOptions: {
+      // 出力設定
+      output: {
+        // チャンク分割の設定
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'pinia']
+        },
+        // アセットファイル名のカスタマイズ
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+    
+    // minify設定（'terser'または'esbuild'）
+    minify: 'terser',
+    
+    // Terser オプション
+    terserOptions: {
+      compress: {
+        // コンソールログを削除
+        drop_console: true,
+        // デバッグ文を削除
+        drop_debugger: true
+      }
+    }
+  },
+
+  // 解決設定
+  resolve: {
+    // エイリアス
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
+  
+  // 開発サーバー設定
+  server: {
+    port: 3000,
+    // プロキシ設定
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  }
+})</code></pre>
+
+            <h3>4. 環境変数の設定</h3>
+            <p>
+                Viteは環境変数を使用して開発環境と本番環境を区別できます。<code>.env</code>ファイルを使用して環境変数を設定できます。
+            </p>
+
+            <h4>環境変数ファイルの種類：</h4>
+            <ul>
+                <li><code>.env</code> - すべての環境で読み込まれる</li>
+                <li><code>.env.local</code> - すべての環境で読み込まれる（gitignoreされる）</li>
+                <li><code>.env.development</code> - 開発環境のみ</li>
+                <li><code>.env.production</code> - 本番環境のみ</li>
+            </ul>
+
+            <pre><code class="language-text"># .env.production
+VITE_API_URL=https://api.example.com
+VITE_APP_TITLE=My Vue App</code></pre>
+
+            <p>
+                環境変数を使用するには、<code>import.meta.env</code>を使います：
+            </p>
+
+            <pre><code class="language-javascript">// アプリケーションコード内で環境変数にアクセス
+console.log(import.meta.env.VITE_API_URL) // https://api.example.com
+console.log(import.meta.env.VITE_APP_TITLE) // My Vue App</code></pre>
+
+            <p>
+                注意：セキュリティ上の理由から、<code>VITE_</code>プレフィックスがない環境変数はクライアントサイドのコードから参照できません。
+            </p>
+
+            <h3>5. アセット処理</h3>
+
+            <h4>5.1 静的アセット</h4>
+            <p>
+                <code>public</code>ディレクトリに配置したファイルは、ビルド時にルートディレクトリにコピーされます。これはファビコンや<code>robots.txt</code>などのファイルに適しています。
+            </p>
+
+            <pre><code class="language-text">public/
+  ├── favicon.ico
+  ├── robots.txt
+  └── static-image.png</code></pre>
+
+            <p>
+                これらのファイルは以下のように参照できます：
+            </p>
+
+            <pre><code class="language-html">&lt;img src="/static-image.png" alt="静的画像" /&gt;</code></pre>
+
+            <h4>5.2 SWG、画像、CSSなどの最適化</h4>
+            <p>
+                <code>src/assets</code>ディレクトリに配置したファイルは、インポート時に処理され、最適化されます。
+            </p>
+
+            <pre><code class="language-javascript">// CSSファイルのインポート
+import './assets/style.css'
+
+// 画像のインポート
+import logo from './assets/logo.png'</code></pre>
+
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;img :src="logo" alt="ロゴ" /&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>6. 本番環境のデプロイ</h3>
+            <p>
+                Viteでビルドした静的ファイルは様々なホスティングサービスにデプロイできます。ここでは代表的なデプロイ方法をいくつか紹介します。
+            </p>
+
+            <h4>6.1 静的ホスティングサービス（Netlify, Vercel, GitHub Pages）</h4>
+
+            <h5>GitHub Pages</h5>
+            <p>
+                GitHub Pagesにデプロイする場合は、以下の手順に従います：
+            </p>
+
+            <pre><code class="language-bash"># vite.config.jsでベースパスを設定（リポジトリ名を使用）
+# base: '/your-repository-name/'
+
+# ビルド
+npm run build
+
+# GitHub Pagesにデプロイ用のスクリプト（package.jsonに追加）
+# "deploy": "gh-pages -d dist"
+
+# デプロイ
+npm run deploy</code></pre>
+
+            <p>
+                または、GitHub Actionsを使用した自動デプロイも可能です：
+            </p>
+
+            <pre><code class="language-yaml"># .github/workflows/deploy.yml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages</code></pre>
+
+            <h5>Netlify</h5>
+            <p>
+                Netlifyへのデプロイは非常に簡単です：
+            </p>
+
+            <ol>
+                <li>Netlifyでアカウントを作成</li>
+                <li>「New site from Git」を選択</li>
+                <li>GitHubリポジトリを接続</li>
+                <li>ビルド設定：
+                    <ul>
+                        <li>Build command: <code>npm run build</code></li>
+                        <li>Publish directory: <code>dist</code></li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h5>Vercel</h5>
+            <p>
+                Vercelへのデプロイも同様に簡単です：
+            </p>
+
+            <ol>
+                <li>Vercelでアカウントを作成</li>
+                <li>「Import Project」を選択</li>
+                <li>GitHubリポジトリを接続</li>
+                <li>フレームワークプリセットで「Vite」を選択</li>
+                <li>「Deploy」をクリック</li>
+            </ol>
+
+            <h4>6.2 従来のWebサーバー（Apache, Nginx）</h4>
+            <p>
+                ApacheやNginxなどの従来のWebサーバーにデプロイする場合は、ビルドした<code>dist</code>ディレクトリの内容をサーバーにアップロードします。
+            </p>
+
+            <p>
+                SPA（シングルページアプリケーション）の場合、すべてのリクエストを<code>index.html</code>にリダイレクトする設定が必要です。
+            </p>
+
+            <h5>Apache（.htaccess）</h5>
+            <pre><code class="language-apache"># .htaccess
+&lt;IfModule mod_rewrite.c&gt;
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+&lt;/IfModule&gt;</code></pre>
+
+            <h5>Nginx</h5>
+            <pre><code class="language-nginx"># nginx.conf
+server {
+  listen 80;
+  server_name example.com;
+
+  root /path/to/dist;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  # キャッシュ設定
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000";
+  }
+}</code></pre>
+
+            <h4>6.3 Docker を使用したデプロイ</h4>
+            <p>
+                Dockerを使用してアプリケーションをコンテナ化することもできます。
+            </p>
+
+            <pre><code class="language-dockerfile"># Dockerfile
+FROM node:18-alpine as build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# 本番環境用のステージ
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+
+            <pre><code class="language-bash"># Dockerイメージをビルド
+docker build -t my-vue-app .
+
+# コンテナを実行
+docker run -p 8080:80 my-vue-app</code></pre>
+
+            <h3>7. パフォーマンス最適化</h3>
+
+            <h4>7.1 コード分割</h4>
+            <p>
+                Viteは自動的にルートベースのコード分割を行います。Vue Routerを使用している場合、各ルートは個別のチャンクになります。
+            </p>
+
+            <pre><code class="language-javascript">// router/index.js
+import { createRouter, createWebHistory } from 'vue-router'
+
+const routes = [
+  {
+    path: '/',
+    component: () => import('../views/Home.vue') // 遅延ロード
+  },
+  {
+    path: '/about',
+    component: () => import('../views/About.vue') // 遅延ロード
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router</code></pre>
+
+            <h4>7.2 プリロード</h4>
+            <p>
+                Viteは自動的にプリロードリンクを生成しますが、ユーザー操作の前にリソースをプリロードするような追加の最適化も可能です。
+            </p>
+
+            <pre><code class="language-javascript">// マウスがボタン上にホバーしたときに、About ページをプリロード
+function preloadAboutPage() {
+  const aboutComponent = import('../views/About.vue')
+}
+</code></pre>
+
+            <h4>7.3 キャッシュ管理</h4>
+            <p>
+                Viteは出力ファイル名にハッシュを含めることで、効率的なキャッシュ管理を実現しています。ビルド設定でこの動作をカスタマイズできます。
+            </p>
+
+            <pre><code class="language-javascript">// vite.config.js
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        // チャンクファイル名のカスタマイズ
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        // エントリーファイル名のカスタマイズ
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        // アセットファイル名のカスタマイズ
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
+      }
+    }
+  }
+})</code></pre>
+
+            <h3>8. 高度なビルド設定</h3>
+
+            <h4>8.1 ライブラリモード</h4>
+            <p>
+                Viteを使用して再利用可能なライブラリをビルドすることもできます。
+            </p>
+
+            <pre><code class="language-javascript">// vite.config.js
+export default defineConfig({
+  build: {
+    lib: {
+      entry: path.resolve(__dirname, 'src/index.js'),
+      name: 'MyLib',
+      fileName: (format) => `my-lib.${format}.js`
+    },
+    rollupOptions: {
+      // 外部依存関係を指定
+      external: ['vue'],
+      output: {
+        // グローバル変数の名前を指定
+        globals: {
+          vue: 'Vue'
+        }
+      }
+    }
+  }
+})</code></pre>
+
+            <h4>8.2 PWA（Progressive Web App）</h4>
+            <p>
+                Vite PWA プラグインを使用して、Service Worker とマニフェストファイルを生成できます。
+            </p>
+
+            <pre><code class="language-bash"># Vite PWA プラグインをインストール
+npm install -D vite-plugin-pwa</code></pre>
+
+            <pre><code class="language-javascript">// vite.config.js
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'My Vue App',
+        short_name: 'MyApp',
+        description: 'My Awesome Vue App',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
+  ]
+})</code></pre>
+
+            <h4>8.3 レガシーブラウザのサポート</h4>
+            <p>
+                古いブラウザをサポートする場合は、@vitejs/plugin-legacy を使用できます。
+            </p>
+
+            <pre><code class="language-bash"># レガシープラグインをインストール
+npm install -D @vitejs/plugin-legacy</code></pre>
+
+            <pre><code class="language-javascript">// vite.config.js
+import legacy from '@vitejs/plugin-legacy'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    legacy({
+      targets: ['> 1%', 'last 2 versions', 'not dead'],
+      additionalLegacyPolyfills: ['regenerator-runtime/runtime']
+    })
+  ]
+})</code></pre>
+
+            <h3>9. 継続的インテグレーション/継続的デプロイ（CI/CD）</h3>
+            <p>
+                自動化されたビルドとデプロイプロセスを構築することで、開発効率を向上させることができます。
+            </p>
+
+            <h4>9.1 GitHub Actions の例</h4>
+            <pre><code class="language-yaml"># .github/workflows/ci.yml
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint
+        run: npm run lint
+      
+      - name: Test
+        run: npm run test
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+          
+      - name: Deploy to production
+        uses: some-deployment-action@v1
+        with:
+          folder: dist
+          token: ${{ secrets.DEPLOY_TOKEN }}</code></pre>
+
+            <h3>10. リアルワールドでの Vite ビルド戦略</h3>
+            <p>
+                大規模プロジェクトでは、より高度なビルド戦略が必要になります。
+            </p>
+
+            <h4>10.1 マイクロフロントエンド</h4>
+            <p>
+                大規模アプリケーションでは、マイクロフロントエンドアーキテクチャを採用し、複数のViteアプリケーションを統合することができます。
+            </p>
+
+            <h4>10.2 インフラストラクチャのベストプラクティス</h4>
+            <ul>
+                <li>CDN（コンテンツ配信ネットワーク）の使用</li>
+                <li>HTTPSの強制</li>
+                <li>適切なセキュリティヘッダーの設定</li>
+                <li>ロードバランシングの実装</li>
+            </ul>
+
+            <h3>まとめ</h3>
+            <p>
+                Viteは現代的なフロントエンド開発において非常に効率的なビルドツールです。この章では、Viteを使用したビルドプロセス、最適化手法、およびデプロイ戦略について学びました。適切なビルド設定とデプロイ方法を選択することで、高速で安定したVue.jsアプリケーションを提供できます。
+            </p>
+
+            <h3>演習問題</h3>
+            <ol>
+                <li>Viteプロジェクトをビルドし、ビルド結果を分析してください。</li>
+                <li>環境変数を使用して、開発環境と本番環境で異なる設定を適用してください。</li>
+                <li>静的ホスティングサービス（GitHub Pages、Netlify、Vercelなど）にアプリケーションをデプロイしてください。</li>
+                <li>コード分割とプリロードを活用して、アプリケーションのパフォーマンスを向上させてください。</li>
+                <li>Dockerを使用してアプリケーションをコンテナ化し、デプロイしてください。</li>
+            </ol>
+        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

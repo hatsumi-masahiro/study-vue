@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3章: アロー関数 (Arrow Functions)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第3章: アロー関数 (Arrow Functions)</h1>
+        </div>
+    </header>
+    <div class="container">
+
+
+        <section id="chapter3">
+            <h2 id="chapter3" class="chapter-heading">第3章: アロー関数 (Arrow Functions)</h2>
+
+            <h3>概要</h3>
+            <p>アロー関数はES6で導入された新しい関数の記法で、<code>() => { ... }</code>という簡潔な構文を持ちます。アロー関数を理解するには、まず「JavaScriptでは関数を変数のように扱える」という概念を把握することが重要です。アロー関数はこの特性を活かした簡潔な関数定義方法であり、特に関数を引数として渡す場合や、短い処理を書く場合に便利です。
+            </p>
+
+            <h3>関数を変数として扱う基本概念</h3>
+            <p>JavaScriptでは関数はファーストクラスオブジェクトであり、変数に代入することができます。以下は基本的な例です：</p>
+
+            <pre><code class="language-javascript">// 従来の関数宣言
+function greet(name) {
+    return "Hello, " + name;
+}
+
+// 関数式：関数を変数に代入する
+const sayHello = function(name) {
+    return "Hello, " + name;
+};
+
+// 関数を呼び出す
+console.log(greet("John"));     // "Hello, John"
+console.log(sayHello("Mary"));  // "Hello, Mary"
+</code></pre>
+
+            <h3>アロー関数の基本</h3>
+            <p>アロー関数は次のように記述します：</p>
+
+            <pre><code class="language-javascript">// 最もシンプルなアロー関数
+const sayHi = () => {
+    console.log("Hi!");
+    return "挨拶完了";
+};
+sayHi();  // "Hi!" と表示され、"挨拶完了" が返される
+
+// 引数を1つ取るアロー関数
+const greet = (name) => {
+    console.log("Hello, " + name);
+    return "挨拶完了";
+};
+greet("Alice");  // "Hello, Alice" と表示される
+
+// 引数を複数取るアロー関数
+const add = (a, b) => {
+    return a + b;
+};
+console.log(add(5, 3));  // 8
+</code></pre>
+
+            <h3>アロー関数の省略記法</h3>
+            <p>アロー関数には以下の省略記法があります：</p>
+
+            <pre><code class="language-javascript">// 1. 引数が1つの場合、括弧を省略できる
+const double = num => {
+    return num * 2;
+};
+console.log(double(4));  // 8
+
+// 2. 関数本体が単一の式のみの場合、波括弧とreturnを省略できる
+const double2 = num => num * 2;
+console.log(double2(4));  // 8
+
+const greet2 = name => "Hello, " + name;
+console.log(greet2("Bob"));  // "Hello, Bob"
+
+// 3. オブジェクトリテラルを返す場合は、括弧で囲む必要がある
+const createPerson = (name, age) => ({ name: name, age: age });
+console.log(createPerson("Carol", 25));  // { name: "Carol", age: 25 }
+</code></pre>
+
+            <h3>アロー関数の実際の使用例</h3>
+            <p>アロー関数は特に配列操作やコールバック関数で威力を発揮します：</p>
+
+            <pre><code class="language-javascript">// 配列の各要素を2倍にする: 通常の無名関数 vs アロー関数
+const numbers = [1, 2, 3];
+
+// 従来の書き方
+const doubled1 = numbers.map(function(x) {
+    return x * 2;
+});
+
+// アロー関数での書き方（短縮形）
+const doubled2 = numbers.map(x => x * 2);
+
+console.log(doubled1);  // [2, 4, 6]
+console.log(doubled2);  // [2, 4, 6]
+</code></pre>
+
+            <h3>アロー関数と<code>this</code>の違い</h3>
+            <p>アロー関数の重要な特徴として、<code>this</code>の扱いが従来の関数と異なります。通常の<code>function</code>で定義した関数は呼び出し方によって<code>this</code>の値が変わりますが、アロー関数は自身が<code>this</code>を持たず、囲んでいる外側のスコープの<code>this</code>値を引き継ぎます。
+            </p>
+
+            <pre><code class="language-javascript">// オブジェクトのメソッドにおけるthisの違い
+const user = {
+name: "Carol",
+// 通常の関数でメソッド定義
+greetNormal: function() {
+    console.log("Hello, " + this.name);
+},
+// アロー関数でメソッド定義
+greetArrow: () => {
+    console.log("Hello, " + this.name);
+}
+};
+
+user.greetNormal();  // "Hello, Carol"
+user.greetArrow();   // "Hello, undefined"（アロー関数は自身にthisがなく、外側のthis＝グローバルを参照するため）
+</code></pre>
+
+            <p>この違いから、<strong>オブジェクトのメソッドやクラスのメソッドを定義する場合は通常の<code>function</code>を用いるべき</strong>であり、アロー関数を用いると<code>this</code>が意図したものにならない点に注意が必要です。
+            </p>
+
+            <p>一方、コールバック関数やタイマー処理などで、外側の<code>this</code>をそのまま使いたいケースではアロー関数が便利です：</p>
+
+            <pre><code class="language-javascript">// この例ではsetTimeoutのコールバックにアロー関数を使用
+const timer = {
+seconds: 0,
+start: function() {
+// アロー関数を使うとthisがtimerを指す
+setInterval(() => {
+  this.seconds++;
+  console.log(this.seconds + "秒経過");
+}, 1000);
+
+// 従来の関数を使うとthisがグローバルオブジェクトを指し、エラーとなる
+/*
+setInterval(function() {
+  this.seconds++;  // ここのthisはwindowオブジェクト
+  console.log(this.seconds + "秒経過");
+}, 1000);
+*/
+}
+};
+
+// timer.start(); // 実行するとコンソールに1秒ごとに経過秒数が表示される
+</code></pre>
+
+            <h3>まとめ</h3>
+            <p>アロー関数は特に以下のような場合に便利です：</p>
+
+            <ol>
+                <li>簡潔な一行関数を書きたい場合</li>
+                <li>配列操作のコールバック関数</li>
+                <li>外側のスコープの<code>this</code>を使いたいコールバック関数</li>
+            </ol>
+
+            <p>一方、以下の場合には通常の関数を使うべきです：</p>
+
+            <ol>
+                <li>オブジェクトのメソッド</li>
+                <li>クラスのメソッド</li>
+                <li>独自の<code>this</code>コンテキストが必要な場合</li>
+            </ol>
+
+            <p>アロー関数の構文に慣れると、多くのモダンJavaScriptコードがより読みやすくなり、特にReactやVueといったフレームワークでのコンポーネント開発がスムーズになります。</p>
+        </section>
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

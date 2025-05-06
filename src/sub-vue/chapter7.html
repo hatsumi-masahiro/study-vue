@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第7章: コンポーネント入門（SFC / Props / Emits）</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第7章: コンポーネント入門（SFC / Props / Emits）</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter7">
+            <h2 id="chapter7" class="chapter-heading">第7章: コンポーネント入門（SFC / Props / Emits）</h2>
+
+            <h3>概要</h3>
+            <p>
+                本章では、Vue.jsのコンポーネントシステムについて学びます。単一ファイルコンポーネント（SFC）の構造と利点、Propsを使用したデータの受け渡し、Emitsを使用したイベントの発信方法について理解を深めます。また、コンポーネントのライフサイクルと再利用可能なコンポーネントの設計についても学びます。
+            </p>
+            
+            <h3>1. コンポーネントの基本概念</h3>
+            <p>
+                コンポーネントは、Vue.jsアプリケーションの基本的な構成要素です。コンポーネントを使用することで、UIを独立した再利用可能なパーツに分割できます。大規模なアプリケーションでは、コンポーネントベースの開発が必須となります。
+            </p>
+            
+            <h4>コンポーネントの利点</h4>
+            <ul>
+                <li><strong>再利用性</strong>：コードの重複を減らし、同じUIパーツを複数の場所で使用できます</li>
+                <li><strong>保守性</strong>：小さな単位に分割することで、コードの管理と理解が容易になります</li>
+                <li><strong>テスト容易性</strong>：個々のコンポーネントを独立してテストできます</li>
+                <li><strong>関心の分離</strong>：各コンポーネントは特定の機能や見た目に集中できます</li>
+            </ul>
+
+            <h3>2. 単一ファイルコンポーネント（SFC）</h3>
+            <p>
+                Vue.jsでは、単一ファイルコンポーネント（Single File Component, SFC）と呼ばれる特別なファイル形式を使用します。これは<code>.vue</code>拡張子を持つファイルで、テンプレート、スクリプト、スタイルを1つのファイルにカプセル化します。
+            </p>
+            
+            <h4>SFCの基本構造</h4>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;!-- HTMLテンプレート --&gt;
+  &lt;div class="greeting"&gt;
+    &lt;h1&gt;{{ message }}&lt;/h1&gt;
+    &lt;button @click="greet"&gt;挨拶する&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+// JavaScriptコード
+import { ref } from 'vue'
+
+const message = ref('こんにちは、Vue!')
+
+function greet() {
+  alert('こんにちは！')
+}
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+/* CSSスタイル */
+.greeting {
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  color: #42b983;
+}
+
+button {
+  background-color: #42b983;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>SFCの利点</h4>
+            <ul>
+                <li><strong>コードの整理</strong>：関連するHTML、JavaScript、CSSが1つのファイルにまとまる</li>
+                <li><strong>スコープ付きCSS</strong>：<code>scoped</code>属性を使用して、スタイルをコンポーネント内に閉じ込められる</li>
+                <li><strong>プリプロセッサのサポート</strong>：SCSS、TypeScript、Pugなどのプリプロセッサを簡単に使用できる</li>
+                <li><strong>開発体験の向上</strong>：エディタの補完や構文ハイライトが機能する</li>
+            </ul>
+
+            <h4>script setupの利点</h4>
+            <p>
+                Vue 3では、<code>&lt;script setup&gt;</code>構文を使用することで、より簡潔にComposition APIを記述できます。従来の<code>setup()</code>関数に比べて以下の利点があります：
+            </p>
+            <ul>
+                <li>ボイラープレートコードが少なくなる</li>
+                <li>トップレベルの変数や関数が自動的にテンプレートで使用可能になる</li>
+                <li>型推論が改善される（TypeScriptと併用時）</li>
+                <li>コンポーネントのオプションが明示的に定義される</li>
+            </ul>
+
+            <h3>3. コンポーネントの登録と使用</h3>
+
+            <h4>グローバル登録</h4>
+            <p>
+                グローバル登録を使用すると、アプリケーション全体でコンポーネントを使用できます。<code>main.js</code>ファイルで行うことが一般的です。
+            </p>
+            <pre><code class="language-javascript">// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import GlobalComponent from './components/GlobalComponent.vue'
+
+const app = createApp(App)
+
+// グローバルコンポーネントの登録
+app.component('GlobalComponent', GlobalComponent)
+
+app.mount('#app')</code></pre>
+
+            <h4>ローカル登録（コンポーネントのインポート）</h4>
+            <p>
+                ローカル登録では、コンポーネントを使用する親コンポーネント内でインポートして使用します。これが推奨される方法です。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+// コンポーネントのインポート
+import ChildComponent from './components/ChildComponent.vue'
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;親コンポーネント&lt;/h2&gt;
+    &lt;ChildComponent /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                <code>&lt;script setup&gt;</code>を使用する場合、インポートしたコンポーネントは自動的に登録され、テンプレートで使用できます。通常の<code>&lt;script&gt;</code>ブロックを使用する場合は、<code>components</code>オプションで明示的に登録する必要があります。
+            </p>
+
+            <h3>4. Props：親から子へのデータ伝達</h3>
+            <p>
+                Propsは、親コンポーネントから子コンポーネントにデータを渡す方法です。子コンポーネントはPropsを通じて親からのデータを受け取り、表示や処理に使用できます。
+            </p>
+            
+
+
+
+
+
+
+
+
+
+
+            
+            <h4>Propsの定義（子コンポーネント）</h4>
+            <pre><code class="language-html">&lt;!-- UserCard.vue (子コンポーネント) --&gt;
+&lt;script setup&gt;
+// defineProps を使用してプロパティを定義
+const props = defineProps({
+  // 基本的な型チェック
+  username: String,
+  
+  // 詳細な定義（型、必須フラグ、デフォルト値）
+  email: {
+    type: String,
+    required: true
+  },
+  
+  // デフォルト値を持つプロパティ
+  role: {
+    type: String,
+    default: 'user'
+  },
+  
+  // 配列のデフォルト値（ファクトリ関数が必要）
+  tags: {
+    type: Array,
+    default: () => []
+  },
+  
+  // バリデーション関数
+  age: {
+    type: Number,
+    validator: (value) => value >= 0 && value < 120
+  }
+})
+
+// props はテンプレート内で直接使用可能
+// また、propsはreactiveなので、値の変更を監視できます
+</code></pre>
+
+            <h4>Propsの使用（親コンポーネント）</h4>
+            <pre><code class="language-html">&lt;!-- ParentComponent.vue (親コンポーネント) --&gt;
+&lt;script setup&gt;
+import { ref } from 'vue'
+import UserCard from './components/UserCard.vue'
+
+const currentUser = ref({
+  username: '山田太郎',
+  email: 'taro@example.com',
+  role: 'admin',
+  tags: ['開発', 'マネージャー'],
+  age: 32
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;ユーザー情報&lt;/h2&gt;
+    
+    &lt;!-- 静的な値を渡す --&gt;
+    &lt;UserCard
+      username="ゲスト"
+      email="guest@example.com"
+      :age="25"
+    /&gt;
+    
+    &lt;!-- 動的な値を渡す（v-bindを使用） --&gt;
+    &lt;UserCard
+      :username="currentUser.username"
+      :email="currentUser.email"
+      :role="currentUser.role"
+      :tags="currentUser.tags"
+      :age="currentUser.age"
+    /&gt;
+    
+    &lt;!-- スプレッド構文を使用して全てのプロパティを渡す --&gt;
+    &lt;UserCard v-bind="currentUser" /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>Propsの命名規則</h4>
+            <p>
+                JavaScriptではキャメルケース（camelCase）、HTMLではケバブケース（kebab-case）を使用するのが一般的です。Vue.jsは自動的に変換を行います。
+            </p>
+            <pre><code class="language-html">&lt;!-- 子コンポーネント内 --&gt;
+&lt;script setup&gt;
+defineProps({
+  postTitle: String,  // camelCase
+  authorName: String  // camelCase
+})
+&lt;/script&gt;
+
+&lt;!-- 親コンポーネント内 --&gt;
+&lt;template&gt;
+  &lt;BlogPost
+    post-title="Vue.jsの基本"  &lt;!-- kebab-case --&gt;
+    author-name="山田太郎"  &lt;!-- kebab-case --&gt;
+  /&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>Propsの型</h4>
+            <p>
+                Vueでは以下の型がサポートされています：
+            </p>
+            <ul>
+                <li><code>String</code></li>
+                <li><code>Number</code></li>
+                <li><code>Boolean</code></li>
+                <li><code>Array</code></li>
+                <li><code>Object</code></li>
+                <li><code>Date</code></li>
+                <li><code>Function</code></li>
+                <li><code>Symbol</code></li>
+            </ul>
+            <p>
+                また、カスタムクラスやコンストラクタ関数も型として使用できます。
+            </p>
+
+            <h4>Propsの単方向データフロー</h4>
+            <p>
+                Propsは常に親から子への単方向のデータフローに従います。親のプロパティが更新されると、子のプロパティも更新されますが、その逆は起こりません。これにより、子コンポーネントが誤って親の状態を変更することを防ぎます。
+            </p>
+            <p>
+                子コンポーネント内でプロパティを変更しようとすると、Vueは警告を出します。プロパティを基にローカルの状態を作成したい場合は、以下の方法があります：
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref, computed } from 'vue'
+
+const props = defineProps({
+  initialCount: {
+    type: Number,
+    default: 0
+  }
+})
+
+// 1. プロパティを基にローカルデータを作成
+const count = ref(props.initialCount)
+
+// 2. 計算プロパティを使用して変換
+const formattedCount = computed(() => `カウント: ${props.initialCount}`)
+&lt;/script&gt;</code></pre>
+
+            <h3>5. Emits：子から親へのイベント発信</h3>
+            <p>
+                Emitsは、子コンポーネントから親コンポーネントにイベントを発信する方法です。これにより、子は親に対して通知を行ったり、データを送信したりできます。
+            </p>
+
+            <h4>Emitsの定義（子コンポーネント）</h4>
+            <pre><code class="language-html">&lt;!-- SearchForm.vue (子コンポーネント) --&gt;
+&lt;script setup&gt;
+import { ref } from 'vue'
+
+// emitsの定義
+const emit = defineEmits([
+  'search',        // 基本的なイベント
+  'reset',         // 引数のないイベント
+  'update:query'   // v-modelのための更新イベント
+])
+
+// v-modelで使用する検索クエリ
+const searchQuery = ref('')
+
+// 検索イベントの発信
+function handleSearch() {
+  if (searchQuery.value.trim()) {
+    // イベント名と引数を指定して発信
+    emit('search', searchQuery.value)
+  }
+}
+
+// リセットイベントの発信
+function handleReset() {
+  searchQuery.value = ''
+  emit('reset')
+}
+
+// 入力値の変更時にv-model更新イベントを発信
+function updateQuery(event) {
+  const value = event.target.value
+  searchQuery.value = value
+  emit('update:query', value)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="search-form"&gt;
+    &lt;input
+      :value="searchQuery"
+      @input="updateQuery"
+      placeholder="検索ワードを入力..."
+      type="text"
+    &gt;
+    &lt;button @click="handleSearch"&gt;検索&lt;/button&gt;
+    &lt;button @click="handleReset"&gt;リセット&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>Emitsのバリデーション</h4>
+            <p>
+                Propsと同様に、Emitsもオブジェクト構文を使用してバリデーションを追加できます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+const emit = defineEmits({
+  // バリデーション関数
+  search: (query) => {
+    // 空の検索クエリを拒否
+    if (!query.trim()) {
+      console.warn('検索クエリが空です')
+      return false
+    }
+    return true
+  },
+  
+  // ペイロードがオブジェクトであることを確認
+  'filter-change': (filters) => {
+    return typeof filters === 'object' && filters !== null
+  }
+})
+&lt;/script&gt;</code></pre>
+
+            <h4>Emitsの使用（親コンポーネント）</h4>
+            <pre><code class="language-html">&lt;!-- ParentComponent.vue (親コンポーネント) --&gt;
+&lt;script setup&gt;
+import { ref } from 'vue'
+import SearchForm from './components/SearchForm.vue'
+
+const searchQuery = ref('')
+const searchResults = ref([])
+
+// 子コンポーネントからのイベントを処理
+function handleSearch(query) {
+  console.log(`検索ワード: ${query}`)
+  // 検索処理を実行...
+  searchResults.value = [`${query}に関する結果1`, `${query}に関する結果2`]
+}
+
+function handleReset() {
+  searchResults.value = []
+  console.log('検索をリセットしました')
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;検索アプリ&lt;/h2&gt;
+    
+    &lt;!-- イベントリスナーを設定 --&gt;
+    &lt;SearchForm
+      @search="handleSearch"
+      @reset="handleReset"
+      @update:query="searchQuery = $event"
+    /&gt;
+    
+    &lt;!-- または、v-modelを使用（@update:queryと:queryをまとめたもの） --&gt;
+    &lt;SearchForm
+      v-model:query="searchQuery"
+      @search="handleSearch"
+      @reset="handleReset"
+    /&gt;
+    
+    &lt;!-- 現在の検索クエリを表示 --&gt;
+    &lt;p v-if="searchQuery"&gt;現在の検索: {{ searchQuery }}&lt;/p&gt;
+    
+    &lt;!-- 検索結果を表示 --&gt;
+    &lt;div v-if="searchResults.length"&gt;
+      &lt;h3&gt;検索結果&lt;/h3&gt;
+      &lt;ul&gt;
+        &lt;li v-for="(result, index) in searchResults" :key="index"&gt;
+          {{ result }}
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>6. コンポーネントの通信パターン</h3>
+            <p>
+                Vue.jsでは、コンポーネント間の通信に以下のパターンが一般的に使用されます。
+            </p>
+
+            <h4>Props Down, Events Up（親子間通信）</h4>
+            <p>
+                最も基本的な通信パターンです。親から子にはpropsでデータを渡し、子から親にはイベント（emits）で通知します。
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'><rect x='150' y='20' width='100' height='60' fill='%2342b983' stroke='%23333' rx='5' /><text x='200' y='50' font-family='Arial' font-size='14' text-anchor='middle' fill='white'>親コンポーネント</text><rect x='150' y='120' width='100' height='60' fill='%23f9ce59' stroke='%23333' rx='5' /><text x='200' y='150' font-family='Arial' font-size='14' text-anchor='middle'>子コンポーネント</text><path d='M200 80 L200 120' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)' /><path d='M180 120 L180 80' stroke='%23333' stroke-width='2' stroke-dasharray='5,5' marker-end='url(%23arrowhead)' /><text x='215' y='100' font-family='Arial' font-size='12'>Props</text><text x='145' y='100' font-family='Arial' font-size='12'>Events</text><defs><marker id='arrowhead' markerWidth='10' markerHeight='7' refX='9' refY='3.5' orient='auto'><polygon points='0 0, 10 3.5, 0 7' /></marker></defs></svg>" alt="Props Down, Events Up パターン" width="400" height="200">
+            </div>
+
+            <h4>v-modelを使用した双方向バインディング</h4>
+            <p>
+                フォーム要素やカスタムコンポーネントで双方向バインディングを実現するためのパターンです。内部的には、プロパティとイベントの組み合わせです。
+            </p>
+            <pre><code class="language-html">&lt;!-- CustomInput.vue (子コンポーネント) --&gt;
+&lt;script setup&gt;
+// modelValueはv-modelのデフォルトプロパティ名
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue'])
+
+function updateValue(event) {
+  emit('update:modelValue', event.target.value)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;input
+    :value="modelValue"
+    @input="updateValue"
+    class="custom-input"
+  &gt;
+&lt;/template&gt;
+
+&lt;!-- 親コンポーネント --&gt;
+&lt;template&gt;
+  &lt;CustomInput v-model="searchText" /&gt;
+  
+  &lt;!-- 上記は以下と同等 --&gt;
+  &lt;CustomInput
+    :modelValue="searchText"
+    @update:modelValue="searchText = $event"
+  /&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>複数のv-modelバインディング</h4>
+            <p>
+                Vue 3では、1つのコンポーネントに対して複数のv-modelバインディングを設定できます。
+            </p>
+            <pre><code class="language-html">&lt;!-- UserForm.vue (子コンポーネント) --&gt;
+&lt;script setup&gt;
+const props = defineProps({
+  firstName: String,
+  lastName: String
+})
+
+const emit = defineEmits([
+  'update:firstName',
+  'update:lastName'
+])
+
+function updateFirstName(event) {
+  emit('update:firstName', event.target.value)
+}
+
+function updateLastName(event) {
+  emit('update:lastName', event.target.value)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;input :value="firstName" @input="updateFirstName" placeholder="名"&gt;
+    &lt;input :value="lastName" @input="updateLastName" placeholder="姓"&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- 親コンポーネント --&gt;
+&lt;template&gt;
+  &lt;UserForm
+    v-model:firstName="user.firstName"
+    v-model:lastName="user.lastName"
+  /&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>7. コンポーネントのライフサイクル</h3>
+            <p>
+                Vue.jsのコンポーネントには、作成から破棄までのライフサイクルがあります。各段階でフックを使用して、特定のタイミングでコードを実行できます。
+            </p>
+
+            <h4>ライフサイクルフック</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { onMounted, onUpdated, onUnmounted, onBeforeUnmount } from 'vue'
+
+// コンポーネントがマウントされた（DOMに追加された）後に実行
+onMounted(() => {
+  console.log('コンポーネントがマウントされました')
+  // 外部APIからデータを取得するなどの初期化処理
+})
+
+// コンポーネントが更新された後に実行
+onUpdated(() => {
+  console.log('コンポーネントが更新されました')
+})
+
+// コンポーネントが削除される直前に実行
+onBeforeUnmount(() => {
+  console.log('コンポーネントが間もなく削除されます')
+  // クリーンアップ処理の準備
+})
+
+// コンポーネントが削除された後に実行
+onUnmounted(() => {
+  console.log('コンポーネントが削除されました')
+  // イベントリスナーの削除やタイマーのクリアなど
+})
+&lt;/script&gt;</code></pre>
+
+            <h4>その他のライフサイクルフック</h4>
+            <ul>
+                <li><code>onBeforeMount</code>: マウント開始前</li>
+                <li><code>onBeforeUpdate</code>: 再レンダリング前</li>
+                <li><code>onErrorCaptured</code>: 子孫コンポーネントからのエラーをキャプチャ</li>
+                <li><code>onRenderTracked</code>: リアクティブ依存関係が初めて追跡されたとき（開発モードのみ）</li>
+                <li><code>onRenderTriggered</code>: 再レンダリングがトリガーされたとき（開発モードのみ）</li>
+                <li><code>onActivated</code>: <code>&lt;keep-alive&gt;</code>で囲まれたコンポーネントがアクティブになったとき</li>
+                <li><code>onDeactivated</code>: <code>&lt;keep-alive&gt;</code>で囲まれたコンポーネントが非アクティブになったとき</li>
+            </ul>
+
+            <h3>8. スロット（Slots）：コンポーネントへのコンテンツ配信</h3>
+            <p>
+                スロットを使用すると、親コンポーネントから子コンポーネントへHTMLコンテンツを渡すことができます。これにより、柔軟なコンポーネント設計が可能になります。
+            </p>
+
+            <h4>基本的なスロット</h4>
+            <pre><code class="language-html">&lt;!-- BaseCard.vue (子コンポーネント) --&gt;
+&lt;template&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;
+      &lt;h3&gt;{{ title }}&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;div class="card-body"&gt;
+      &lt;!-- ここにスロットを配置 --&gt;
+      &lt;slot&gt;デフォルトコンテンツ&lt;/slot&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+defineProps({
+  title: {
+    type: String,
+    default: 'カード'
+  }
+})
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: #f5f5f5;
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.card-body {
+  padding: 15px;
+}
+&lt;/style&gt;
+
+&lt;!-- 親コンポーネント --&gt;
+&lt;template&gt;
+  &lt;BaseCard title="プロフィール"&gt;
+    &lt;!-- このコンテンツがスロットに挿入される --&gt;
+    &lt;p&gt;名前: 山田太郎&lt;/p&gt;
+    &lt;p&gt;職業: プログラマー&lt;/p&gt;
+  &lt;/BaseCard&gt;
+  
+  &lt;BaseCard title="通知"&gt;
+    &lt;p&gt;新しいメッセージが3件あります。&lt;/p&gt;
+  &lt;/BaseCard&gt;
+  
+  &lt;!-- デフォルトコンテンツが表示される --&gt;
+  &lt;BaseCard title="情報なし" /&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>名前付きスロット</h4>
+            <p>
+                複数のスロットを使用したい場合は、名前付きスロットを使用します。
+            </p>
+            <pre><code class="language-html">&lt;!-- BaseLayout.vue (子コンポーネント) --&gt;
+&lt;template&gt;
+  &lt;div class="container"&gt;
+    &lt;header class="header"&gt;
+      &lt;slot name="header"&gt;デフォルトヘッダー&lt;/slot&gt;
+    &lt;/header&gt;
+    
+    &lt;main class="content"&gt;
+      &lt;!-- デフォルトスロット（name="default"と同じ） --&gt;
+      &lt;slot&gt;デフォルトコンテンツ&lt;/slot&gt;
+    &lt;/main&gt;
+    
+    &lt;footer class="footer"&gt;
+      &lt;slot name="footer"&gt;デフォルトフッター&lt;/slot&gt;
+    &lt;/footer&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- 親コンポーネント --&gt;
+&lt;template&gt;
+  &lt;BaseLayout&gt;
+    &lt;!-- v-slot:header または #header --&gt;
+    &lt;template #header&gt;
+      &lt;h1&gt;ウェブサイトのタイトル&lt;/h1&gt;
+      &lt;nav&gt;
+        &lt;a href="#"&gt;ホーム&lt;/a&gt;
+        &lt;a href="#"&gt;概要&lt;/a&gt;
+        &lt;a href="#"&gt;お問い合わせ&lt;/a&gt;
+      &lt;/nav&gt;
+    &lt;/template&gt;
+    
+    &lt;!-- デフォルトスロット（v-slot:default） --&gt;
+    &lt;p&gt;メインコンテンツがここに入ります。&lt;/p&gt;
+    
+    &lt;!-- v-slot:footer または #footer --&gt;
+    &lt;template #footer&gt;
+      &lt;p&gt;&copy; 2023 私のウェブサイト&lt;/p&gt;
+    &lt;/template&gt;
+  &lt;/BaseLayout&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>スコープ付きスロット</h4>
+            <p>
+                子コンポーネントのデータを親コンポーネントのスロットコンテンツで使用したい場合は、スコープ付きスロットを使用します。
+            </p>
+            <pre><code class="language-html">&lt;!-- ItemList.vue (子コンポーネント) --&gt;
+&lt;script setup&gt;
+const props = defineProps({
+  items: {
+    type: Array,
+    required: true
+  }
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;ul class="item-list"&gt;
+    &lt;li v-for="(item, index) in items" :key="index"&gt;
+      &lt;!-- item と index を親コンポーネントに渡す --&gt;
+      &lt;slot :item="item" :index="index"&gt;
+        &lt;!-- デフォルト表示 --&gt;
+        {{ item.text }}
+      &lt;/slot&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/template&gt;
+
+&lt;!-- 親コンポーネント --&gt;
+&lt;script setup&gt;
+import { ref } from 'vue'
+
+const items = ref([
+  { id: 1, text: '項目1', status: 'active' },
+  { id: 2, text: '項目2', status: 'completed' },
+  { id: 3, text: '項目3', status: 'active' }
+])
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;ItemList :items="items"&gt;
+    &lt;!-- v-slot="slotProps" でスロットのプロパティを受け取る --&gt;
+    &lt;template v-slot="{ item, index }"&gt;
+      &lt;div :class="{ completed: item.status === 'completed' }"&gt;
+        {{ index + 1 }}. {{ item.text }}
+        &lt;span v-if="item.status === 'completed'"&gt;(完了)&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+  &lt;/ItemList&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>9. 再利用可能なコンポーネントの設計</h3>
+            <p>
+                効果的な再利用可能なコンポーネントを設計するためのベストプラクティスを紹介します。
+            </p>
+
+            <h4>単一責任の原則</h4>
+            <p>
+                コンポーネントは1つの責任を持つべきです。複数の役割を持つコンポーネントは、より小さなコンポーネントに分割することを検討しましょう。
+            </p>
+
+            <h4>明確なインターフェース</h4>
+            <p>
+                コンポーネントは明確なインターフェースを持つべきです。必要なpropsとemitsを明示的に定義し、適切な検証とドキュメンテーションを提供しましょう。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+// 明確なインターフェースの例
+const props = defineProps({
+  // 必要なプロパティを明確に定義
+  label: {
+    type: String,
+    required: true,
+    default: '送信'
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  variant: {
+    type: String,
+    default: 'primary',
+    validator: (value) => ['primary', 'secondary', 'danger'].includes(value)
+  }
+})
+
+// 発信するイベントを明確に定義
+const emit = defineEmits({
+  click: null,
+  'focus': null
+})
+&lt;/script&gt;</code></pre>
+
+            <h4>コンポーネントの構成</h4>
+            <p>
+                小さな単一目的のコンポーネントを組み合わせて、より複雑なUIを構築しましょう。
+            </p>
+            <pre><code class="language-html">&lt;!-- 小さなコンポーネントの組み合わせ例 --&gt;
+&lt;template&gt;
+  &lt;Card&gt;
+    &lt;CardHeader&gt;
+      &lt;h2&gt;{{ title }}&lt;/h2&gt;
+    &lt;/CardHeader&gt;
+    
+    &lt;CardBody&gt;
+      &lt;TextField
+        v-model="username"
+        label="ユーザー名"
+        required
+      /&gt;
+      &lt;PasswordField
+        v-model="password"
+        label="パスワード"
+        required
+      /&gt;
+    &lt;/CardBody&gt;
+    
+    &lt;CardFooter&gt;
+      &lt;Button
+        variant="secondary"
+        @click="cancel"
+      &gt;
+        キャンセル
+      &lt;/Button&gt;
+      &lt;Button
+        variant="primary"
+        :loading="isSubmitting"
+        @click="submit"
+      &gt;
+        送信
+      &lt;/Button&gt;
+    &lt;/CardFooter&gt;
+  &lt;/Card&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>変更の容易性</h4>
+            <p>
+                再利用可能なコンポーネントは、さまざまな状況に対応できるよう、十分に柔軟であるべきです。propsやスロットを使用して、外観や振る舞いをカスタマイズできるようにしましょう。
+            </p>
+
+            <h4>プレゼンテーションとロジックの分離</h4>
+            <p>
+                コンポーネントは、プレゼンテーション（見た目）とロジック（振る舞い）を明確に分離すべきです。これにより、保守性とテスト容易性が向上します。
+            </p>
+            <pre><code class="language-html">&lt;!-- コンポーザブル関数でロジックを分離する例 --&gt;
+&lt;script setup&gt;
+import { ref } from 'vue'
+import { useForm } from './composables/useForm'
+
+// ロジックをコンポーザブル関数に抽出
+const { formData, errors, validate, handleSubmit } = useForm({
+  initialData: {
+    username: '',
+    password: ''
+  },
+  validationRules: {
+    username: (value) => !!value || 'ユーザー名は必須です',
+    password: (value) => value.length >= 6 || 'パスワードは6文字以上必要です'
+  },
+  onSubmit: async (data) => {
+    // フォーム送信処理
+    console.log('送信データ:', data)
+  }
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- プレゼンテーション部分 --&gt;
+  &lt;form @submit.prevent="handleSubmit"&gt;
+    &lt;div class="form-group"&gt;
+      &lt;label for="username"&gt;ユーザー名&lt;/label&gt;
+      &lt;input
+        id="username"
+        v-model="formData.username"
+        type="text"
+        @blur="validate('username')"
+      &gt;
+      &lt;p v-if="errors.username" class="error"&gt;{{ errors.username }}&lt;/p&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="password"&gt;パスワード&lt;/label&gt;
+      &lt;input
+        id="password"
+        v-model="formData.password"
+        type="password"
+        @blur="validate('password')"
+      &gt;
+      &lt;p v-if="errors.password" class="error"&gt;{{ errors.password }}&lt;/p&gt;
+    &lt;/div&gt;
+    
+    &lt;button type="submit"&gt;送信&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>10. 実践的な例：再利用可能なフォームコンポーネント</h3>
+            <p>
+                これまで学んだ概念を組み合わせて、再利用可能なフォームコンポーネントを作成してみましょう。
+            </p>
+            
+            <h4>BaseInput.vue</h4>
+            <pre><code class="language-html">&lt;!-- BaseInput.vue --&gt;
+&lt;script setup&gt;
+// プロパティの定義
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: ''
+  },
+  label: {
+    type: String,
+    default: ''
+  },
+  placeholder: {
+    type: String,
+    default: ''
+  },
+  type: {
+    type: String,
+    default: 'text',
+    validator: (value) => [
+      'text', 'password', 'email', 'number', 'tel', 'url'
+    ].includes(value)
+  },
+  required: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  error: {
+    type: String,
+    default: ''
+  }
+})
+
+// イベントの定義
+const emit = defineEmits([
+  'update:modelValue',
+  'blur',
+  'focus',
+  'input'
+])
+
+// 入力値の更新
+function updateValue(event) {
+  emit('update:modelValue', event.target.value)
+}
+
+// ブラーイベントの処理
+function handleBlur(event) {
+  emit('blur', event)
+}
+
+// フォーカスイベントの処理
+function handleFocus(event) {
+  emit('focus', event)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="form-control" :class="{ 'has-error': error }"&gt;
+    &lt;label v-if="label" :for="label"&gt;
+      {{ label }}
+      &lt;span v-if="required" class="required"&gt;*&lt;/span&gt;
+    &lt;/label&gt;
+    
+    &lt;input
+      :id="label"
+      :value="modelValue"
+      @input="updateValue"
+      @blur="handleBlur"
+      @focus="handleFocus"
+      :type="type"
+      :placeholder="placeholder"
+      :required="required"
+      :disabled="disabled"
+      class="input"
+    &gt;
+    
+    &lt;p v-if="error" class="error-message"&gt;{{ error }}&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.form-control {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.required {
+  color: #ff4c4c;
+  margin-left: 0.25rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.has-error .input {
+  border-color: #ff4c4c;
+}
+
+.error-message {
+  margin-top: 0.25rem;
+  color: #ff4c4c;
+  font-size: 0.875rem;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>BaseSelect.vue</h4>
+            <pre><code class="language-html">&lt;!-- BaseSelect.vue --&gt;
+&lt;script setup&gt;
+// プロパティの定義
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: ''
+  },
+  options: {
+    type: Array,
+    required: true
+  },
+  label: {
+    type: String,
+    default: ''
+  },
+  placeholder: {
+    type: String,
+    default: '選択してください'
+  },
+  required: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  error: {
+    type: String,
+    default: ''
+  },
+  valueKey: {
+    type: String,
+    default: 'value'
+  },
+  labelKey: {
+    type: String,
+    default: 'label'
+  }
+})
+
+// イベントの定義
+const emit = defineEmits([
+  'update:modelValue',
+  'change'
+])
+
+// 値の更新
+function updateValue(event) {
+  emit('update:modelValue', event.target.value)
+  emit('change', event.target.value)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="form-control" :class="{ 'has-error': error }"&gt;
+    &lt;label v-if="label" :for="label"&gt;
+      {{ label }}
+      &lt;span v-if="required" class="required"&gt;*&lt;/span&gt;
+    &lt;/label&gt;
+    
+    &lt;select
+      :id="label"
+      :value="modelValue"
+      @change="updateValue"
+      :required="required"
+      :disabled="disabled"
+      class="select"
+    &gt;
+      &lt;option value="" disabled&gt;{{ placeholder }}&lt;/option&gt;
+      
+      &lt;!-- オプションが単純な配列の場合 --&gt;
+      &lt;option
+        v-for="option in options"
+        :key="typeof option === 'object' ? option[valueKey] : option"
+        :value="typeof option === 'object' ? option[valueKey] : option"
+      &gt;
+        {{ typeof option === 'object' ? option[labelKey] : option }}
+      &lt;/option&gt;
+    &lt;/select&gt;
+    
+    &lt;p v-if="error" class="error-message"&gt;{{ error }}&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.form-control {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.required {
+  color: #ff4c4c;
+  margin-left: 0.25rem;
+}
+
+.select {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.has-error .select {
+  border-color: #ff4c4c;
+}
+
+.error-message {
+  margin-top: 0.25rem;
+  color: #ff4c4c;
+  font-size: 0.875rem;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>BaseForm.vue</h4>
+            <pre><code class="language-html">&lt;!-- BaseForm.vue --&gt;
+&lt;script setup&gt;
+// イベントの定義
+const emit = defineEmits([
+  'submit',
+  'reset'
+])
+
+// フォーム送信処理
+function handleSubmit(event) {
+  emit('submit', event)
+}
+
+// リセット処理
+function handleReset(event) {
+  emit('reset', event)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;form
+    @submit.prevent="handleSubmit"
+    @reset.prevent="handleReset"
+    class="form"
+  &gt;
+    &lt;!-- スロットでフォーム要素を受け取る --&gt;
+    &lt;slot&gt;&lt;/slot&gt;
+    
+    &lt;!-- フッタースロット --&gt;
+    &lt;div class="form-footer"&gt;
+      &lt;slot name="footer"&gt;
+        &lt;button type="reset" class="btn btn-secondary"&gt;リセット&lt;/button&gt;
+        &lt;button type="submit" class="btn btn-primary"&gt;送信&lt;/button&gt;
+      &lt;/slot&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.form {
+  max-width: 100%;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #42b983;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #f5f5f5;
+  color: #333;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>フォームコンポーネントの使用例</h4>
+            <pre><code class="language-html">&lt;!-- UserForm.vue (実装例) --&gt;
+&lt;script setup&gt;
+import { ref, reactive } from 'vue'
+import BaseForm from './components/BaseForm.vue'
+import BaseInput from './components/BaseInput.vue'
+import BaseSelect from './components/BaseSelect.vue'
+
+// フォームデータ
+const formData = reactive({
+  name: '',
+  email: '',
+  role: '',
+  password: ''
+})
+
+// バリデーションエラー
+const errors = reactive({
+  name: '',
+  email: '',
+  role: '',
+  password: ''
+})
+
+// 役割オプション
+const roleOptions = [
+  { value: 'user', label: '一般ユーザー' },
+  { value: 'editor', label: '編集者' },
+  { value: 'admin', label: '管理者' }
+]
+
+// 送信中フラグ
+const isSubmitting = ref(false)
+
+// バリデーション関数
+function validate() {
+  let isValid = true
+  
+  // 名前の検証
+  if (!formData.name.trim()) {
+    errors.name = '名前を入力してください'
+    isValid = false
+  } else {
+    errors.name = ''
+  }
+  
+  // メールアドレスの検証
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!formData.email.trim()) {
+    errors.email = 'メールアドレスを入力してください'
+    isValid = false
+  } else if (!emailRegex.test(formData.email)) {
+    errors.email = '有効なメールアドレスを入力してください'
+    isValid = false
+  } else {
+    errors.email = ''
+  }
+  
+  // 役割の検証
+  if (!formData.role) {
+    errors.role = '役割を選択してください'
+    isValid = false
+  } else {
+    errors.role = ''
+  }
+  
+  // パスワードの検証
+  if (!formData.password) {
+    errors.password = 'パスワードを入力してください'
+    isValid = false
+  } else if (formData.password.length < 6) {
+    errors.password = 'パスワードは6文字以上にしてください'
+    isValid = false
+  } else {
+    errors.password = ''
+  }
+  
+  return isValid
+}
+
+// フォーム送信
+async function handleSubmit() {
+  if (!validate()) {
+    return
+  }
+  
+  isSubmitting.value = true
+  
+  try {
+    // APIリクエストをシミュレート
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    console.log('送信データ:', formData)
+    alert('ユーザーが正常に登録されました！')
+    
+    // フォームをリセット
+    Object.keys(formData).forEach(key => {
+      formData[key] = ''
+    })
+  } catch (error) {
+    console.error('エラー:', error)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// フォームリセット
+function handleReset() {
+  // フォームデータをリセット
+  Object.keys(formData).forEach(key => {
+    formData[key] = ''
+  })
+  
+  // エラーをリセット
+  Object.keys(errors).forEach(key => {
+    errors[key] = ''
+  })
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="user-form-container"&gt;
+    &lt;h2&gt;ユーザー登録&lt;/h2&gt;
+    
+    &lt;BaseForm
+      @submit="handleSubmit"
+      @reset="handleReset"
+    &gt;
+      &lt;BaseInput
+        v-model="formData.name"
+        label="名前"
+        placeholder="山田太郎"
+        required
+        :error="errors.name"
+      /&gt;
+      
+      &lt;BaseInput
+        v-model="formData.email"
+        label="メールアドレス"
+        type="email"
+        placeholder="example@example.com"
+        required
+        :error="errors.email"
+      /&gt;
+      
+      &lt;BaseSelect
+        v-model="formData.role"
+        :options="roleOptions"
+        label="役割"
+        required
+        :error="errors.role"
+      /&gt;
+      
+      &lt;BaseInput
+        v-model="formData.password"
+        label="パスワード"
+        type="password"
+        required
+        :error="errors.password"
+      /&gt;
+      
+      &lt;template #footer&gt;
+        &lt;button type="reset" class="btn btn-secondary"&gt;
+          クリア
+        &lt;/button&gt;
+        &lt;button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="isSubmitting"
+        &gt;
+          {{ isSubmitting ? '送信中...' : '登録' }}
+        &lt;/button&gt;
+      &lt;/template&gt;
+    &lt;/BaseForm&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.user-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #42b983;
+  color: white;
+}
+
+.btn-primary:disabled {
+  background-color: #8ece8e;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #f5f5f5;
+  color: #333;
+}
+&lt;/style&gt;</code></pre>
+
+            <h3>11. まとめ</h3>
+            <p>
+                本章では、Vue.jsのコンポーネントシステムについて学びました。単一ファイルコンポーネント（SFC）の構造と利点、Propsを使用したデータの受け渡し、Emitsを使用したイベントの発信方法について理解を深めました。また、スロットを使用したコンテンツの配信、コンポーネントのライフサイクル、そして再利用可能なコンポーネントの設計についても学びました。
+            </p>
+            <p>
+                これらの概念を組み合わせることで、保守性が高く、再利用可能なコンポーネントを作成できます。実践的な例として、フォームコンポーネントを実装し、実際のアプリケーション開発でどのようにコンポーネントを組み合わせるかを学びました。
+            </p>
+            <p>
+                次の章では、Vue Routerを使用した画面遷移について学びます。
+            </p>
+        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

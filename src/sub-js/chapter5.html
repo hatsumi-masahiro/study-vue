@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第5章: スプレッド構文とレストパラメータ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>第5章: スプレッド構文とレストパラメータ</h1>
+  </div>
+</header>
+<div class="container">
+    <section id="chapter5">
+        <h2 id="chapter5" class="chapter-heading">第5章: スプレッド構文とレストパラメータ</h2>
+
+        <h3>概要</h3>
+        <p>スプレッド構文（<code>...</code>）は、配列やオブジェクトの要素を展開して別の配列・オブジェクトを作成したり、関数呼び出し時に配列を個々の引数に展開したりする機能です。逆に、関数定義の引数側で<code>...</code>を使うとレストパラメータとなり、可変長の引数を配列として受け取ることができます。スプレッドとレストは見た目は同じ<code>...</code>ですが、使う場所が異なりそれぞれ<strong>展開(spread)</strong>と<strong>収集(rest)</strong>の役割を果たします。</p>
+        <p>スプレッド構文により、複数の配列を結合したりオブジェクトをマージしたりする処理がシンプルに記述できます。レストパラメータを使うと、関数に渡された複数個の引数をまとめて扱うことが可能になります。</p>
+
+        <h3>コードと解説</h3>
+        <p>JavaScriptでのスプレッド構文とレストパラメータの例です。まず配列やオブジェクトでのスプレッドの使い方を示し、その後関数のレストパラメータの例を示します。</p>
+
+        <pre><code class="language-javascript">// 配列のスプレッド例: 配列の結合とコピー
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2];
+console.log(combined); // [1, 2, 3, 4, 5, 6]
+
+// スプレッドを使った配列のコピー（新しい配列を生成）
+const copy = [...arr1];
+copy.push(99);
+console.log(arr1);  // [1, 2, 3] （元の配列は変更なし）
+console.log(copy);  // [1, 2, 3, 99] （コピー側のみ変更）
+
+// オブジェクトのスプレッド例: オブジェクトのマージ
+const obj1 = {a: 1, b: 2};
+const obj2 = {b: 5, c: 6};
+const merged = {...obj1, ...obj2};
+console.log(merged); // { a: 1, b: 5, c: 6 }
+// ※ プロパティbはobj2側で上書き
+
+// レストパラメータ例: 可変長引数を合計する関数
+function sumAll(...numbers) {
+  return numbers.reduce((sum, n) => sum + n, 0);
+}
+console.log(sumAll(1, 2, 3, 4)); // 10
+console.log(sumAll(5, 10));      // 15</code></pre>
+
+        <p><strong>解説:</strong> スプレッド構文<code>...</code>を配列に適用すると、配列内の要素を順に展開します。<code>[...arr1, ...arr2]</code>は配列<code>arr1</code>と<code>arr2</code>の要素をすべて並べた新しい配列を生成します。これにより、<code>concat</code>メソッドを使わず直感的に配列結合ができます。また<code>const copy = [...arr]</code>のように書けば配列のコピー（シャローコピー）が簡単に作れます。</p>
+        <p>オブジェクトに対する<code>{...obj1, ...obj2}</code>も同様に、<code>obj1</code>と<code>obj2</code>のプロパティを併せ持つ新しいオブジェクトを生成します。重複するプロパティ（上記例では<code>b</code>）がある場合、後ろに記述したオブジェクトの値で上書きされます。これにより、オブジェクトのマージや特定プロパティの上書きコピーといった操作が容易に実現できます。</p>
+        <p>関数定義での<code>...numbers</code>はレストパラメータを表し、呼び出し時に渡された任意個数の引数が配列<code>numbers</code>にまとまります。上記<code>sumAll</code>関数は、この<code>numbers</code>配列の全要素を合計して返しています。<code>sumAll(1,2,3,4)</code>のように呼び出すと、<code>numbers</code>は<code>[1,2,3,4]</code>となり、その合計<code>10</code>を返します。レストパラメータにより、関数側では配列処理の形で実装を書けるため、可変個の引数を扱うロジックがシンプルになります。</p>
+    </section>
+  <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

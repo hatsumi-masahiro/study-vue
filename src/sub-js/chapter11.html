@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第11章: Vitestによるテストの基本</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第11章: Vitestによるテストの基本</h1>
+        </div>
+    </header>
+    <div class="container">
+
+        <section id="chapter11">
+            <h2 id="chapter11" class="chapter-heading">第11章: Vitestによるテストの基本</h2>
+
+            <h3>概要</h3>
+            <p>ソフトウェアの品質を保つためには単体テスト(unit
+                test)が重要です。JavaScript/TypeScriptでのテストフレームワークとしてはJestなどが有名ですが、ここではViteエコシステム向けに開発された<strong>Vitest</strong>を使用します。Vitestは高速なビルドツールであるViteに統合された次世代のテストフレームワークで、Jestと互換性のあるAPIを提供します。そのため、Jestで使われる<code>describe</code>や<code>test/it</code>、<code>expect</code>といった関数を利用してテストを書くことができます。
+            </p>
+            <p>Vitestを使うことで、VueやReactの開発環境(Viteベース)とシームレスに統合されたテスト実行が可能です。本章では、Vitestをプロジェクトに導入し、ごく基本的なテストを書いて実行する手順を学びます。
+            </p>
+            <p>Vitestの導入は<code>npm install -D vitest</code>で行い、<code>package.json</code>の<code>"scripts"</code>に<code>"test": "vitest"</code>を追加しておくと<code>npm run test</code>でテストを実行できます。テストファイル名は通常<code>*.test.js</code>や<code>*.spec.ts</code>といった形式にし、ソースコードと分けて配置します。
+            </p>
+
+            <h3>コードと解説</h3>
+            <p>それでは、簡単な関数とそのテストを書いてみましょう。例として、二つの数値の和を返す関数<code>sum</code>を作成し、それが正しく動作することをテストします。</p>
+
+            <pre><code class="language-javascript">/*** sum.js ***/
+export function sum(a, b) {
+    return a + b;
+}
+
+/*** sum.test.js ***/
+import { test, expect } from 'vitest';
+import { sum } from './sum.js';
+
+test('1 + 2 は 3 を返す', () => {
+    expect(sum(1, 2)).toBe(3);
+});</code></pre>
+
+            <p><strong>解説:</strong> <code>sum.js</code> (および <code>sum.ts</code>)
+                では、単純に二つの引数を加算して返す関数<code>sum</code>を定義・エクスポートしています。対応するテストファイルでは<code>import</code>により<code>sum</code>関数を読み込み、<code>test</code>関数を使ってテストケースを定義しています。<code>test</code>関数の第一引数はテストの説明（文字列）、第二引数はテスト本体の関数です。
+            </p>
+            <p>本体内では<code>expect(sum(1, 2)).toBe(3)</code>と書いており、<code>sum(1,2)</code>の結果が<code>3</code>であることをアサート（断言）しています。<code>toBe</code>は厳密な等価比較（<code>===</code>相当）で期待値と比較するマッチャーです。他にも<code>toEqual</code>（オブジェクトの内容比較）や<code>toContain</code>（配列や文字列に要素が含まれるか）など様々なマッチャー関数があります。
+            </p>
+            <p>Vitestを実行すると、このテストが走り、もし期待通り<code>sum(1,2)</code>が<code>3</code>を返せばテストはパスします。仮に実装や期待値が異なればテストは失敗し、どの部分が想定と違ったか報告されます。上記のテストケース程度であれば一瞬で実行が完了し、Vitestは結果をターミナル上に以下のように出力します：
+            </p>
+
+            <div class="note">
+                <pre><code class="language-text">✓ sum.test.js (1)
+✓ 1 + 2 は 3 を返す
+
+Test Files  1 passed (1)
+Tests  1 passed (1)
+Start at  10:00:00
+Duration  312ms</code></pre>
+            </div>
+
+            <p>このように、テストが成功するとグリーン（✓）で表示され、失敗すると詳細なエラーメッセージとともに赤色で表示されます。VitestはJestと互換性が高いため、既存のJest向け知識（<code>describe</code>ブロックでテストをグループ化する、<code>beforeEach</code>で事前処理を行う等）もそのまま活かせます。
+            </p>
+            <p>テストコード自体もTypeScriptで記述できるため、開発中に型のミスがあればテストを書く段階で検出できます。VitestはViteのプロジェクトに組み込みやすく、ホットリロード的にテストを実行し直す機能も提供されています。まずは簡単な関数のテストから始めて、徐々にコンポーネント単位のテストやモックの使い方などに広げていきましょう。
+            </p>
+        </section>
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+        </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

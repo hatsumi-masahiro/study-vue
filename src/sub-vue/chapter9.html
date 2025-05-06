@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第9章: Pinia で状態管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>第9章: Pinia で状態管理</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter9">
+            <h2 id="chapter9" class="chapter-heading">第9章: Pinia で状態管理</h2>
+
+            <h3>概要</h3>
+            <p>
+                本章では、Vue.jsアプリケーションにおける状態管理の概念と、Piniaを使用した効果的な状態管理の方法について学びます。状態管理の必要性、Piniaの基本的な使い方、ストアの設計パターン、そしてVue.jsのリアクティブシステムとの統合について理解を深めます。
+            </p>
+            
+            <h3>1. 状態管理の概念</h3>
+            <p>
+                まず、アプリケーションの状態管理とは何か、なぜ必要なのかを理解しましょう。
+            </p>
+            
+            <h4>アプリケーションの状態とは</h4>
+            <p>
+                アプリケーションの「状態」とは、アプリケーションが動作するために必要なデータを指します。例えば、ユーザー情報、製品リスト、現在の表示モード、フォームの入力値などがアプリケーションの状態に含まれます。
+            </p>
+
+            <h4>状態管理の問題</h4>
+            <p>
+                小規模なアプリケーションでは、コンポーネント内でローカルの状態（<code>ref</code>や<code>reactive</code>）を使用して管理することができます。しかし、アプリケーションが大きくなるにつれて、以下のような問題が発生します：
+            </p>
+            <ul>
+                <li><strong>コンポーネント間の状態共有</strong>：異なるコンポーネント間で状態を共有する必要がある</li>
+                <li><strong>状態の受け渡し</strong>：深くネストされたコンポーネントに状態を渡す必要がある（Props Drilling問題）</li>
+                <li><strong>状態の一貫性</strong>：アプリケーション全体で一貫した状態を維持する必要がある</li>
+                <li><strong>状態変更の追跡</strong>：いつ、どこで、なぜ状態が変更されたかを追跡する必要がある</li>
+            </ul>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'><rect x='0' y='0' width='600' height='400' fill='white'/><rect x='100' y='50' width='400' height='50' rx='5' fill='%2342b983' stroke='%23333'/><text x='300' y='80' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>コンポーネントA</text><rect x='100' y='150' width='175' height='50' rx='5' fill='%2342b983' stroke='%23333'/><text x='187.5' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>コンポーネントB</text><rect x='325' y='150' width='175' height='50' rx='5' fill='%2342b983' stroke='%23333'/><text x='412.5' y='180' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>コンポーネントC</text><rect x='100' y='250' width='175' height='50' rx='5' fill='%2342b983' stroke='%23333'/><text x='187.5' y='280' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>コンポーネントD</text><rect x='325' y='250' width='175' height='50' rx='5' fill='%2342b983' stroke='%23333'/><text x='412.5' y='280' font-family='Arial' font-size='16' text-anchor='middle' fill='white'>コンポーネントE</text><path d='M300 100 L187.5 150' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><path d='M300 100 L412.5 150' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><path d='M187.5 200 L187.5 250' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><path d='M412.5 200 L412.5 250' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><path d='M187.5 150 L412.5 150' stroke='%23333' stroke-width='2' stroke-dasharray='5,5'/><path d='M187.5 250 L412.5 250' stroke='%23333' stroke-width='2' stroke-dasharray='5,5'/><text x='300' y='140' font-family='Arial' font-size='14' fill='%23333'>Props Drilling</text><text x='300' y='325' font-family='Arial' font-size='14' fill='%23333'>コンポーネント間の状態共有が困難</text><defs><marker id='arrowhead' markerWidth='10' markerHeight='7' refX='9' refY='3.5' orient='auto'><polygon points='0 0, 10 3.5, 0 7' /></marker></defs></svg>" alt="Props Drilling問題の図" width="600" height="400">
+            </div>
+
+            <h4>状態管理パターン</h4>
+            <p>
+                これらの問題を解決するために、「状態管理パターン」が生まれました。状態管理パターンは、以下の要素で構成されます：
+            </p>
+            <ul>
+                <li><strong>状態（State）</strong>：アプリケーションのデータを保持するもの</li>
+                <li><strong>ビュー（View）</strong>：状態を表示するUI</li>
+                <li><strong>アクション（Actions）</strong>：ユーザー入力などに応じて状態を変更する処理</li>
+            </ul>
+            <p>
+                状態管理パターンでは、状態の変更は一方向のデータフローに従います：ビューはアクションをトリガーし、アクションは状態を変更し、状態の変更がビューに反映されます。
+            </p>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='300' viewBox='0 0 500 300'><rect x='0' y='0' width='500' height='300' fill='white'/><ellipse cx='250' cy='75' rx='100' ry='50' fill='%23f9ce59' stroke='%23333'/><text x='250' y='80' font-family='Arial' font-size='16' text-anchor='middle' fill='black'>状態（State）</text><ellipse cx='100' cy='200' rx='80' ry='50' fill='%2342b983' stroke='%23333'/><text x='100' y='205' font-family='Arial' font-size='16' text-anchor='middle' fill='black'>ビュー（View）</text><ellipse cx='400' cy='200' rx='80' ry='50' fill='%234b7cb0' stroke='%23333'/><text x='400' y='205' font-family='Arial' font-size='16' text-anchor='middle' fill='black'>アクション（Actions）</text><path d='M175 95 L120 160' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><text x='125' y='130' font-family='Arial' font-size='12' fill='%23333'>レンダリング</text><path d='M150 200 L320 200' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><text x='235' y='190' font-family='Arial' font-size='12' fill='%23333'>トリガー</text><path d='M350 170 L280 95' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><text x='330' y='130' font-family='Arial' font-size='12' fill='%23333'>変更</text><defs><marker id='arrowhead' markerWidth='10' markerHeight='7' refX='9' refY='3.5' orient='auto'><polygon points='0 0, 10 3.5, 0 7' /></marker></defs></svg>" alt="状態管理パターンの図" width="500" height="300">
+            </div>
+
+            <h4>状態管理ライブラリの必要性</h4>
+            <p>
+                状態管理パターンを実装するために、専用のライブラリを使用することが一般的です。Vue.jsエコシステムでは、以下のような状態管理ライブラリがあります：
+            </p>
+            <ul>
+                <li><strong>Vuex</strong>：Vue 2向けの公式状態管理ライブラリ</li>
+                <li><strong>Pinia</strong>：Vue 3向けの新しい状態管理ライブラリ（現在の公式推奨）</li>
+            </ul>
+
+            <h3>2. Piniaの登場と特徴</h3>
+            <p>
+                Piniaは、Vue 3のために設計された次世代の状態管理ライブラリです。当初はVuexの代替として開発されましたが、現在はVue.jsの公式状態管理ライブラリとして採用されています。
+            </p>
+            
+            <h4>なぜPiniaが登場したのか</h4>
+            <p>
+                Vuexには以下のような問題点がありました：
+            </p>
+            <ul>
+                <li><strong>TypeScriptサポートの制限</strong>：Vuexは型推論が弱く、TypeScriptとの相性があまり良くありませんでした</li>
+                <li><strong>ボイラープレートコードの多さ</strong>：MutationsとActionsの区別など、冗長なコードが必要でした</li>
+                <li><strong>モジュール構造の複雑さ</strong>：ネストされたモジュールの扱いが複雑でした</li>
+                <li><strong>Composition APIとの統合</strong>：Vue 3のComposition APIとの統合が最適ではありませんでした</li>
+            </ul>
+
+            <h4>Piniaの主な特徴</h4>
+            <p>
+                Piniaは、これらの問題を解決するために設計されました：
+            </p>
+            <ul>
+                <li><strong>TypeScriptとの完全な互換性</strong>：型推論が強力で、TypeScriptと組み合わせて使いやすい</li>
+                <li><strong>単純で直感的なAPI</strong>：Mutationsがなく、ActionsとStateのみのシンプルな構造</li>
+                <li><strong>軽量</strong>：バンドルサイズが小さく、パフォーマンスが向上</li>
+                <li><strong>Composition APIの完全サポート</strong>：Vue 3のComposition APIと自然に統合</li>
+                <li><strong>DevToolsの統合</strong>：Vue DevToolsと連携して、状態の変更を追跡可能</li>
+                <li><strong>エクステンション機能</strong>：プラグインシステムによる拡張が容易</li>
+                <li><strong>モジュラー設計</strong>：複数のストアを使用して、関心事を分離可能</li>
+            </ul>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'><rect x='0' y='0' width='600' height='400' fill='white'/><rect x='50' y='50' width='200' height='100' rx='10' fill='%23f9ce59' stroke='%23333'/><text x='150' y='100' font-family='Arial' font-size='18' text-anchor='middle' fill='black'>ユーザーストア</text><rect x='350' y='50' width='200' height='100' rx='10' fill='%23f9ce59' stroke='%23333'/><text x='450' y='100' font-family='Arial' font-size='18' text-anchor='middle' fill='black'>カートストア</text><rect x='50' y='250' width='200' height='100' rx='10' fill='%23f9ce59' stroke='%23333'/><text x='150' y='300' font-family='Arial' font-size='18' text-anchor='middle' fill='black'>製品ストア</text><rect x='350' y='250' width='200' height='100' rx='10' fill='%23f9ce59' stroke='%23333'/><text x='450' y='300' font-family='Arial' font-size='18' text-anchor='middle' fill='black'>設定ストア</text><rect x='200' y='150' width='200' height='100' rx='10' fill='%2342b983' stroke='%23333'/><text x='300' y='200' font-family='Arial' font-size='18' text-anchor='middle' fill='black'>Vueコンポーネント</text><path d='M150 150 L250 175' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><path d='M450 150 L350 175' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><path d='M250 225 L150 250' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><path d='M350 225 L450 250' stroke='%23333' stroke-width='2' marker-end='url(%23arrowhead)'/><defs><marker id='arrowhead' markerWidth='10' markerHeight='7' refX='9' refY='3.5' orient='auto'><polygon points='0 0, 10 3.5, 0 7' /></marker></defs></svg>" alt="Piniaのモジュラー設計" width="600" height="400">
+            </div>
+
+            <h3>3. Piniaのインストールと設定</h3>
+            <p>
+                Piniaを使い始めるには、まずインストールと基本設定が必要です。
+            </p>
+            
+            <h4>インストール</h4>
+            <pre><code class="language-bash">npm install pinia</code></pre>
+
+            <h4>Vueアプリケーションへの統合</h4>
+            <pre><code class="language-javascript">// src/main.js
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+app.use(pinia)
+app.mount('#app')</code></pre>
+
+            <h3>4. Piniaストアの基本</h3>
+            <p>
+                Piniaでは、「ストア」はアプリケーションの状態を保持し、操作するためのオブジェクトです。
+            </p>
+            
+            <h4>ストアの定義</h4>
+            <p>
+                Piniaストアは、<code>defineStore</code>関数を使用して定義します。
+            </p>
+            <pre><code class="language-javascript">// src/stores/counter.js
+import { defineStore } from 'pinia'
+
+// ストアの定義（IDと設定オブジェクト）
+export const useCounterStore = defineStore('counter', {
+  // 状態（State）
+  state: () => ({
+    count: 0,
+    name: 'カウンター'
+  }),
+  
+  // ゲッター（Getters）
+  getters: {
+    doubleCount: (state) => state.count * 2,
+    
+    // 他のゲッターを使用するゲッター
+    doubleCountPlusOne() {
+      return this.doubleCount + 1
+    }
+  },
+  
+  // アクション（Actions）
+  actions: {
+    increment() {
+      this.count++
+    },
+    
+    decrement() {
+      this.count--
+    },
+    
+    // 非同期アクション
+    async fetchCount() {
+      try {
+        const response = await fetch('/api/count')
+        const data = await response.json()
+        this.count = data.count
+      } catch (error) {
+        console.error('カウントの取得に失敗しました:', error)
+      }
+    }
+  }
+})</code></pre>
+
+            <h4>Composition API構文でのストア定義</h4>
+            <p>
+                Vue 3のComposition API構文を使用して、より簡潔にストアを定義することもできます。
+            </p>
+            <pre><code class="language-javascript">// src/stores/counter.js
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useCounterStore = defineStore('counter', () => {
+  // 状態（State）- refを使用
+  const count = ref(0)
+  const name = ref('カウンター')
+  
+  // ゲッター（Getters）- computedを使用
+  const doubleCount = computed(() => count.value * 2)
+  const doubleCountPlusOne = computed(() => doubleCount.value + 1)
+  
+  // アクション（Actions）- 通常の関数を使用
+  function increment() {
+    count.value++
+  }
+  
+  function decrement() {
+    count.value--
+  }
+  
+  async function fetchCount() {
+    try {
+      const response = await fetch('/api/count')
+      const data = await response.json()
+      count.value = data.count
+    } catch (error) {
+      console.error('カウントの取得に失敗しました:', error)
+    }
+  }
+  
+  // 公開するプロパティとメソッドを返す
+  return {
+    count,
+    name,
+    doubleCount,
+    doubleCountPlusOne,
+    increment,
+    decrement,
+    fetchCount
+  }
+})</code></pre>
+
+            <h3>5. ストアの使用</h3>
+            <p>
+                定義したストアを使用して、コンポーネント内で状態を管理する方法を見ていきましょう。
+            </p>
+            
+            <h4>コンポーネント内でのストアの使用</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { useCounterStore } from '@/stores/counter'
+
+// ストアのインスタンスを取得
+const counterStore = useCounterStore()
+
+// 状態、ゲッター、アクションにアクセス
+console.log(counterStore.count)         // 状態へのアクセス
+console.log(counterStore.doubleCount)   // ゲッターへのアクセス
+counterStore.increment()                // アクションの実行
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;{{ counterStore.name }}&lt;/h1&gt;
+    &lt;p&gt;カウント: {{ counterStore.count }}&lt;/p&gt;
+    &lt;p&gt;2倍のカウント: {{ counterStore.doubleCount }}&lt;/p&gt;
+    &lt;button @click="counterStore.increment()"&gt;増やす&lt;/button&gt;
+    &lt;button @click="counterStore.decrement()"&gt;減らす&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>ストアの分解と自動参照のアンラップ</h4>
+            <p>
+                <code>storeToRefs</code>関数を使用すると、ストアのプロパティを分解しながらリアクティブ性を保持できます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { useCounterStore } from '@/stores/counter'
+import { storeToRefs } from 'pinia'
+
+const counterStore = useCounterStore()
+
+// storeToRefsを使用して状態とゲッターを分解
+// アクションは含めない（リアクティブでないため）
+const { count, name, doubleCount } = storeToRefs(counterStore)
+
+// アクションは直接分解できる
+const { increment, decrement } = counterStore
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;{{ name }}&lt;/h1&gt;
+    &lt;p&gt;カウント: {{ count }}&lt;/p&gt;
+    &lt;p&gt;2倍のカウント: {{ doubleCount }}&lt;/p&gt;
+    &lt;button @click="increment()"&gt;増やす&lt;/button&gt;
+    &lt;button @click="decrement()"&gt;減らす&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>外部コンポーネント間での状態共有</h4>
+            <p>
+                Piniaの主な利点の1つは、コンポーネント間で状態を簡単に共有できることです。
+            </p>
+            <pre><code class="language-html">&lt;!-- ComponentA.vue --&gt;
+&lt;script setup&gt;
+import { useCounterStore } from '@/stores/counter'
+
+const counterStore = useCounterStore()
+
+function resetCounter() {
+  counterStore.count = 0
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;コンポーネントA&lt;/h2&gt;
+    &lt;p&gt;カウント: {{ counterStore.count }}&lt;/p&gt;
+    &lt;button @click="counterStore.increment()"&gt;A: 増やす&lt;/button&gt;
+    &lt;button @click="resetCounter"&gt;リセット&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- ComponentB.vue --&gt;
+&lt;script setup&gt;
+import { useCounterStore } from '@/stores/counter'
+import { storeToRefs } from 'pinia'
+
+const counterStore = useCounterStore()
+const { count, doubleCount } = storeToRefs(counterStore)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;コンポーネントB&lt;/h2&gt;
+    &lt;p&gt;カウント: {{ count }}&lt;/p&gt;
+    &lt;p&gt;2倍のカウント: {{ doubleCount }}&lt;/p&gt;
+    &lt;button @click="counterStore.increment()"&gt;B: 増やす&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;!-- App.vue --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;Piniaによる状態共有&lt;/h1&gt;
+    &lt;ComponentA /&gt;
+    &lt;ComponentB /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <p>
+                上記の例では、ComponentAとComponentBが同じカウンターストアを使用しています。一方のコンポーネントで状態を変更すると、もう一方のコンポーネントでも変更が反映されます。
+            </p>
+
+            <h3>6. 状態の変更</h3>
+            <p>
+                Piniaでは、状態を変更する方法がいくつかあります。
+            </p>
+            
+            <h4>直接変更</h4>
+            <p>
+                Vuexと異なり、Piniaでは状態を直接変更できます。
+            </p>
+            <pre><code class="language-javascript">const counterStore = useCounterStore()
+
+// 直接変更
+counterStore.count = 10
+
+// オブジェクトや配列のプロパティも直接変更可能
+counterStore.user.name = '山田太郎'
+counterStore.items[0] = '新しいアイテム'</code></pre>
+
+            <h4>アクションを使用した変更</h4>
+            <p>
+                状態の変更ロジックをカプセル化するために、アクションを使用することを推奨します。
+            </p>
+            <pre><code class="language-javascript">// ストア定義
+export const useCounterStore = defineStore('counter', {
+  state: () => ({
+    count: 0
+  }),
+  actions: {
+    // 複雑なロジックをカプセル化
+    incrementBy(amount) {
+      if (amount <= 0) return
+      this.count += amount
+    },
+    async fetchAndUpdate() {
+      try {
+        const response = await fetch('/api/data')
+        const data = await response.json()
+        this.count = data.newCount
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
+})
+
+// 使用
+const counterStore = useCounterStore()
+counterStore.incrementBy(5)
+await counterStore.fetchAndUpdate()</code></pre>
+
+            <h4>$patchメソッド</h4>
+            <p>
+                複数の状態を一度に更新するには、<code>$patch</code>メソッドを使用できます。
+            </p>
+            <pre><code class="language-javascript">const userStore = useUserStore()
+
+// オブジェクトを使用して複数のプロパティを更新
+userStore.$patch({
+  name: '山田太郎',
+  age: 25,
+  isActive: true
+})
+
+// 関数を使用して複雑な更新を行う
+userStore.$patch((state) => {
+  state.count++
+  state.history.push('カウントが増加: ' + state.count)
+  state.lastUpdated = new Date()
+})</code></pre>
+
+            <h4>$resetメソッド</h4>
+            <p>
+                ストアの状態を初期値にリセットするには、<code>$reset</code>メソッドを使用します。
+            </p>
+            <pre><code class="language-javascript">const counterStore = useCounterStore()
+
+// ストアの状態を初期値にリセット
+counterStore.$reset()</code></pre>
+
+            <h3>7. ストア間の連携</h3>
+            <p>
+                複数のストアを組み合わせて使用する方法を見ていきましょう。
+            </p>
+            
+            <h4>別のストアの使用</h4>
+            <p>
+                ストア内で他のストアを使用することができます。
+            </p>
+            <pre><code class="language-javascript">// src/stores/cart.js
+import { defineStore } from 'pinia'
+import { useProductStore } from './product'
+
+export const useCartStore = defineStore('cart', {
+  state: () => ({
+    items: [] // { productId, quantity }
+  }),
+  getters: {
+    total() {
+      const productStore = useProductStore()
+      return this.items.reduce((sum, item) => {
+        const product = productStore.getProductById(item.productId)
+        return sum + (product?.price || 0) * item.quantity
+      }, 0)
+    }
+  },
+  actions: {
+    addItem(productId, quantity = 1) {
+      const productStore = useProductStore()
+      const product = productStore.getProductById(productId)
+      
+      if (!product || product.stock < quantity) {
+        return false
+      }
+      
+      // カートに追加
+      const existingItem = this.items.find(item => item.productId === productId)
+      
+      if (existingItem) {
+        // 既存のアイテムの数量を更新
+        existingItem.quantity += quantity
+      } else {
+        // 新しいアイテムを追加
+        this.items.push({ productId, quantity })
+      }
+      
+      // 商品の在庫を減らす
+      productStore.decreaseStock(productId, quantity)
+      
+      return true
+    },
+    
+    removeItem(productId) {
+      const index = this.items.findIndex(item => item.productId === productId)
+      if (index !== -1) {
+        this.items.splice(index, 1)
+      }
+    }
+  }
+})
+
+// src/stores/product.js
+import { defineStore } from 'pinia'
+
+export const useProductStore = defineStore('product', {
+  state: () => ({
+    products: [
+      { id: 1, name: '商品A', price: 100, stock: 10 },
+      { id: 2, name: '商品B', price: 200, stock: 5 },
+      { id: 3, name: '商品C', price: 300, stock: 3 }
+    ]
+  }),
+  getters: {
+    getProductById: (state) => {
+      return (productId) => state.products.find(p => p.id === productId)
+    },
+    availableProducts: (state) => {
+      return state.products.filter(p => p.stock > 0)
+    }
+  },
+  actions: {
+    decreaseStock(productId, quantity = 1) {
+      const product = this.products.find(p => p.id === productId)
+      if (product && product.stock >= quantity) {
+        product.stock -= quantity
+        return true
+      }
+      return false
+    }
+  }
+})</code></pre>
+
+            <h4>コンポーズドストア</h4>
+            <p>
+                複雑なアプリケーションでは、コンポーザブル関数を使用して、複数のストアを組み合わせたカスタムロジックを作成できます。
+            </p>
+            <pre><code class="language-javascript">// src/composables/useShoppingList.js
+import { computed } from 'vue'
+import { useCartStore } from '@/stores/cart'
+import { useProductStore } from '@/stores/product'
+import { useUserStore } from '@/stores/user'
+
+export function useShoppingList() {
+  const cartStore = useCartStore()
+  const productStore = useProductStore()
+  const userStore = useUserStore()
+  
+  // カートのアイテムを商品情報と一緒に取得
+  const cartItems = computed(() => {
+    return cartStore.items.map(item => {
+      const product = productStore.getProductById(item.productId)
+      return {
+        ...item,
+        product,
+        total: (product?.price || 0) * item.quantity
+      }
+    })
+  })
+  
+  // ユーザーの最大予算に基づいた購入可能なアイテム
+  const affordableItems = computed(() => {
+    const budget = userStore.currentUser?.budget || 0
+    return cartItems.value.filter(item => item.total <= budget)
+  })
+  
+  // 購入処理
+  async function checkout() {
+    if (cartStore.total > (userStore.currentUser?.budget || 0)) {
+      throw new Error('予算が不足しています')
+    }
+    
+    try {
+      // 購入処理を実行
+      await userStore.updateBudget(-cartStore.total)
+      await cartStore.checkout()
+      return true
+    } catch (error) {
+      console.error('購入処理に失敗しました:', error)
+      return false
+    }
+  }
+  
+  return {
+    cartItems,
+    affordableItems,
+    checkout
+  }
+}</code></pre>
+
+            <h3>8. Piniaを使った実践的な例</h3>
+            <p>
+                ここでは、Piniaを使ったTodoリストアプリケーションの例を見てみましょう。
+            </p>
+            
+            <h4>Todoストアの定義</h4>
+            <pre><code class="language-javascript">// src/stores/todo.js
+import { defineStore } from 'pinia'
+
+export const useTodoStore = defineStore('todo', {
+  state: () => ({
+    todos: [],
+    filter: 'all', // 'all', 'completed', 'active'
+    nextId: 0
+  }),
+  
+  getters: {
+    filteredTodos(state) {
+      if (state.filter === 'completed') {
+        return state.todos.filter(todo => todo.completed)
+      } else if (state.filter === 'active') {
+        return state.todos.filter(todo => !todo.completed)
+      }
+      return state.todos
+    },
+    
+    totalCount: state => state.todos.length,
+    
+    completedCount: state => state.todos.filter(todo => todo.completed).length,
+    
+    activeCount: state => state.todos.filter(todo => !todo.completed).length,
+    
+    allCompleted: state => state.todos.length > 0 && state.todos.every(todo => todo.completed)
+  },
+  
+  actions: {
+    addTodo(text) {
+      if (!text.trim()) return
+      
+      this.todos.push({
+        id: this.nextId++,
+        text,
+        completed: false,
+        createdAt: new Date()
+      })
+    },
+    
+    removeTodo(id) {
+      const index = this.todos.findIndex(todo => todo.id === id)
+      if (index !== -1) {
+        this.todos.splice(index, 1)
+      }
+    },
+    
+    toggleTodo(id) {
+      const todo = this.todos.find(todo => todo.id === id)
+      if (todo) {
+        todo.completed = !todo.completed
+      }
+    },
+    
+    setFilter(filter) {
+      this.filter = filter
+    },
+    
+    toggleAllTodos(completed = true) {
+      this.todos.forEach(todo => {
+        todo.completed = completed
+      })
+    },
+    
+    clearCompleted() {
+      this.todos = this.todos.filter(todo => !todo.completed)
+    },
+    
+    // 非同期アクション
+    async fetchTodos() {
+      try {
+        const response = await fetch('/api/todos')
+        const data = await response.json()
+        
+        // 既存のTodoをクリアして新しいデータをセット
+        this.todos = data.map((todo, index) => ({
+          id: index,
+          text: todo.text,
+          completed: todo.completed,
+          createdAt: new Date(todo.createdAt)
+        }))
+        
+        // 次のIDを更新
+        this.nextId = this.todos.length
+      } catch (error) {
+        console.error('Todoの取得に失敗しました:', error)
+      }
+    }
+  }
+})</code></pre>
+
+            <h4>Todoリストコンポーネント</h4>
+            <pre><code class="language-html">&lt;!-- src/components/TodoList.vue --&gt;
+&lt;script setup&gt;
+import { ref } from 'vue'
+import { useTodoStore } from '@/stores/todo'
+import { storeToRefs } from 'pinia'
+
+const todoStore = useTodoStore()
+const { filteredTodos, totalCount, completedCount, activeCount } = storeToRefs(todoStore)
+
+const newTodoText = ref('')
+
+function addTodo() {
+  todoStore.addTodo(newTodoText.value)
+  newTodoText.value = ''
+}
+
+function toggleAll() {
+  todoStore.toggleAllTodos(!todoStore.allCompleted)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="todo-app"&gt;
+    &lt;h1&gt;Todoリスト&lt;/h1&gt;
+    
+    &lt;!-- Todoフォーム --&gt;
+    &lt;div class="todo-form"&gt;
+      &lt;input
+        v-model="newTodoText"
+        @keyup.enter="addTodo"
+        placeholder="新しいタスクを入力..."
+        type="text"
+      &gt;
+      &lt;button @click="addTodo"&gt;追加&lt;/button&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- フィルター --&gt;
+    &lt;div class="todo-filters"&gt;
+      &lt;button
+        :class="{ active: todoStore.filter === 'all' }"
+        @click="todoStore.setFilter('all')"
+      &gt;
+        すべて ({{ totalCount }})
+      &lt;/button&gt;
+      &lt;button
+        :class="{ active: todoStore.filter === 'active' }"
+        @click="todoStore.setFilter('active')"
+      &gt;
+        未完了 ({{ activeCount }})
+      &lt;/button&gt;
+      &lt;button
+        :class="{ active: todoStore.filter === 'completed' }"
+        @click="todoStore.setFilter('completed')"
+      &gt;
+        完了済み ({{ completedCount }})
+      &lt;/button&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- Todoリスト --&gt;
+    &lt;div v-if="filteredTodos.length" class="todo-list"&gt;
+      &lt;div class="todo-controls"&gt;
+        &lt;button @click="toggleAll"&gt;
+          {{ todoStore.allCompleted ? 'すべて未完了にする' : 'すべて完了にする' }}
+        &lt;/button&gt;
+        &lt;button @click="todoStore.clearCompleted" v-if="completedCount"&gt;
+          完了済みを削除
+        &lt;/button&gt;
+      &lt;/div&gt;
+      
+      &lt;ul&gt;
+        &lt;li
+          v-for="todo in filteredTodos"
+          :key="todo.id"
+          :class="{ completed: todo.completed }"
+          class="todo-item"
+        &gt;
+          &lt;input
+            type="checkbox"
+            :checked="todo.completed"
+            @change="todoStore.toggleTodo(todo.id)"
+          &gt;
+          &lt;span class="todo-text"&gt;{{ todo.text }}&lt;/span&gt;
+          &lt;span class="todo-date"&gt;{{ todo.createdAt.toLocaleString() }}&lt;/span&gt;
+          &lt;button @click="todoStore.removeTodo(todo.id)" class="delete-btn"&gt;削除&lt;/button&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- 空の状態 --&gt;
+    &lt;div v-else class="empty-state"&gt;
+      &lt;p&gt;{{ todoStore.totalCount ? 'フィルター条件に一致するTodoがありません' : 'Todoがありません' }}&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.todo-app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.todo-form {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.todo-form input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+}
+
+.todo-form button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #42b983;
+  color: white;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.todo-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.todo-filters button {
+  padding: 6px 12px;
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.todo-filters button.active {
+  background-color: #42b983;
+  color: white;
+  border-color: #42b983;
+}
+
+.todo-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.todo-controls button {
+  padding: 6px 12px;
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.todo-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.todo-text {
+  flex-grow: 1;
+  margin: 0 10px;
+}
+
+.todo-date {
+  color: #999;
+  font-size: 0.8em;
+  margin-right: 10px;
+}
+
+.delete-btn {
+  padding: 4px 8px;
+  background-color: #ff4c4c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 20px;
+}
+&lt;/style&gt;</code></pre>
+
+            <h3>9. Piniaの高度な機能</h3>
+            <p>
+                Piniaには、より高度なユースケースに対応するための機能があります。
+            </p>
+            
+            <h4>永続化プラグイン</h4>
+            <p>
+                ページのリロード後もストアの状態を保持するために、永続化プラグインを使用できます。
+            </p>
+            <pre><code class="language-javascript">// src/plugins/piniaPersist.js
+import { watch } from 'vue'
+
+// 簡単な永続化プラグイン
+export function createPiniaPersistPlugin(options = {}) {
+  const storage = options.storage || localStorage
+  const key = options.key || 'pinia'
+  
+  return function({ store }) {
+    // 初期状態をロード
+    const savedState = JSON.parse(storage.getItem(`${key}-${store.$id}`))
+    
+    if (savedState) {
+      store.$patch(savedState)
+    }
+    
+    // 状態の変更を監視して保存
+    watch(
+      () => store.$state,
+      (state) => {
+        storage.setItem(`${key}-${store.$id}`, JSON.stringify(state))
+      },
+      { deep: true }
+    )
+    
+    // ストアにリセットメソッドを追加
+    store.$clearPersistedState = () => {
+      storage.removeItem(`${key}-${store.$id}`)
+    }
+  }
+}
+
+// src/main.js
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import { createPiniaPersistPlugin } from './plugins/piniaPersist'
+import App from './App.vue'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+// プラグインを使用
+pinia.use(createPiniaPersistPlugin({
+  storage: sessionStorage, // localStorage or sessionStorage
+  key: 'my-app'
+}))
+
+app.use(pinia)
+app.mount('#app')</code></pre>
+
+            <h4>ストア間のフック</h4>
+            <p>
+                Piniaでは、ストアの状態が変更されたときにフックを実行できます。
+            </p>
+            <pre><code class="language-javascript">// src/plugins/piniaHooks.js
+export function createPiniaHooksPlugin() {
+  return function({ store }) {
+    // 元のアクションを保存
+    const originalActions = { ...store }
+    
+    // アクションの前後にフックを追加
+    Object.keys(originalActions).forEach(actionName => {
+      if (typeof originalActions[actionName] === 'function' && !actionName.startsWith(')) {
+        store[actionName] = async function(...args) {
+          console.log(`[${store.$id}] ${actionName} 実行前`, args)
+          
+          try {
+            const result = await originalActions[actionName].apply(this, args)
+            console.log(`[${store.$id}] ${actionName} 実行成功`, result)
+            return result
+          } catch (error) {
+            console.error(`[${store.$id}] ${actionName} 実行エラー`, error)
+            throw error
+          }
+        }
+      }
+    })
+    
+    // 状態変更の監視
+    store.$subscribe((mutation, state) => {
+      console.log(`[${store.$id}] 状態が変更されました`, mutation)
+    })
+  }
+}
+
+// src/main.js
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import { createPiniaHooksPlugin } from './plugins/piniaHooks'
+import App from './App.vue'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+// フックプラグインを使用
+pinia.use(createPiniaHooksPlugin())
+
+app.use(pinia)
+app.mount('#app')</code></pre>
+
+            <h4>TypeScriptとの統合</h4>
+            <p>
+                Piniaは、TypeScriptと非常に相性が良いです。
+            </p>
+            <pre><code class="language-typescript">// src/stores/user.ts
+import { defineStore } from 'pinia'
+
+interface User {
+  id: number
+  name: string
+  email: string
+  isAdmin: boolean
+}
+
+interface UserState {
+  currentUser: User | null
+  isAuthenticated: boolean
+  token: string | null
+}
+
+export const useUserStore = defineStore('user', {
+  state: (): UserState => ({
+    currentUser: null,
+    isAuthenticated: false,
+    token: null
+  }),
+  
+  getters: {
+    fullName(): string {
+      return this.currentUser ? this.currentUser.name : 'ゲスト'
+    },
+    
+    isAdmin(): boolean {
+      return !!this.currentUser?.isAdmin
+    }
+  },
+  
+  actions: {
+    async login(email: string, password: string): Promise<boolean> {
+      try {
+        // ログイン処理...
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        })
+        
+        if (!response.ok) {
+          throw new Error('認証に失敗しました')
+        }
+        
+        const data = await response.json()
+        
+        this.currentUser = data.user
+        this.isAuthenticated = true
+        this.token = data.token
+        
+        return true
+      } catch (error) {
+        console.error(error)
+        return false
+      }
+    },
+    
+    logout(): void {
+      this.currentUser = null
+      this.isAuthenticated = false
+      this.token = null
+    }
+  }
+})</code></pre>
+
+            <h3>10. Piniaと状態管理のベストプラクティス</h3>
+            <p>
+                Piniaを効果的に使用するためのベストプラクティスを紹介します。
+            </p>
+            
+            <ul>
+                <li><strong>ストアを機能単位に分割する</strong>：大きな単一のストアではなく、機能単位に分割してモジュール化しましょう</li>
+                <li><strong>ストアの責任を明確にする</strong>：各ストアの責任を明確にし、単一の関心事に集中させましょう</li>
+                <li><strong>リアクティブな状態の変更を追跡可能にする</strong>：直接変更よりもアクションを通じて状態を変更することで、デバッグや追跡が容易になります</li>
+                <li><strong>必要なときだけストアを使用する</strong>：単純なコンポーネント内の状態には、通常のref/reactiveを使用し、複数のコンポーネント間で共有する必要がある場合にのみストアを使用しましょう</li>
+                <li><strong>適切なストア構造を選択する</strong>：オプションAPIとComposition API、どちらの構文がプロジェクトに適しているかを検討しましょう</li>
+                <li><strong>TypeScriptとの統合を活用する</strong>：型付けによってコードの品質を向上させましょう</li>
+                <li><strong>適切なデータ構造を選択する</strong>：配列、オブジェクト、Mapなど、データの性質に合わせた適切なデータ構造を選択しましょう</li>
+                <li><strong>ゲッターとアクションの命名規則を統一する</strong>：一貫性のある命名規則を使用しましょう</li>
+            </ul>
+
+            <h4>効率的なストア構造の例</h4>
+            <pre><code class="language-javascript">// src/stores/index.js
+// すべてのストアをエクスポート
+export * from './user'
+export * from './product'
+export * from './cart'
+export * from './notification'
+
+// src/stores/user.js
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import { useNotificationStore } from './notification'
+
+// Composition API構文
+export const useUserStore = defineStore('user', () => {
+  // 通知ストアをインポート
+  const notificationStore = useNotificationStore()
+  
+  // 状態
+  const currentUser = ref(null)
+  const isLoading = ref(false)
+  const error = ref(null)
+  
+  // ゲッター
+  const isAuthenticated = computed(() => !!currentUser.value)
+  const isAdmin = computed(() => currentUser.value?.role === 'admin')
+  
+  // アクション
+  async function login(credentials) {
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      // ログイン処理...
+      const user = await api.login(credentials)
+      currentUser.value = user
+      
+      // 通知を表示
+      notificationStore.show({
+        type: 'success',
+        message: 'ログインしました'
+      })
+      
+      return true
+    } catch (e) {
+      error.value = e.message
+      
+      notificationStore.show({
+        type: 'error',
+        message: `ログインに失敗しました: ${e.message}`
+      })
+      
+      return false
+    } finally {
+      isLoading.value = false
+    }
+  }
+  
+  function logout() {
+    currentUser.value = null
+    // その他のログアウト処理...
+    
+    notificationStore.show({
+      type: 'info',
+      message: 'ログアウトしました'
+    })
+  }
+  
+  // 公開するプロパティとメソッド
+  return {
+    currentUser,
+    isLoading,
+    error,
+    isAuthenticated,
+    isAdmin,
+    login,
+    logout
+  }
+})</code></pre>
+
+            <h3>11. まとめ</h3>
+            <p>
+                本章では、Vue.jsにおける状態管理の概念と、Piniaを使用した効果的な状態管理の方法について学びました。
+            </p>
+            <p>
+                状態管理の必要性とパターン、従来のVuexからPiniaへの移行理由、Piniaの基本的な使い方、ストアの設計パターン、そしてPiniaの高度な機能について理解を深めました。
+            </p>
+            <p>
+                Piniaは、Vue 3のComposition APIと完全に統合され、TypeScriptとの相性が良く、シンプルで直感的なAPIを提供する強力な状態管理ライブラリです。これを活用することで、大規模なVue.jsアプリケーションでも状態を効率的に管理できます。
+            </p>
+            <p>
+                次の章では、Vue.jsアプリケーションへのTypeScriptの導入について学びます。
+            </p>
+        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

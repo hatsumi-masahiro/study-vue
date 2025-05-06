@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第10章: async/await による非同期処理の改善</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第10章: async/await による非同期処理の改善</h1>
+        </div>
+    </header>
+    <div class="container">
+
+        <section id="chapter10">
+            <h2 id="chapter10" class="chapter-heading">第10章: async/await による非同期処理の改善</h2>
+
+            <h3>概要</h3>
+            <p>ES2017では、Promiseをさらに扱いやすくするために<code>async</code>/<code>await</code>構文が導入されました。<code>async</code>関数の中で<code>await</code>式を使うと、Promiseの完了を待ってその結果を取得するまで関数の実行を一時停止し、まるで同期処理のように非同期処理を書けます。
+            </p>
+            <p><code>async</code>を付けた関数は常にPromiseを返すようになります（関数内部で暗黙的にPromiseが生成されます）。<code>await</code>はそのPromiseが解決されるまで待ち、解決値を返します。<code>await</code>は<code>async</code>関数の中でしか使用できない制約がありますが、その代わり<code>async</code>関数内では直列的なコードで非同期処理を順序よく書くことが可能です。
+            </p>
+            <p>本章では、前章で書いたPromiseの例を<code>async/await</code>を用いた書き方に書き換えてみます。</p>
+
+            <h3>コードと解説</h3>
+            <p>JavaScriptで<code>async/await</code>を使った例を示します。先ほどの<code>fetchData</code>（Promiseを返す関数）をそのまま利用し、<code>async</code>関数内で<code>await</code>しています。
+            </p>
+
+            <pre><code class="language-javascript">
+async function processData() {
+    try {
+        console.log("データ取得開始");
+        const result = await fetchData();   // fetchData()のPromiseが解決するまで待機
+        console.log(result.message);        // "データ取得成功"
+        console.log(result.data);           // [1, 2, 3]
+        // ここでresultを使った後続の処理が書ける
+    } catch (error) {
+        console.error("エラーが発生しました:", error);
+    } finally {
+        console.log("非同期処理が終了（async/await）");
+    }
+}
+
+processData();  // async関数はPromiseを返すが、ここでは即時実行
+                
+</code></pre>
+
+            <p><strong>解説:</strong>
+                <code>async function processData()</code>と宣言することで、この関数は必ずPromiseを返すようになります。実際には関数がreturnで値（または何も）返した場合、その値で解決するPromiseが戻り、エラーが発生してcatchされなかった場合はrejectされたPromiseが返ります。<code>await fetchData()</code>の行では、前章で定義した<code>fetchData()</code>の完了を待ち、その結果<code>result</code>に代入します。<code>await</code>している間、非同期処理が完了するまで<code>processData</code>関数の実行は一時停止し、完了後に次の行に進みます。
+            </p>
+            <p>この間JavaScript全体の実行がブロックされるわけではなく、他のイベントループは回っています。<code>await</code>はあくまで<code>processData</code>関数内の流れを一時停止するものです。そのため、<code>async/await</code>を使っても非同期処理であることに変わりはなく、内部ではPromiseが動いています。
+            </p>
+            <p><code>try...catch</code>構文を用いることで、<code>await</code>した呼び出しでエラー（Promiseのreject）が発生した場合に<code>catch</code>ブロックで捕捉できます。<code>.then().catch()</code>チェーンの場合と同様に、例外処理を行えるわけです。<code>finally</code>ブロックも用いることができ、Promiseの<code>.finally</code>と同様の役割を果たします。
+            </p>
+            <p>このように<code>async/await</code>を使うことで、Promiseチェーンで書いていた非同期処理をより直感的な手続き型のコードに変換できます。特に複数の非同期処理を順番に行う場合や、条件分岐を交えながら非同期処理を記述する場合に、<code>async/await</code>は可読性と保守性を向上させます。
+            </p>
+        </section>
+
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

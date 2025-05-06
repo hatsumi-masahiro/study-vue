@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第1章: 変数宣言 とスコープ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">    
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第1章: 変数宣言 (let/const) とスコープ</h1>
+        </div>
+    </header>
+    <div class="container">
+        <!-- 00.モダンJavaScript学習教材.htmlから切り出した第1章の本文 -->
+
+
+        <section id="chapter1">
+            <h2 id="chapter1" class="chapter-heading">第1章: 変数宣言 (let/const) とスコープ</h2>
+
+            <h3>概要</h3>
+            <p>ES6では変数宣言に<code>let</code>と<code>const</code>が導入され、従来の<code>var</code>に代わって推奨されます。<code>let</code>と<code>const</code>はブロックスコープ（<code>{ }</code>で囲まれた範囲）を持ち、<code>var</code>のように関数全体やグローバルにまで変数が漏れません。また、<code>let</code>変数は宣言より前にはアクセスできず、一時的デッドゾーン(TDZ)と呼ばれる状態になります。<code>const</code>は<code>let</code>と同様にブロックスコープですが、再代入ができない点が異なります。一度<code>const</code>で値を設定すると、同じ変数名で別の値を代入し直すとエラーになります。ただし、<code>const</code>で宣言したオブジェクトや配列の「中身」は変更可能であることに注意が必要です。
+            </p>
+
+            <h3>コードと解説</h3>
+            <p>まずはJavaScriptにおける<code>var</code>と<code>let/const</code>の挙動の違いを確認しましょう。</p>
+
+            <pre><code class="language-javascript">// varとletのスコープの違い
+function scopeTest() {
+    if (true) {
+        var x = 1;
+        let y = 2;
+    }
+    console.log(x); // 1 （varで宣言したxは関数スコープなのでここでも参照可能）
+    console.log(y); // ReferenceError: y is not defined （letで宣言したyはブロックスコープなのでブロック外では未定義）
+}
+scopeTest();
+
+// constの再代入禁止
+const PI = 3.14;
+PI = 3.15; // エラー: const変数には再代入できない
+
+// constで宣言したオブジェクトの中身は変更可能
+const user = { name: "Alice", age: 25 };
+user.age = 26;       // プロパティの変更は可能
+user = { name: "Bob", age: 30 }; // エラー: user自体を別のオブジェクトに再割り当てすることはできない
+
+</code></pre>
+
+
+
+            <p><strong>解説:</strong>
+                上記のコードでは、<code>var</code>で宣言した<code>x</code>は関数<code>scopeTest</code>内であればブロックを越えて参照できます。一方<code>let</code>で宣言した<code>y</code>はそのブロック内でのみ有効で、ブロックの外に出ると存在しなくなるため<code>ReferenceError</code>が発生します。<code>let</code>と<code>const</code>はこのようにブロック単位のスコープを作るため、例えばループ内で<code>let</code>を使うと各反復で変数が新しく作られ直し、意図しない値の共有を防げます。
+            </p>
+            <p>また、<code>const</code>は再代入不可であるものの、オブジェクトや配列の内容までは不変にするわけではありません。上記例では<code>user</code>オブジェクトのプロパティ<code>age</code>を変更すること自体はエラーになりません（オブジェクトの参照自体は同じままだからです）。しかし<code>user</code>に別のオブジェクトを代入し直そうとするとエラーになります。このように、<code>const</code>は「変数への再代入を禁止する」キーワードだと理解しましょう。実務では、「再代入しない変数は全て<code>const</code>を使い、そうでなければ<code>let</code>を使う」というコーディングスタイルが一般的です。
+            </p>
+        </section>
+
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第6章: リストレンダリング & イベント</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第6章: リストレンダリング & イベント</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter6">
+            <h2 id="chapter6" class="chapter-heading">第6章: リストレンダリング & イベント</h2>
+
+            <h3>概要</h3>
+            <p>
+                本章では、Vue.jsのリストレンダリングとイベント処理について学びます。<code>v-for</code>ディレクティブを使用したリストの表示方法、イベントハンドリングの基本、そしてこれらを組み合わせた実践的な例について理解を深めます。
+            </p>
+            
+            <h3>1. リストレンダリング（v-for）</h3>
+            <p>
+                <code>v-for</code>ディレクティブを使用すると、配列やオブジェクトに基づいて要素のリストをレンダリングできます。
+            </p>
+            
+            <h4>基本的な配列のレンダリング</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const fruits = ref(['りんご', 'バナナ', 'オレンジ', 'ぶどう', 'いちご'])
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;h3&gt;フルーツリスト&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li v-for="fruit in fruits"&gt;{{ fruit }}&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>インデックス付きの配列レンダリング</h4>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;h3&gt;インデックス付きフルーツリスト&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li v-for="(fruit, index) in fruits"&gt;
+      {{ index + 1 }}. {{ fruit }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>オブジェクトのレンダリング</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { reactive } from 'vue'
+
+const user = reactive({
+  name: '山田太郎',
+  age: 28,
+  email: 'taro@example.com',
+  location: '東京'
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;h3&gt;ユーザー情報&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li v-for="(value, key) in user"&gt;
+      {{ key }}: {{ value }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  
+  &lt;!-- インデックス付き --&gt;
+  &lt;h3&gt;ユーザー情報（インデックス付き）&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li v-for="(value, key, index) in user"&gt;
+      {{ index + 1 }}. {{ key }}: {{ value }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>v-forとv-if</h4>
+            <p>
+                <code>v-for</code>と<code>v-if</code>を同時に使用する場合は注意が必要です。Vue 3では、<code>v-if</code>は常に<code>v-for</code>よりも優先されます。つまり、<code>v-if</code>の条件は<code>v-for</code>のスコープ内の変数にアクセスできません。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const users = ref([
+  { name: '山田太郎', active: true },
+  { name: '佐藤花子', active: false },
+  { name: '鈴木一郎', active: true }
+])
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- 非推奨: v-forと同じ要素でv-ifを使用 --&gt;
+  &lt;ul&gt;
+    &lt;li
+      v-for="user in users"
+      v-if="user.active"
+      :key="user.name"
+    &gt;
+      {{ user.name }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  
+  &lt;!-- 推奨: v-forの親要素またはテンプレートでv-ifを使用 --&gt;
+  &lt;ul v-if="users.length"&gt;
+    &lt;li v-for="user in users" :key="user.name"&gt;
+      {{ user.name }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;p v-else&gt;ユーザーがいません&lt;/p&gt;
+  
+  &lt;!-- 推奨: 計算プロパティを使用してフィルタリング --&gt;
+  &lt;h3&gt;アクティブなユーザー&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li v-for="user in activeUsers" :key="user.name"&gt;
+      {{ user.name }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { computed } from 'vue'
+
+// アクティブなユーザーのみをフィルタリングする計算プロパティ
+const activeUsers = computed(() => {
+  return users.value.filter(user => user.active)
+})
+&lt;/script&gt;</code></pre>
+
+            <h4>キーの使用</h4>
+            <p>
+                <code>v-for</code>を使用する場合は、各要素に一意の<code>key</code>属性を指定することが重要です。これにより、Vue.jsはDOMの更新を効率的に行うことができます。
+            </p>
+            <pre><code class="language-html">&lt;ul&gt;
+  &lt;li v-for="item in items" :key="item.id"&gt;
+    {{ item.name }}
+  &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+            <p>
+                キーには、各要素を一意に識別できる値（通常はIDやユニークな文字列）を使用します。インデックスをキーとして使用することもできますが、配列の要素が追加、削除、順序変更される場合は問題が生じる可能性があります。
+            </p>
+
+            <h4>範囲のv-for</h4>
+            <p>
+                <code>v-for</code>は、整数の範囲に対しても使用できます。
+            </p>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;h3&gt;1から10までのリスト&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li v-for="n in 10" :key="n"&gt;{{ n }}&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>配列変更の検出</h4>
+            <p>
+                Vue.jsは、配列の変更メソッド（<code>push</code>、<code>pop</code>、<code>shift</code>、<code>unshift</code>、<code>splice</code>、<code>sort</code>、<code>reverse</code>）を監視し、自動的にビューを更新します。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const items = ref(['項目1', '項目2', '項目3'])
+
+function addItem() {
+  items.value.push('新しい項目')
+}
+
+function removeItem() {
+  items.value.pop()
+}
+
+function sortItems() {
+  items.value.sort()
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;h3&gt;項目リスト&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li v-for="(item, index) in items" :key="index"&gt;
+      {{ item }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  
+  &lt;div class="buttons"&gt;
+    &lt;button @click="addItem"&gt;項目を追加&lt;/button&gt;
+    &lt;button @click="removeItem"&gt;最後の項目を削除&lt;/button&gt;
+    &lt;button @click="sortItems"&gt;項目を並べ替え&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>2. イベントハンドリング</h3>
+            <p>
+                Vue.jsでは、<code>v-on</code>ディレクティブ（または<code>@</code>省略記法）を使用してDOMイベントをリッスンします。
+            </p>
+            
+            <h4>基本的なイベントハンドリング</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const count = ref(0)
+
+function increment() {
+  count.value++
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;h3&gt;カウンター: {{ count }}&lt;/h3&gt;
+  
+  &lt;!-- 完全な構文 --&gt;
+  &lt;button v-on:click="increment"&gt;増やす (v-on)&lt;/button&gt;
+  
+  &lt;!-- 省略記法 --&gt;
+  &lt;button @click="increment"&gt;増やす (@)&lt;/button&gt;
+  
+  &lt;!-- インラインステートメント --&gt;
+  &lt;button @click="count++"&gt;増やす (インライン)&lt;/button&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>イベント修飾子</h4>
+            <p>
+                イベントハンドラにはイベント修飾子を使用できます。修飾子を使用すると、イベントの伝播や標準的な挙動を制御できます。
+            </p>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;h3&gt;イベント修飾子の例&lt;/h3&gt;
+  
+  &lt;!-- イベントの伝播を停止 --&gt;
+  &lt;div @click="outerClick" class="outer"&gt;
+    外側の要素
+    &lt;button @click.stop="innerClick" class="inner"&gt;
+      内側の要素 (.stop)
+    &lt;/button&gt;
+  &lt;/div&gt;
+  
+  &lt;!-- デフォルトの挙動を防止 --&gt;
+  &lt;a href="https://example.com" @click.prevent="linkClick"&gt;
+    リンク (.prevent)
+  &lt;/a&gt;
+  
+  &lt;!-- キャプチャモード --&gt;
+  &lt;div @click.capture="captureClick" class="outer"&gt;
+    外側の要素 (.capture)
+    &lt;button @click="innerClick" class="inner"&gt;
+      内側の要素
+    &lt;/button&gt;
+  &lt;/div&gt;
+  
+  &lt;!-- セルフ --&gt;
+  &lt;div @click.self="selfClick" class="outer"&gt;
+    この要素自体をクリックした場合のみ発火 (.self)
+    &lt;button @click="innerClick" class="inner"&gt;
+      内側の要素
+    &lt;/button&gt;
+  &lt;/div&gt;
+  
+  &lt;!-- 一度だけ --&gt;
+  &lt;button @click.once="onceClick"&gt;
+    一度だけクリック (.once)
+  &lt;/button&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+function outerClick() {
+  alert('外側の要素がクリックされました')
+}
+
+function innerClick() {
+  alert('内側の要素がクリックされました')
+}
+
+function linkClick() {
+  alert('リンクがクリックされました')
+}
+
+function captureClick() {
+  alert('キャプチャフェーズ: 外側の要素がクリックされました')
+}
+
+function selfClick() {
+  alert('この要素自体がクリックされました')
+}
+
+function onceClick() {
+  alert('このアラートは一度だけ表示されます')
+}
+&lt;/script&gt;
+
+&lt;style scoped&gt;
+.outer {
+  padding: 20px;
+  background-color: #f0f0f0;
+  margin-bottom: 10px;
+}
+
+.inner {
+  padding: 10px;
+  background-color: #e0e0e0;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>キー修飾子</h4>
+            <p>
+                キーボードイベントをリッスンする場合、特定のキーに対してイベントハンドラを設定できます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const message = ref('')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;h3&gt;キー修飾子の例&lt;/h3&gt;
+  
+  &lt;!-- Enterキーを押したときにフォームを送信 --&gt;
+  &lt;input
+    v-model="message"
+    @keyup.enter="alert('Enterキーが押されました')"
+    placeholder="テキストを入力し、Enterキーを押してください"
+  &gt;
+  
+  &lt;!-- エスケープキーを押したときに入力をクリア --&gt;
+  &lt;input
+    v-model="message"
+    @keyup.esc="message = ''"
+    placeholder="テキストを入力し、Escキーを押してください"
+  &gt;
+  
+  &lt;!-- 他のキー修飾子の例 --&gt;
+  &lt;div class="key-examples"&gt;
+    &lt;p&gt;以下のボックスにフォーカスを当てて、キーを押してください:&lt;/p&gt;
+    &lt;input
+      @keyup.space="alert('スペースキーが押されました')"
+      @keyup.delete="alert('デリートキーが押されました')"
+      @keyup.tab="alert('タブキーが押されました')"
+      @keyup.up="alert('上矢印キーが押されました')"
+      @keyup.down="alert('下矢印キーが押されました')"
+      placeholder="スペース、デリート、タブ、上下矢印キーを試してください"
+    &gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>マウス修飾子</h4>
+            <p>
+                マウスイベントに特定の修飾子を適用できます。
+            </p>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;h3&gt;マウス修飾子の例&lt;/h3&gt;
+  
+  &lt;div class="mouse-area"&gt;
+    &lt;!-- 左クリック --&gt;
+    &lt;button @click.left="alert('左クリックされました')"&gt;
+      左クリック
+    &lt;/button&gt;
+    
+    &lt;!-- 右クリック --&gt;
+    &lt;button @click.right="alert('右クリックされました')"&gt;
+      右クリック
+    &lt;/button&gt;
+    
+    &lt;!-- 中クリック --&gt;
+    &lt;button @click.middle="alert('中クリックされました')"&gt;
+      中クリック
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.mouse-area {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>イベント引数の受け取り</h4>
+            <p>
+                イベントハンドラ内では、イベントオブジェクトを受け取ることができます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+function handleClick(event) {
+  console.log(event.target)  // クリックされた要素
+  console.log(event.currentTarget)  // イベントハンドラがアタッチされた要素
+  console.log(event.clientX, event.clientY)  // クリック位置の座標
+}
+
+function handleWithParam(message, event) {
+  alert(message)
+  console.log(event)  // ネイティブイベント
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;h3&gt;イベント引数の例&lt;/h3&gt;
+  
+  &lt;!-- イベントオブジェクトの取得 --&gt;
+  &lt;button @click="handleClick"&gt;イベントオブジェクトを取得&lt;/button&gt;
+  
+  &lt;!-- カスタム引数とイベントオブジェクト --&gt;
+  &lt;button @click="handleWithParam('こんにちは！', $event)"&gt;
+    引数とイベントオブジェクトを渡す
+  &lt;/button&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>3. リストレンダリングとイベントハンドリングの組み合わせ</h3>
+            <p>
+                リストレンダリングとイベントハンドリングを組み合わせると、インタラクティブなリスト操作が可能になります。以下に、簡単なTodoリストアプリケーションの例を示します。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+// Todoリストの状態
+const newTodo = ref('')
+const todos = ref([
+  { id: 1, text: 'Vue.jsを学ぶ', completed: false },
+  { id: 2, text: 'コンポーネントを作成する', completed: false },
+  { id: 3, text: '状態管理を理解する', completed: false }
+])
+
+// 新しいTodoを追加
+function addTodo() {
+  if (newTodo.value.trim()) {
+    const newId = todos.value.length ? Math.max(...todos.value.map(t => t.id)) + 1 : 1
+    todos.value.push({
+      id: newId,
+      text: newTodo.value.trim(),
+      completed: false
+    })
+    newTodo.value = ''
+  }
+}
+
+// Todoの完了状態を切り替え
+function toggleComplete(todo) {
+  todo.completed = !todo.completed
+}
+
+// Todoを削除
+function removeTodo(id) {
+  todos.value = todos.value.filter(todo => todo.id !== id)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="todo-app"&gt;
+    &lt;h2&gt;Todo リスト&lt;/h2&gt;
+    
+    &lt;!-- 新規Todo入力フォーム --&gt;
+    &lt;div class="add-todo"&gt;
+      &lt;input
+        v-model="newTodo"
+        @keyup.enter="addTodo"
+        placeholder="新しいタスクを入力..."
+      &gt;
+      &lt;button @click="addTodo"&gt;追加&lt;/button&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- Todoリスト --&gt;
+    &lt;ul class="todo-list"&gt;
+      &lt;li v-for="todo in todos" :key="todo.id" :class="{ completed: todo.completed }"&gt;
+        &lt;input
+          type="checkbox"
+          :checked="todo.completed"
+          @change="toggleComplete(todo)"
+        &gt;
+        &lt;span class="todo-text"&gt;{{ todo.text }}&lt;/span&gt;
+        &lt;button class="delete-btn" @click="removeTodo(todo.id)"&gt;削除&lt;/button&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+    
+    &lt;!-- 統計情報 --&gt;
+    &lt;div class="todo-stats" v-if="todos.length"&gt;
+      &lt;p&gt;
+        {{ todos.filter(todo => todo.completed).length }} / {{ todos.length }} 完了
+      &lt;/p&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- リストが空の場合 --&gt;
+    &lt;p v-if="!todos.length" class="empty-list"&gt;
+      タスクがありません。新しいタスクを追加してください。
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.todo-app {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-todo {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.add-todo input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+}
+
+.add-todo button {
+  padding: 8px 16px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.todo-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.todo-list li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.todo-list li:last-child {
+  border-bottom: none;
+}
+
+.todo-text {
+  flex-grow: 1;
+  margin-left: 10px;
+}
+
+.completed .todo-text {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.delete-btn {
+  padding: 4px 8px;
+  background-color: #ff4c4c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.todo-stats {
+  margin-top: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.empty-list {
+  color: #999;
+  text-align: center;
+  font-style: italic;
+}
+&lt;/style&gt;</code></pre>
+
+            <h3>4. フォームと入力処理の実践</h3>
+            <p>
+                ここでは、フォーム入力とリストレンダリング、イベントハンドリングを組み合わせた、より実践的な例を見てみましょう。以下は、シンプルなユーザー管理アプリケーションの例です。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref, reactive, computed } from 'vue'
+
+// ユーザーフォームの初期状態
+const initialUserForm = {
+  id: null,
+  name: '',
+  email: '',
+  role: 'user',
+  active: true
+}
+
+// 状態
+const users = ref([
+  { id: 1, name: '山田太郎', email: 'taro@example.com', role: 'admin', active: true },
+  { id: 2, name: '佐藤花子', email: 'hanako@example.com', role: 'user', active: true },
+  { id: 3, name: '鈴木一郎', email: 'ichiro@example.com', role: 'user', active: false }
+])
+const userForm = reactive({ ...initialUserForm })
+const editMode = ref(false)
+const searchQuery = ref('')
+
+// 検索結果
+const filteredUsers = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  if (!query) return users.value
+  
+  return users.value.filter(user => 
+    user.name.toLowerCase().includes(query) ||
+    user.email.toLowerCase().includes(query) ||
+    user.role.toLowerCase().includes(query)
+  )
+})
+
+// ユーザーを追加/更新
+function saveUser() {
+  if (!userForm.name || !userForm.email) return
+  
+  if (editMode.value) {
+    // 既存ユーザーの更新
+    const index = users.value.findIndex(user => user.id === userForm.id)
+    if (index !== -1) {
+      users.value[index] = { ...userForm }
+    }
+  } else {
+    // 新規ユーザーの追加
+    const newId = users.value.length ? Math.max(...users.value.map(u => u.id)) + 1 : 1
+    users.value.push({
+      ...userForm,
+      id: newId
+    })
+  }
+  
+  // フォームをリセット
+  resetForm()
+}
+
+// ユーザーを編集モードにする
+function editUser(user) {
+  Object.assign(userForm, user)
+  editMode.value = true
+}
+
+// ユーザーを削除
+function deleteUser(id) {
+  if (confirm('このユーザーを削除してもよろしいですか？')) {
+    users.value = users.value.filter(user => user.id !== id)
+  }
+}
+
+// フォームをリセット
+function resetForm() {
+  Object.assign(userForm, initialUserForm)
+  editMode.value = false
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="user-management"&gt;
+    &lt;h2&gt;{{ editMode ? 'ユーザー編集' : 'ユーザー追加' }}&lt;/h2&gt;
+    
+    &lt;!-- ユーザーフォーム --&gt;
+    &lt;form @submit.prevent="saveUser" class="user-form"&gt;
+      &lt;div class="form-group"&gt;
+        &lt;label for="name"&gt;名前&lt;/label&gt;
+        &lt;input
+          id="name"
+          v-model="userForm.name"
+          type="text"
+          required
+          placeholder="名前を入力"
+        &gt;
+      &lt;/div&gt;
+      
+      &lt;div class="form-group"&gt;
+        &lt;label for="email"&gt;メールアドレス&lt;/label&gt;
+        &lt;input
+          id="email"
+          v-model="userForm.email"
+          type="email"
+          required
+          placeholder="メールアドレスを入力"
+        &gt;
+      &lt;/div&gt;
+      
+      &lt;div class="form-group"&gt;
+        &lt;label for="role"&gt;役割&lt;/label&gt;
+        &lt;select id="role" v-model="userForm.role"&gt;
+          &lt;option value="user"&gt;一般ユーザー&lt;/option&gt;
+          &lt;option value="admin"&gt;管理者&lt;/option&gt;
+          &lt;option value="editor"&gt;編集者&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/div&gt;
+      
+      &lt;div class="form-group"&gt;
+        &lt;label class="checkbox-label"&gt;
+          &lt;input type="checkbox" v-model="userForm.active"&gt;
+          アクティブ
+        &lt;/label&gt;
+      &lt;/div&gt;
+      
+      &lt;div class="form-actions"&gt;
+        &lt;button type="submit" class="save-btn"&gt;{{ editMode ? '更新' : '追加' }}&lt;/button&gt;
+        &lt;button type="button" class="cancel-btn" @click="resetForm"&gt;キャンセル&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+    
+    &lt;h2&gt;ユーザー一覧&lt;/h2&gt;
+    
+    &lt;!-- 検索フィールド --&gt;
+    &lt;div class="search-box"&gt;
+      &lt;input
+        v-model="searchQuery"
+        placeholder="ユーザーを検索..."
+        type="text"
+      &gt;
+    &lt;/div&gt;
+    
+    &lt;!-- ユーザーテーブル --&gt;
+    &lt;table class="user-table" v-if="filteredUsers.length"&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          &lt;th&gt;ID&lt;/th&gt;
+          &lt;th&gt;名前&lt;/th&gt;
+          &lt;th&gt;メールアドレス&lt;/th&gt;
+          &lt;th&gt;役割&lt;/th&gt;
+          &lt;th&gt;状態&lt;/th&gt;
+          &lt;th&gt;操作&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr v-for="user in filteredUsers" :key="user.id" :class="{ inactive: !user.active }"&gt;
+          &lt;td&gt;{{ user.id }}&lt;/td&gt;
+          &lt;td&gt;{{ user.name }}&lt;/td&gt;
+          &lt;td&gt;{{ user.email }}&lt;/td&gt;
+          &lt;td&gt;{{ user.role === 'admin' ? '管理者' : user.role === 'editor' ? '編集者' : '一般ユーザー' }}&lt;/td&gt;
+          &lt;td&gt;
+            &lt;span :class="user.active ? 'status-active' : 'status-inactive'"&gt;
+              {{ user.active ? 'アクティブ' : '非アクティブ' }}
+            &lt;/span&gt;
+          &lt;/td&gt;
+          &lt;td class="actions"&gt;
+            &lt;button class="edit-btn" @click="editUser(user)"&gt;編集&lt;/button&gt;
+            &lt;button class="delete-btn" @click="deleteUser(user.id)"&gt;削除&lt;/button&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+    
+    &lt;!-- ユーザーがいない場合 --&gt;
+    &lt;p v-else class="no-users"&gt;
+      {{ searchQuery ? '検索結果がありません。' : 'ユーザーはまだ登録されていません。' }}
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.user-management {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.user-form {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  background-color: #f9f9f9;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+}
+
+.checkbox-label input {
+  margin-right: 8px;
+}
+
+input[type="text"],
+input[type="email"],
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.save-btn {
+  padding: 8px 16px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.user-table th {
+  background-color: #f2f2f2;
+}
+
+.user-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.inactive {
+  background-color: #f8f8f8;
+  color: #999;
+}
+
+.status-active {
+  color: #42b983;
+  font-weight: bold;
+}
+
+.status-inactive {
+  color: #ff4c4c;
+}
+
+.actions {
+  display: flex;
+  gap: 5px;
+}
+
+.edit-btn {
+  padding: 4px 8px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  padding: 4px 8px;
+  background-color: #ff4c4c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.no-users {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+&lt;/style&gt;</code></pre>
+
+            <h3>5. コンポーネント間のイベント通信</h3>
+            <p>
+                Vueコンポーネントを使用する場合、親コンポーネントから子コンポーネントへはpropsを通じてデータを渡し、子コンポーネントから親コンポーネントへはイベントを通じてデータを渡します。ここでは簡単な例を示します。
+            </p>
+            
+            <h4>子コンポーネント（ChildComponent.vue）</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { defineProps, defineEmits } from 'vue'
+
+// プロパティの定義
+const props = defineProps({
+  item: {
+    type: Object,
+    required: true
+  }
+})
+
+// イベットの定義
+const emit = defineEmits(['update', 'delete'])
+
+// 親コンポーネントにイベントを送信
+function updateItem() {
+  emit('update', props.item)
+}
+
+function deleteItem() {
+  emit('delete', props.item.id)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="item-card"&gt;
+    &lt;h3&gt;{{ item.name }}&lt;/h3&gt;
+    &lt;p&gt;{{ item.description }}&lt;/p&gt;
+    &lt;div class="item-actions"&gt;
+      &lt;button @click="updateItem"&gt;更新&lt;/button&gt;
+      &lt;button @click="deleteItem"&gt;削除&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.item-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.item-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:first-child {
+  background-color: #42b983;
+  color: white;
+}
+
+button:last-child {
+  background-color: #ff4c4c;
+  color: white;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>親コンポーネント（ParentComponent.vue）</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+import ChildComponent from './ChildComponent.vue'
+
+// アイテムリスト
+const items = ref([
+  {
+    id: 1,
+    name: '項目1',
+    description: 'これは最初の項目です。'
+  },
+  {
+    id: 2,
+    name: '項目2',
+    description: 'これは2番目の項目です。'
+  }
+])
+
+// 子コンポーネントからのイベント処理
+function handleUpdate(item) {
+  console.log('アイテムを更新:', item)
+  // ここで更新処理を実装
+}
+
+function handleDelete(id) {
+  console.log('アイテムを削除:', id)
+  items.value = items.value.filter(item => item.id !== id)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="parent-component"&gt;
+    &lt;h2&gt;親コンポーネント&lt;/h2&gt;
+    
+    &lt;div v-if="items.length"&gt;
+      &lt;!-- 子コンポーネントをループでレンダリング --&gt;
+      &lt;ChildComponent
+        v-for="item in items"
+        :key="item.id"
+        :item="item"
+        @update="handleUpdate"
+        @delete="handleDelete"
+      /&gt;
+    &lt;/div&gt;
+    
+    &lt;p v-else&gt;アイテムがありません。&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.parent-component {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+&lt;/style&gt;</code></pre>
+
+            <h3>6. イベントと状態管理のベストプラクティス</h3>
+            <p>
+                Vueアプリケーションでイベントと状態を管理する際のベストプラクティスをいくつか紹介します。
+            </p>
+            
+            <ul>
+                <li><strong>コンポーネントの責任を明確にする</strong>：各コンポーネントは単一の責任を持つべきです。リストレンダリングとイベント処理を適切に分離しましょう。</li>
+                <li><strong>props down, events up パターンを使用する</strong>：親コンポーネントからは子コンポーネントへpropsとしてデータを渡し、子コンポーネントからは親コンポーネントへイベントとしてデータを渡します。</li>
+                <li><strong>計算プロパティを活用する</strong>：リストのフィルタリングやソートなどの操作は、計算プロパティを使用して実装しましょう。</li>
+                <li><strong>メソッドを適切に分割する</strong>：イベントハンドラとして使用するメソッドは、単一の責任を持つべきです。複雑なロジックは別のメソッドに分割しましょう。</li>
+                <li><strong>key属性を適切に使用する</strong>：<code>v-for</code>を使用する場合は、常に一意の<code>key</code>属性を指定しましょう。</li>
+                <li><strong>複雑な状態管理にはPiniaを使用する</strong>：コンポーネント間で共有する必要がある状態が多い場合は、Pinia（Vue 3向けの状態管理ライブラリ）の使用を検討しましょう。</li>
+            </ul>
+
+            <h3>7. まとめ</h3>
+            <p>
+                本章では、Vue.jsのリストレンダリングとイベント処理について学びました。<code>v-for</code>ディレクティブを使用したリストのレンダリング方法、<code>v-on</code>（<code>@</code>）ディレクティブを使用したイベントハンドリングの基本、そしてこれらを組み合わせた実践的な例について理解を深めました。
+            </p>
+            <p>
+                Todoリストアプリケーションやユーザー管理アプリケーションの例を通じて、リストレンダリングとイベントハンドリングの連携方法を学びました。また、コンポーネント間のイベント通信についても理解しました。
+            </p>
+            <p>
+                次の章では、Vueのコンポーネントシステムについてより詳しく学び、単一ファイルコンポーネント（SFC）、props、emitsなどについて理解を深めます。
+            </p>
+        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

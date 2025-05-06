@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第12章: デバッグ & 開発ツール</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第12章: デバッグ & 開発ツール</h1>
+        </div>
+    </header>
+    <div class="container">
+      <section id="chapter12">
+        <h2 id="chapter12" class="chapter-heading">第12章: デバッグ & 開発ツール</h2>
+
+        <h3>概要</h3>
+        <p>
+            効率的な開発とデバッグは、高品質なVue.jsアプリケーションを構築するための重要な要素です。この章では、Vue.jsアプリケーションの開発とデバッグを効率化するためのツールやテクニックについて学びます。Vue DevTools、ブラウザのデバッグツール、コードの検査方法、パフォーマンスの最適化など、実践的なスキルを身につけましょう。
+        </p>
+
+        <h3>1. Vue DevTools</h3>
+        <p>
+            Vue DevToolsは、Vue.jsアプリケーションの開発やデバッグに欠かせない拡張機能です。コンポーネントツリーの表示、状態の確認、イベントの監視など、多くの機能を提供します。
+        </p>
+
+        <h4>1.1 Vue DevToolsのインストールと基本的な使い方</h4>
+        <p>
+            Vue DevToolsは主要なブラウザの拡張機能としてインストールできます：
+        </p>
+        <ul>
+            <li><a href="https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd" target="_blank">Chrome用Vue DevTools</a></li>
+            <li><a href="https://addons.mozilla.org/ja/firefox/addon/vue-js-devtools/" target="_blank">Firefox用Vue DevTools</a></li>
+            <li><a href="https://microsoftedge.microsoft.com/addons/detail/vuejs-devtools/olofadcdnkkjdfgjcmjaadnlehnnihnl" target="_blank">Edge用Vue DevTools</a></li>
+        </ul>
+
+        <p>
+            Vue DevToolsをインストールすると、開発者ツールに「Vue」タブが追加されます。Vue.jsアプリケーションが実行されているページで開発者ツールを開くと、Vue DevToolsを使用できます。
+        </p>
+
+        <h4>1.2 コンポーネントツリーの検査</h4>
+        <p>
+            Vue DevToolsを使用すると、アプリケーションのコンポーネント構造を階層的に表示できます。各コンポーネントを選択すると、そのprops、data、computed、setup()で定義された状態などが表示されます。
+        </p>
+
+        <pre><code class="language-html">&lt;!-- App.vue --&gt;
+&lt;template&gt;
+&lt;div&gt;
+&lt;h1&gt;{{ title }}&lt;/h1&gt;
+&lt;user-profile :user="currentUser" /&gt;
+&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { ref } from 'vue'
+import UserProfile from './components/UserProfile.vue'
+
+const title = ref('ユーザー情報')
+const currentUser = ref({
+id: 1,
+name: '山田太郎',
+email: 'yamada@example.com'
+})
+&lt;/script&gt;</code></pre>
+
+        <p>
+            上記のコードでは、DevToolsでAppコンポーネントを選択すると、<code>title</code>と<code>currentUser</code>の値が表示され、UserProfileコンポーネントに渡されるpropsも確認できます。
+        </p>
+
+        <h4>1.3 状態の管理とデバッグ</h4>
+        <p>
+            Vue DevToolsでは、コンポーネントの状態をリアルタイムで監視できるだけでなく、状態を直接編集することも可能です。これにより、UIの変更がどのように反映されるかを即座に確認できます。
+        </p>
+
+        <h4>1.4 Piniaストアの検査</h4>
+        <p>
+            Vue DevToolsはPiniaストアもサポートしており、ストアの状態、ゲッター、アクションの実行を監視できます。
+        </p>
+
+        <pre><code class="language-javascript">// stores/counter.js
+import { defineStore } from 'pinia'
+
+export const useCounterStore = defineStore('counter', {
+state: () => ({
+count: 0,
+lastUpdated: null
+}),
+getters: {
+doubleCount: (state) => state.count * 2
+},
+actions: {
+increment() {
+  this.count++
+  this.lastUpdated = new Date()
+}
+}
+})</code></pre>
+
+        <p>
+            DevToolsの「Pinia」タブでは、ストアの状態変化を監視し、アクションの実行履歴も確認できます。
+        </p>
+
+        <h4>1.5 イベントの監視</h4>
+        <p>
+            Vue DevToolsの「Events」タブでは、アプリケーション内で発行されたカスタムイベントを監視できます。イベントの名前、ペイロード、発行されたコンポーネントなどの情報が表示されます。
+        </p>
+
+        <h4>1.6 パフォーマンスの測定</h4>
+        <p>
+            Vue 3のDevToolsには「Performance」タブが追加され、コンポーネントのレンダリング性能を測定できます。これにより、パフォーマンスのボトルネックを特定しやすくなります。
+        </p>
+
+        <h3>2. ブラウザのデバッグツール</h3>
+        <p>
+            ブラウザの標準開発者ツールは、Vue.jsアプリケーションのデバッグに不可欠です。
+        </p>
+
+        <h4>2.1 コンソールでのデバッグ</h4>
+        <p>
+            最も基本的なデバッグ方法は、<code>console.log()</code>を使用してデータを出力することです。
+        </p>
+
+        <pre><code class="language-javascript">// コンポーネント内
+const user = ref({
+name: '山田太郎',
+email: 'yamada@example.com'
+})
+
+// データを検査
+console.log('User object:', user.value)
+
+// 複数の値をラベル付きで出力
+console.log('Name:', user.value.name, 'Email:', user.value.email)
+
+// オブジェクトの内容を表形式で表示
+console.table(user.value)
+
+// 警告メッセージを出力
+console.warn('This feature will be deprecated soon')
+
+// エラーメッセージを出力
+console.error('Something went wrong!')</code></pre>
+
+        <h4>2.2 ブレークポイントの設定</h4>
+        <p>
+            コードの特定の行で実行を一時停止するには、ブレークポイントを設定します。ブレークポイントには複数の方法があります：
+        </p>
+
+        <pre><code class="language-javascript">// 1. デバッガーステートメント
+function calculateTotal(items) {
+let total = 0
+debugger; // ここで実行が一時停止
+for (const item of items) {
+total += item.price * item.quantity
+}
+return total
+}
+
+// 2. 条件付きブレークポイント
+function processItems(items) {
+items.forEach(item => {
+if (item.price < 0) {
+  console.log('Negative price detected')
+  debugger; // 価格が負の場合のみ一時停止
+}
+// 処理を続行
+})
+}</code></pre>
+
+        <p>
+            また、ブラウザの開発者ツールの「Sources」タブで行番号をクリックしてブレークポイントを設定することもできます。
+        </p>
+
+        <h4>2.3 ウォッチ式の使用</h4>
+        <p>
+            ブレークポイントで停止中に、「Watch」パネルに式を追加して値を監視できます。これにより、デバッグ中に特定の変数や式の値を常に確認できます。
+        </p>
+
+        <h4>2.4 コールスタックの確認</h4>
+        <p>
+            ブレークポイントで停止中に、「Call Stack」パネルで実行中の関数呼び出しの階層を確認できます。これにより、特定のコードがどのように呼び出されたかを追跡できます。
+        </p>
+
+        <h3>3. コードのデバッグテクニック</h3>
+
+        <h4>3.1 条件付きロギング</h4>
+        <p>
+            特定の条件を満たす場合にのみログを出力することで、デバッグの情報量を管理できます。
+        </p>
+
+        <pre><code class="language-javascript">function processOrders(orders) {
+orders.forEach(order => {
+// 特定の条件を満たす場合のみログを出力
+if (order.total > 10000) {
+  console.log('High value order:', order)
+}
+
+// 処理を続行
+processOrder(order)
+})
+}</code></pre>
+
+        <h4>3.2 エラーハンドリングとデバッグ</h4>
+        <p>
+            try/catchブロックを使用して、エラーを捕捉し詳細な情報を記録できます。
+        </p>
+
+        <pre><code class="language-javascript">async function fetchUserData(userId) {
+try {
+const response = await fetch(`/api/users/${userId}`)
+
+if (!response.ok) {
+  throw new Error(`HTTP error! status: ${response.status}`)
+}
+
+const data = await response.json()
+return data
+} catch (error) {
+console.error('Error fetching user data:', error.message)
+console.log('Error details:', error)
+console.log('User ID:', userId)
+
+// エラーを再スローするか、デフォルト値を返す
+return { id: userId, name: 'Unknown', error: true }
+}
+}</code></pre>
+
+        <h4>3.3 デバッグモードの実装</h4>
+        <p>
+            アプリケーションにデバッグモードを実装することで、開発中に追加の情報を表示できます。
+        </p>
+
+        <pre><code class="language-javascript">// 環境変数または設定に基づくデバッグフラグ
+const isDebugMode = import.meta.env.MODE === 'development'
+
+// デバッグユーティリティ関数
+const debug = {
+log(...args) {
+if (isDebugMode) {
+  console.log('[DEBUG]', ...args)
+}
+},
+warn(...args) {
+if (isDebugMode) {
+  console.warn('[DEBUG WARNING]', ...args)
+}
+},
+error(...args) {
+if (isDebugMode) {
+  console.error('[DEBUG ERROR]', ...args)
+}
+},
+// 実行時間を測定
+time(label, callback) {
+if (!isDebugMode) {
+  return callback()
+}
+
+console.time(`[DEBUG TIME] ${label}`)
+const result = callback()
+console.timeEnd(`[DEBUG TIME] ${label}`)
+return result
+}
+}
+
+// 使用例
+function processData(data) {
+debug.log('Processing data:', data)
+
+return debug.time('Data processing', () => {
+// 重い処理
+const result = data.map(item => /* ... */)
+debug.log('Processing complete')
+return result
+})
+}</code></pre>
+
+        <h3>4. Vue特有のデバッグテクニック</h3>
+
+        <h4>4.1 コンポーネントデバッグ</h4>
+        <p>
+            Vue.jsコンポーネントには、デバッグに役立つライフサイクルフックがあります。
+        </p>
+
+        <pre><code class="language-html">&lt;script setup&gt;
+import { ref, onMounted, onUpdated, watch } from 'vue'
+
+const count = ref(0)
+const props = defineProps(['initialValue'])
+
+// マウント時のデバッグ
+onMounted(() => {
+console.log('Component mounted')
+console.log('Initial props:', props)
+console.log('Initial count:', count.value)
+})
+
+// 更新時のデバッグ
+onUpdated(() => {
+console.log('Component updated')
+console.log('Current count:', count.value)
+})
+
+// 特定の値の変更を監視
+watch(count, (newValue, oldValue) => {
+console.log(`Count changed from ${oldValue} to ${newValue}`)
+}, { immediate: true })
+
+// メソッド内でのデバッグ
+function increment() {
+console.log('Increment called, current count:', count.value)
+count.value++
+console.log('After increment, count:', count.value)
+}
+&lt;/script&gt;</code></pre>
+
+        <h4>4.2 テンプレートデバッグ</h4>
+        <p>
+            テンプレート内でもデバッグ情報を表示できます。
+        </p>
+
+        <pre><code class="language-html">&lt;template&gt;
+&lt;div&gt;
+&lt;h1&gt;{{ title }}&lt;/h1&gt;
+
+&lt;!-- デバッグ情報（開発環境のみ表示） --&gt;
+&lt;div v-if="isDebugMode" class="debug-info"&gt;
+  &lt;pre&gt;{{ JSON.stringify(user, null, 2) }}&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;user-profile :user="user" /&gt;
+
+&lt;!-- 条件付きデバッグメッセージ --&gt;
+&lt;p v-if="isDebugMode && user.role === 'admin'"&gt;
+  Admin user detected
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { ref, computed } from 'vue'
+import UserProfile from './components/UserProfile.vue'
+
+const isDebugMode = import.meta.env.MODE === 'development'
+const title = ref('ユーザー情報')
+const user = ref({
+id: 1,
+name: '山田太郎',
+email: 'yamada@example.com',
+role: 'admin'
+})
+&lt;/script&gt;</code></pre>
+
+        <h4>4.3 コンポーネント名の明示的な設定</h4>
+        <p>
+            デバッグを容易にするため、コンポーネントに明示的な名前を設定しましょう。
+        </p>
+
+        <pre><code class="language-html">&lt;!-- UserProfile.vue --&gt;
+&lt;script&gt;
+export default {
+name: 'UserProfile', // 明示的な名前
+// ...
+}
+&lt;/script&gt;
+
+&lt;!-- または Composition APIを使用する場合 --&gt;
+&lt;script setup&gt;
+import { defineOptions } from 'vue'
+
+// コンポーネント名を定義
+defineOptions({
+name: 'UserProfile'
+})
+
+// ...
+&lt;/script&gt;</code></pre>
+
+        <h3>5. HTTPリクエストのデバッグ</h3>
+
+        <h4>5.1 ネットワークパネルの使用</h4>
+        <p>
+            ブラウザの開発者ツールの「Network」タブを使用して、APIリクエストとレスポンスを監視できます。
+        </p>
+
+        <h4>5.2 Axiosをデバッグする</h4>
+        <p>
+            Axiosを使用している場合、インターセプターを使ってデバッグ情報を追加できます。
+        </p>
+
+        <pre><code class="language-javascript">// api/axios.js
+import axios from 'axios'
+
+const api = axios.create({
+baseURL: import.meta.env.VITE_API_URL
+})
+
+// デバッグモード
+const isDebugMode = import.meta.env.MODE === 'development'
+
+// リクエストインターセプター
+api.interceptors.request.use(config => {
+if (isDebugMode) {
+console.log('➡️ API Request:', config.method.toUpperCase(), config.url)
+console.log('Request data:', config.data)
+console.log('Request headers:', config.headers)
+
+// 実行時間の計測開始
+config.metadata = { startTime: new Date() }
+}
+return config
+})
+
+// レスポンスインターセプター
+api.interceptors.response.use(
+response => {
+if (isDebugMode) {
+  // 実行時間の計算
+  const endTime = new Date()
+  const duration = endTime - response.config.metadata.startTime
+  
+  console.log('⬅️ API Response:', response.status, response.config.url)
+  console.log(`Response time: ${duration}ms`)
+  console.log('Response data:', response.data)
+}
+return response
+},
+error => {
+if (isDebugMode) {
+  console.error('❌ API Error:', error.message)
+  
+  if (error.response) {
+    console.error('Error status:', error.response.status)
+    console.error('Error data:', error.response.data)
+  }
+}
+return Promise.reject(error)
+}
+)
+
+export default api</code></pre>
+
+        <h3>6. パフォーマンスのデバッグと最適化</h3>
+
+        <h4>6.1 Vueのパフォーマンス測定</h4>
+        <p>
+            Vue 3では、パフォーマンスを測定するためのAPIが提供されています。
+        </p>
+
+        <pre><code class="language-javascript">// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+const app = createApp(App)
+
+// 開発環境のみ
+if (import.meta.env.DEV) {
+app.config.performance = true
+}
+
+app.mount('#app')</code></pre>
+
+        <p>
+            <code>app.config.performance</code>をtrueに設定すると、コンポーネントの初期化、コンパイル、レンダリングにかかる時間を測定できます。
+        </p>
+
+        <h4>6.2 Performance APIの使用</h4>
+        <p>
+            ブラウザのPerformance APIを使用して、コードの実行時間を測定できます。
+        </p>
+
+        <pre><code class="language-javascript">// パフォーマンス測定用ユーティリティ
+function measurePerformance(label, callback) {
+const startMark = `start_${label}`
+const endMark = `end_${label}`
+
+performance.mark(startMark)
+const result = callback()
+performance.mark(endMark)
+
+performance.measure(label, startMark, endMark)
+
+// 測定結果をログに出力
+const measures = performance.getEntriesByName(label)
+console.log(`${label}: ${measures[0].duration.toFixed(2)}ms`)
+
+// マークをクリア
+performance.clearMarks(startMark)
+performance.clearMarks(endMark)
+performance.clearMeasures(label)
+
+return result
+}
+
+// 使用例
+function processLargeData(data) {
+return measurePerformance('processLargeData', () => {
+// 重い処理
+return data.map(/* ... */).filter(/* ... */).reduce(/* ... */)
+})
+}</code></pre>
+
+        <h4>6.3 レンダリングの最適化</h4>
+        <p>
+            不要な再レンダリングを避けるためのデバッグと最適化テクニックを紹介します。
+        </p>
+
+        <pre><code class="language-html">&lt;script setup&gt;
+import { ref, computed, onUpdated } from 'vue'
+
+const items = ref([/* ... */])
+const filter = ref('')
+
+// computedプロパティを使用して計算を最適化
+const filteredItems = computed(() => {
+console.log('Recalculating filtered items')
+return items.value.filter(item => 
+item.name.toLowerCase().includes(filter.value.toLowerCase())
+)
+})
+
+// 更新のたびに呼び出される
+onUpdated(() => {
+console.log('Component updated')
+})
+
+// ヘビーな計算を行う関数
+function calculateTotal() {
+console.log('Calculating total')
+return items.value.reduce((sum, item) => sum + item.price, 0)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+&lt;div&gt;
+&lt;input v-model="filter" placeholder="Filter items" /&gt;
+
+&lt;!-- コンポーネントの不要な再レンダリングを検出 --&gt;
+&lt;ul&gt;
+  &lt;li v-for="item in filteredItems" :key="item.id"&gt;
+    {{ item.name }} - {{ item.price }}
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- 不要な計算が呼び出されていないか確認 --&gt;
+&lt;p&gt;Total: {{ calculateTotal() }}&lt;/p&gt;
+&lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+        <p>
+            上記の例では、<code>calculateTotal()</code>がテンプレート内で直接呼び出されているため、コンポーネントが再レンダリングされるたびに実行されます。これをcomputedプロパティに変更することで最適化できます。
+        </p>
+
+        <h3>7. 本番環境と開発環境の違い</h3>
+
+        <h4>7.1 開発モードと本番モードの切り替え</h4>
+        <p>
+            Viteでは、<code>.env</code>ファイルを使用して環境ごとの設定を管理できます。
+        </p>
+
+        <pre><code class="language-text"># .env.development
+VITE_APP_MODE="development"
+VITE_API_URL="http://localhost:3000/api"
+VITE_ENABLE_LOGS=true
+
+# .env.production
+VITE_APP_MODE="production"
+VITE_API_URL="https://api.example.com"
+VITE_ENABLE_LOGS=false</code></pre>
+
+        <p>
+            アプリケーションコード内で環境変数にアクセスします：
+        </p>
+
+        <pre><code class="language-javascript">// logger.js
+const enableLogs = import.meta.env.VITE_ENABLE_LOGS === 'true'
+const isDevelopment = import.meta.env.MODE === 'development'
+
+export const logger = {
+log(...args) {
+if (enableLogs || isDevelopment) {
+  console.log(...args)
+}
+},
+warn(...args) {
+if (enableLogs || isDevelopment) {
+  console.warn(...args)
+}
+},
+error(...args) {
+// エラーは常にログに記録
+console.error(...args)
+}
+}</code></pre>
+
+        <h4>7.2 本番環境でのデバッグ</h4>
+        <p>
+            本番環境でのデバッグはより難しいですが、以下の方法が有効です：
+        </p>
+
+        <ul>
+            <li>ログサービスの使用（Sentry, LogRocket）</li>
+            <li>リモートデバッグの設定</li>
+            <li>URIパラメータによるデバッグモードの有効化</li>
+        </ul>
+
+        <pre><code class="language-javascript">// 本番環境でもデバッグを有効にする条件付きロジック
+const urlParams = new URLSearchParams(window.location.search)
+const enableDebug = urlParams.get('debug') === 'true'
+
+if (enableDebug) {
+// デバッグモードを有効化
+localStorage.setItem('debug', 'true')
+console.log('Debug mode enabled via URL parameter')
+}
+
+// デバッグフラグを確認
+const isDebugMode = import.meta.env.MODE === 'development' || 
+                localStorage.getItem('debug') === 'true'
+
+// 安全な方法でデバッグ情報を表示
+function safeDebug(label, data) {
+if (isDebugMode) {
+console.group(label)
+console.log(data)
+console.groupEnd()
+}
+}</code></pre>
+
+        <h3>8. テストとデバッグの連携</h3>
+
+        <h4>8.1 単体テストでのデバッグ</h4>
+        <p>
+            Vitest（Viteベースのテストランナー）を使用したテストでのデバッグ方法：
+        </p>
+
+        <pre><code class="language-javascript">// counter.test.js
+import { describe, test, expect, vi } from 'vitest'
+import { useCounter } from '../composables/counter'
+
+describe('useCounter', () => {
+// コンソールログをモック化してデバッグ
+const originalConsoleLog = console.log
+let consoleOutput = []
+
+beforeEach(() => {
+consoleOutput = []
+console.log = vi.fn((...args) => {
+  consoleOutput.push(args)
+  originalConsoleLog(...args)
+})
+})
+
+afterEach(() => {
+console.log = originalConsoleLog
+})
+
+test('increment should increase count', () => {
+const { count, increment } = useCounter(0)
+
+expect(count.value).toBe(0)
+increment()
+expect(count.value).toBe(1)
+
+// ログ出力を検証
+expect(consoleOutput.some(log => 
+  log.join(' ').includes('Count incremented')
+)).toBe(true)
+})
+})
+
+// composables/counter.js
+import { ref } from 'vue'
+
+export function useCounter(initialValue = 0) {
+const count = ref(initialValue)
+
+function increment() {
+count.value++
+console.log('Count incremented to', count.value)
+}
+
+function decrement() {
+count.value--
+console.log('Count decremented to', count.value)
+}
+
+return { count, increment, decrement }
+}</code></pre>
+
+        <h4>8.2 コンポーネントテストでのデバッグ</h4>
+        <p>
+            Vue Test Utilsを使用したコンポーネントテストのデバッグ：
+        </p>
+
+        <pre><code class="language-javascript">// Counter.test.js
+import { mount } from '@vue/test-utils'
+import { describe, test, expect } from 'vitest'
+import Counter from '../components/Counter.vue'
+
+describe('Counter.vue', () => {
+test('renders correctly and increments count', async () => {
+const wrapper = mount(Counter)
+
+// コンポーネントのHTMLをコンソールに出力
+console.log('Initial HTML:', wrapper.html())
+
+// 初期状態のテスト
+expect(wrapper.text()).toContain('Count: 0')
+
+// ボタンをクリック
+await wrapper.find('button').trigger('click')
+
+// 更新後のHTMLを出力
+console.log('After click HTML:', wrapper.html())
+
+// 状態の更新を検証
+expect(wrapper.text()).toContain('Count: 1')
+
+// コンポーネントのVMにアクセスしてデバッグ
+console.log('Component data:', wrapper.vm.$data)
+})
+})</code></pre>
+
+        <h3>9. デバッグツールとユーティリティ</h3>
+        <p>
+            Vue.jsアプリケーションの開発とデバッグを支援するための様々なツールやユーティリティがあります。
+        </p>
+
+        <h4>9.1 Vite Plugin Inspect</h4>
+        <p>
+            Viteの内部処理を可視化するプラグインです。ビルドプロセスの問題をデバッグするのに役立ちます。
+        </p>
+
+        <pre><code class="language-bash"># インストール
+npm install -D vite-plugin-inspect</code></pre>
+
+        <pre><code class="language-javascript">// vite.config.js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import Inspect from 'vite-plugin-inspect'
+
+export default defineConfig({
+plugins: [
+vue(),
+Inspect() // http://localhost:5173/__inspect/ でアクセス
+]
+})</code></pre>
+
+        <h4>9.2 コード品質ツール</h4>
+        <p>
+            ESLintとPrettierを使用して、コードの品質を維持し、潜在的なバグを早期に発見できます。
+        </p>
+
+        <pre><code class="language-bash"># ESLintとVue用プラグインのインストール
+npm install -D eslint eslint-plugin-vue
+
+# Prettierのインストール
+npm install -D prettier eslint-config-prettier</code></pre>
+
+        <pre><code class="language-javascript">// .eslintrc.js
+module.exports = {
+root: true,
+env: {
+node: true,
+browser: true,
+es2021: true
+},
+extends: [
+'eslint:recommended',
+'plugin:vue/vue3-recommended',
+'prettier'
+],
+parserOptions: {
+ecmaVersion: 2021,
+sourceType: 'module'
+},
+rules: {
+// カスタムルール
+'vue/no-unused-vars': 'warn',
+'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+}
+}</code></pre>
+
+        <h4>9.3 ブラウザ拡張機能</h4>
+        <p>
+            Vue DevTools以外にも、開発に役立つブラウザ拡張機能があります：
+        </p>
+        <ul>
+            <li>JSON Formatter - APIレスポンスを見やすく表示</li>
+            <li>Wappalyzer - ウェブサイトで使用されている技術を検出</li>
+            <li>React Developer Tools - React/Vueの両方を使用するプロジェクトに便利</li>
+            <li>Lighthouse - パフォーマンス、アクセシビリティ、SEOなどを分析</li>
+        </ul>
+
+        <h4>9.4 ロギングライブラリ</h4>
+        <p>
+            より高度なロギングには、専用のライブラリが便利です。
+        </p>
+
+        <pre><code class="language-bash"># loglevel をインストール
+npm install loglevel</code></pre>
+
+        <pre><code class="language-javascript">// logger.js
+import log from 'loglevel'
+
+// 開発環境では詳細なログを、本番環境では重要なログのみ表示
+if (import.meta.env.DEV) {
+log.setLevel(log.levels.DEBUG)
+} else {
+log.setLevel(log.levels.WARN)
+}
+
+export default log
+
+// 使用例
+import log from './logger'
+
+log.debug('デバッグ情報') // 開発環境でのみ表示
+log.info('情報メッセージ') // 開発環境でのみ表示
+log.warn('警告メッセージ') // 常に表示
+log.error('エラーメッセージ') // 常に表示</code></pre>
+
+        <h3>10. 本番環境でのエラー追跡</h3>
+        <p>
+            本番環境でのエラーを追跡するために、エラーモニタリングサービスを導入できます。
+        </p>
+
+        <h4>10.1 Sentryの導入</h4>
+        <p>
+            Sentryは人気のあるエラー追跡サービスです。
+        </p>
+
+        <pre><code class="language-bash"># Sentryクライアントをインストール
+npm install @sentry/vue @sentry/tracing</code></pre>
+
+        <pre><code class="language-javascript">// main.js
+import { createApp } from 'vue'
+import { createRouter } from 'vue-router'
+import * as Sentry from '@sentry/vue'
+import { BrowserTracing } from '@sentry/tracing'
+import App from './App.vue'
+import router from './router'
+
+const app = createApp(App)
+
+// Sentryを初期化
+if (import.meta.env.PROD) {
+Sentry.init({
+app,
+dsn: import.meta.env.VITE_SENTRY_DSN,
+integrations: [
+  new BrowserTracing({
+    routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+    tracingOrigins: ['localhost', 'my-site-url.com', /^\//]
+  })
+],
+// パフォーマンスサンプリングレート
+tracesSampleRate: 1.0,
+// リリース情報
+release: import.meta.env.VITE_APP_VERSION,
+// 環境
+environment: import.meta.env.MODE
+})
+}
+
+app.use(router)
+app.mount('#app')</code></pre>
+
+        <h4>10.2 グローバルエラーハンドラ</h4>
+        <p>
+            Vue.jsにはグローバルエラーハンドラがあり、キャッチされなかったエラーを処理できます。
+        </p>
+
+        <pre><code class="language-javascript">// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+const app = createApp(App)
+
+// グローバルエラーハンドラ
+app.config.errorHandler = (err, instance, info) => {
+// エラー情報をログ
+console.error('Vue Error:', err)
+console.log('Component:', instance)
+console.log('Error Info:', info)
+
+// カスタムエラー報告ロジック
+reportErrorToAnalyticsService(err, instance, info)
+}
+
+// 非同期エラーハンドラ
+window.addEventListener('error', (event) => {
+console.error('Global error:', event.error)
+})
+
+window.addEventListener('unhandledrejection', (event) => {
+console.error('Unhandled Promise Rejection:', event.reason)
+})
+
+app.mount('#app')
+
+// カスタムエラー報告関数
+function reportErrorToAnalyticsService(err, instance, info) {
+// エラー追跡サービスやアナリティクスにエラーを送信
+// ...
+}</code></pre>
+
+        <h3>11. 実践的なデバッグの例</h3>
+        <p>
+            ここでは、Vue.jsアプリケーションで一般的なデバッグシナリオと解決方法を紹介します。
+        </p>
+
+        <h4>11.1 コンポーネント間のデータフローのデバッグ</h4>
+        <pre><code class="language-html">&lt;!-- ParentComponent.vue --&gt;
+&lt;template&gt;
+&lt;div&gt;
+&lt;h2&gt;Parent Component&lt;/h2&gt;
+&lt;button @click="updateData"&gt;Update Data&lt;/button&gt;
+
+&lt;!-- デバッグ用の表示 --&gt;
+&lt;pre v-if="isDebugMode"&gt;{{ debugData }}&lt;/pre&gt;
+
+&lt;child-component 
+  :items="items" 
+  @item-selected="handleItemSelected" 
+/&gt;
+&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { ref, computed } from 'vue'
+import ChildComponent from './ChildComponent.vue'
+
+// デバッグフラグ
+const isDebugMode = import.meta.env.DEV
+
+const items = ref([
+{ id: 1, name: 'Item 1' },
+{ id: 2, name: 'Item 2' },
+{ id: 3, name: 'Item 3' }
+])
+
+// デバッグ情報
+const debugData = computed(() => {
+return {
+itemsCount: items.value.length,
+itemsData: items.value
+}
+})
+
+function updateData() {
+console.log('Updating data...')
+items.value.push({ id: items.value.length + 1, name: `Item ${items.value.length + 1}` })
+}
+
+function handleItemSelected(itemId) {
+console.log('Item selected in parent:', itemId)
+
+// 選択されたアイテムを見つける
+const selectedItem = items.value.find(item => item.id === itemId)
+console.log('Selected item details:', selectedItem)
+}
+&lt;/script&gt;</code></pre>
+
+        <pre><code class="language-html">&lt;!-- ChildComponent.vue --&gt;
+&lt;template&gt;
+&lt;div&gt;
+&lt;h3&gt;Child Component&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li 
+    v-for="item in items" 
+    :key="item.id"
+    @click="selectItem(item.id)"
+  &gt;
+    {{ item.name }}
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- デバッグ用の表示 --&gt;
+&lt;div v-if="isDebugMode" class="debug-panel"&gt;
+  &lt;p&gt;Last selected: {{ lastSelectedId }}&lt;/p&gt;
+  &lt;p&gt;Items count: {{ items.length }}&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { ref, watch } from 'vue'
+
+// プロパティとイベントの定義
+const props = defineProps({
+items: {
+type: Array,
+required: true
+}
+})
+
+const emit = defineEmits(['item-selected'])
+
+// デバッグフラグ
+const isDebugMode = import.meta.env.DEV
+const lastSelectedId = ref(null)
+
+// propsの変更を監視
+watch(() => props.items, (newItems, oldItems) => {
+if (isDebugMode) {
+console.log('Items changed in child:')
+console.log('New count:', newItems.length)
+console.log('Old count:', oldItems.length)
+console.log('New items:', newItems)
+}
+}, { deep: true })
+
+function selectItem(id) {
+console.log('Item clicked in child:', id)
+lastSelectedId.value = id
+emit('item-selected', id)
+}
+&lt;/script&gt;</code></pre>
+
+        <h4>11.2 APIリクエストのデバッグ</h4>
+        <pre><code class="language-javascript">// api.js
+import axios from 'axios'
+
+const api = axios.create({
+baseURL: import.meta.env.VITE_API_URL,
+timeout: 10000
+})
+
+// ユーザー情報を取得する関数
+export async function fetchUserData(userId) {
+try {
+console.log(`Fetching user data for ID: ${userId}`)
+
+const response = await api.get(`/users/${userId}`)
+
+console.log('API response:', response.data)
+return response.data
+} catch (error) {
+console.error('Error fetching user data:', error)
+
+// エラーの種類に応じたデバッグ情報
+if (error.response) {
+  // サーバーからのレスポンスがあるエラー
+  console.error('Response error:', {
+    status: error.response.status,
+    statusText: error.response.statusText,
+    data: error.response.data
+  })
+} else if (error.request) {
+  // リクエストは送信されたがレスポンスがない
+  console.error('Request error - no response received:', error.request)
+} else {
+  // リクエストの設定時に発生したエラー
+  console.error('Request setup error:', error.message)
+}
+
+// エラーを再スロー
+throw error
+}
+}</code></pre>
+
+        <pre><code class="language-html">&lt;!-- UserProfile.vue --&gt;
+&lt;template&gt;
+&lt;div&gt;
+&lt;h2&gt;User Profile&lt;/h2&gt;
+
+&lt;div v-if="loading"&gt;Loading...&lt;/div&gt;
+
+&lt;div v-else-if="error" class="error"&gt;
+  &lt;p&gt;Error: {{ error }}&lt;/p&gt;
+  &lt;button @click="fetchUser"&gt;Retry&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div v-else-if="user" class="user-profile"&gt;
+  &lt;h3&gt;{{ user.name }}&lt;/h3&gt;
+  &lt;p&gt;Email: {{ user.email }}&lt;/p&gt;
+  &lt;p&gt;Role: {{ user.role }}&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- デバッグパネル --&gt;
+&lt;div v-if="isDebugMode" class="debug-panel"&gt;
+  &lt;h4&gt;Debug Info&lt;/h4&gt;
+  &lt;p&gt;API URL: {{ apiUrl }}&lt;/p&gt;
+  &lt;p&gt;Request Count: {{ requestCount }}&lt;/p&gt;
+  &lt;p&gt;Last Request Time: {{ lastRequestTime }}&lt;/p&gt;
+  
+  &lt;h5&gt;Raw Response:&lt;/h5&gt;
+  &lt;pre&gt;{{ rawResponse }}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { ref, onMounted } from 'vue'
+import { fetchUserData } from '../api'
+
+// デバッグフラグ
+const isDebugMode = import.meta.env.DEV
+const apiUrl = import.meta.env.VITE_API_URL
+
+// 状態
+const user = ref(null)
+const loading = ref(false)
+const error = ref(null)
+
+// デバッグ情報
+const requestCount = ref(0)
+const lastRequestTime = ref(null)
+const rawResponse = ref(null)
+
+// マウント時にユーザー情報を取得
+onMounted(() => {
+fetchUser()
+})
+
+async function fetchUser() {
+loading.value = true
+error.value = null
+
+try {
+// 現在時刻を記録
+const startTime = new Date()
+requestCount.value++
+
+// ユーザーIDは例として1を使用
+const userData = await fetchUserData(1)
+
+// レスポンスを記録
+rawResponse.value = JSON.stringify(userData, null, 2)
+
+// 経過時間を計算
+const endTime = new Date()
+lastRequestTime.value = `${endTime.getTime() - startTime.getTime()}ms`
+
+user.value = userData
+} catch (err) {
+error.value = err.message || 'Failed to fetch user data'
+rawResponse.value = JSON.stringify(err, null, 2)
+} finally {
+loading.value = false
+}
+}
+&lt;/script&gt;</code></pre>
+
+        <h3>まとめ</h3>
+        <p>
+            この章では、Vue.jsアプリケーションの開発とデバッグに役立つツールやテクニックを紹介しました。Vue DevTools、ブラウザのデバッグツール、コンソールデバッグ、パフォーマンス最適化、エラー追跡など、幅広いトピックをカバーしています。
+        </p>
+        <p>
+            効果的なデバッグは、高品質なアプリケーションを開発するための重要なスキルです。問題が発生したときに迅速に原因を特定し、解決できるようになれば、開発効率が大幅に向上します。デバッグツールと手法を日常的に活用して、Vue.jsの開発スキルを向上させましょう。
+        </p>
+
+        <h3>演習問題</h3>
+        <ol>
+            <li>Vue DevToolsを使用して、コンポーネントの状態とpropsを検査するための小さなアプリケーションを作成してください。</li>
+            <li>コンソールログと条件付きデバッグを使用して、異なる環境（開発環境と本番環境）で動作するロガーを実装してください。</li>
+            <li>パフォーマンスの問題があるVueコンポーネントを特定し、最適化するためのデバッグ手法を適用してください。</li>
+            <li>APIリクエストをデバッグするためのインターセプターを実装し、リクエストとレスポンスの詳細をログに記録してください。</li>
+            <li>エラー追跡サービス（SentryなどのモックでもOK）を統合し、グローバルエラーハンドラを実装してください。</li>
+        </ol>
+    </section>
+      
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

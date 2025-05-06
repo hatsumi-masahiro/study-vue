@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第8章: Vue Router で画面遷移</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>第8章: Vue Router で画面遷移</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter8">
+            <h2 id="chapter8" class="chapter-heading">第8章: Vue Router で画面遷移</h2>
+
+            <h3>概要</h3>
+            <p>
+                本章では、Vue Routerを使用して、単一ページアプリケーション（SPA）の画面遷移を実装する方法について学びます。ルートの定義、ナビゲーションの実装、パラメータの受け渡し、ルートガードなどの重要な概念について理解を深めます。
+            </p>
+            
+            <h3>1. Vue Routerの概要</h3>
+            <p>
+                Vue Routerは、Vue.jsの公式ルーティングライブラリです。単一ページアプリケーション（SPA）を構築するための重要な要素であり、URLに基づいてコンポーネントをレンダリングします。Vue Routerを使用すると、ページ全体をリロードすることなく、アプリケーション内を移動できます。
+            </p>
+            
+            <h4>Vue Routerの主な機能</h4>
+            <ul>
+                <li>ネストされたルート/ビューマッピング</li>
+                <li>モジュール式、コンポーネントベースのルーター設定</li>
+                <li>ルートパラメータ、クエリ、ワイルドカード</li>
+                <li>Vue.jsのトランジション機能を利用したトランジション効果</li>
+                <li>細かいナビゲーションコントロール</li>
+                <li>自動的なアクティブCSSクラスの適用</li>
+                <li>HTML5 historyモードまたはハッシュモード</li>
+                <li>スクロール位置の復元</li>
+            </ul>
+
+            <h3>2. Vue Routerのインストールと設定</h3>
+            <p>
+                まず、Vue Routerをインストールし、Vueアプリケーションに統合する方法を学びましょう。
+            </p>
+            
+            <h4>インストール</h4>
+            <p>
+                npm（またはyarn）を使用して、Vue Routerをインストールします：
+            </p>
+            <pre><code class="language-bash">npm install vue-router@4</code></pre>
+            <p>
+                Vue Router 4は、Vue.js 3と互換性があります。Vue.js 2を使用している場合は、Vue Router 3をインストールする必要があります。
+            </p>
+
+            <h4>基本的な設定</h4>
+            <p>
+                Vue Routerを設定するには、ルート定義を作成し、ルーターインスタンスを作成して、Vueアプリケーションに登録します。
+            </p>
+            <pre><code class="language-javascript">// src/router/index.js
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '@/views/Home.vue'
+import About from '@/views/About.vue'
+import NotFound from '@/views/NotFound.vue'
+
+// ルート定義
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: About
+  },
+  {
+    // 404ページ
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound
+  }
+]
+
+// ルーターインスタンスの作成
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router</code></pre>
+
+            <p>
+                次に、作成したルーターをVueアプリケーションに登録します：
+            </p>
+            <pre><code class="language-javascript">// src/main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+
+createApp(App)
+  .use(router)
+  .mount('#app')</code></pre>
+
+            <h4>ルーターの使用</h4>
+            <p>
+                ルーターをアプリケーションに統合するには、<code>&lt;router-view&gt;</code>コンポーネントを使用します。これは、現在のルートに一致するコンポーネントをレンダリングするプレースホルダーです。
+            </p>
+            <pre><code class="language-html">&lt;!-- App.vue --&gt;
+&lt;template&gt;
+  &lt;div id="app"&gt;
+    &lt;nav&gt;
+      &lt;router-link to="/"&gt;ホーム&lt;/router-link&gt; |
+      &lt;router-link to="/about"&gt;概要&lt;/router-link&gt;
+    &lt;/nav&gt;
+    &lt;router-view /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>3. ルートの定義と構成</h3>
+            <p>
+                ルート定義は、パス、名前、コンポーネント、その他のオプションで構成されます。
+            </p>
+            
+            <h4>基本的なルート</h4>
+            <pre><code class="language-javascript">const routes = [
+  {
+    path: '/',          // URLパス
+    name: 'Home',       // ルートの名前（オプション）
+    component: Home     // 表示するコンポーネント
+  }
+]</code></pre>
+
+            <h4>動的セグメント</h4>
+            <p>
+                動的セグメントは、コロン（:）を使用して定義します。これにより、URLの一部をパラメータとして捕捉できます。
+            </p>
+            <pre><code class="language-javascript">{
+  path: '/user/:id',
+  name: 'User',
+  component: User
+}</code></pre>
+
+            <h4>ネストされたルート</h4>
+            <p>
+                <code>children</code>プロパティを使用して、ネストされたルートを定義できます。
+            </p>
+            <pre><code class="language-javascript">{
+  path: '/user/:id',
+  name: 'User',
+  component: User,
+  children: [
+    {
+      path: 'profile',  // /user/:id/profile に一致
+      name: 'UserProfile',
+      component: UserProfile
+    },
+    {
+      path: 'posts',    // /user/:id/posts に一致
+      name: 'UserPosts',
+      component: UserPosts
+    }
+  ]
+}</code></pre>
+            <p>
+                ネストされたルートをレンダリングするには、親コンポーネント内に<code>&lt;router-view&gt;</code>を配置します。
+            </p>
+            <pre><code class="language-html">&lt;!-- User.vue --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;ユーザー {{ $route.params.id }}&lt;/h2&gt;
+    &lt;nav&gt;
+      &lt;router-link :to="{ name: 'UserProfile', params: { id: $route.params.id } }"&gt;プロフィール&lt;/router-link&gt; |
+      &lt;router-link :to="{ name: 'UserPosts', params: { id: $route.params.id } }"&gt;投稿&lt;/router-link&gt;
+    &lt;/nav&gt;
+    &lt;router-view /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>名前付きビュー</h4>
+            <p>
+                複数の<code>&lt;router-view&gt;</code>を同時にレンダリングする場合は、名前付きビューを使用できます。
+            </p>
+            <pre><code class="language-javascript">{
+  path: '/dashboard',
+  name: 'Dashboard',
+  components: {
+    default: DashboardMain,
+    sidebar: DashboardSidebar,
+    header: DashboardHeader
+  }
+}</code></pre>
+            <pre><code class="language-html">&lt;!-- App.vue --&gt;
+&lt;template&gt;
+  &lt;div id="app"&gt;
+    &lt;router-view name="header" /&gt;
+    &lt;div class="content"&gt;
+      &lt;router-view name="sidebar" /&gt;
+      &lt;router-view /&gt; &lt;!-- default --&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>リダイレクト</h4>
+            <p>
+                特定のURLから別のURLにリダイレクトするルートを定義できます。
+            </p>
+            <pre><code class="language-javascript">{
+  path: '/home',
+  redirect: '/'
+}
+
+// または名前付きルートへのリダイレクト
+{
+  path: '/home',
+  redirect: { name: 'Home' }
+}
+
+// または動的リダイレクト
+{
+  path: '/search/:query',
+  redirect: to => {
+    // 関数はルートオブジェクトを受け取り、リダイレクト先を返す
+    return { path: '/results', query: { q: to.params.query } }
+  }
+}</code></pre>
+
+            <h4>エイリアス</h4>
+            <p>
+                エイリアスを使用すると、異なるURLで同じコンポーネントにアクセスできます。
+            </p>
+            <pre><code class="language-javascript">{
+  path: '/posts',
+  name: 'Posts',
+  component: PostList,
+  alias: ['/articles', '/blog']
+}</code></pre>
+
+            <h4>遅延ローディング（コード分割）</h4>
+            <p>
+                大規模なアプリケーションでは、必要なときにのみコンポーネントをロードする遅延ローディングが便利です。
+            </p>
+            <pre><code class="language-javascript">const routes = [
+  {
+    path: '/about',
+    name: 'About',
+    // 動的インポートを使用した遅延ローディング
+    component: () => import('@/views/About.vue')
+  }
+]</code></pre>
+
+            <h3>4. ルーターリンクとナビゲーション</h3>
+            <p>
+                Vue Routerは、ページ間のナビゲーションを実装するためのいくつかの方法を提供します。
+            </p>
+            
+            <h4>router-linkコンポーネント</h4>
+            <p>
+                <code>&lt;router-link&gt;</code>コンポーネントは、ナビゲーションを宣言的に実装するために使用されます。
+            </p>
+            <pre><code class="language-html">&lt;!-- 基本的な使用法 --&gt;
+&lt;router-link to="/"&gt;ホーム&lt;/router-link&gt;
+
+&lt;!-- 完全なURL --&gt;
+&lt;router-link to="/about"&gt;概要&lt;/router-link&gt;
+
+&lt;!-- 名前付きルート --&gt;
+&lt;router-link :to="{ name: 'User', params: { id: 123 } }"&gt;ユーザー&lt;/router-link&gt;
+
+&lt;!-- クエリパラメータ --&gt;
+&lt;router-link :to="{ path: '/search', query: { q: 'vue' } }"&gt;検索&lt;/router-link&gt;
+
+&lt;!-- アクティブクラス --&gt;
+&lt;router-link to="/about" active-class="active"&gt;概要&lt;/router-link&gt;
+
+&lt;!-- 完全一致 --&gt;
+&lt;router-link to="/user" exact&gt;ユーザー&lt;/router-link&gt;</code></pre>
+
+            <h4>プログラムによるナビゲーション</h4>
+            <p>
+                JavaScriptコード内でナビゲーションを実行する場合は、ルーターインスタンスのメソッドを使用できます。
+            </p>
+            <pre><code class="language-javascript">// Composition API
+import { useRouter } from 'vue-router'
+
+export default {
+  setup() {
+    const router = useRouter()
+    
+    function goToHome() {
+      // パスによるナビゲーション
+      router.push('/')
+    }
+    
+    function goToUser(userId) {
+      // オブジェクトによるナビゲーション
+      router.push({
+        name: 'User',
+        params: { id: userId }
+      })
+    }
+    
+    function goToSearch(query) {
+      // クエリパラメータ付きナビゲーション
+      router.push({
+        path: '/search',
+        query: { q: query }
+      })
+    }
+    
+    function goBack() {
+      // 履歴を戻る
+      router.back()
+    }
+    
+    function goForward() {
+      // 履歴を進む
+      router.forward()
+    }
+    
+    function replaceCurrentPage() {
+      // 現在のページを置き換え（履歴に追加しない）
+      router.replace('/login')
+    }
+    
+    return {
+      goToHome,
+      goToUser,
+      goToSearch,
+      goBack,
+      goForward,
+      replaceCurrentPage
+    }
+  }
+}</code></pre>
+
+            <h3>5. ルートパラメータとクエリ</h3>
+            <p>
+                ルートパラメータとクエリを使用して、ルート間でデータを渡すことができます。
+            </p>
+            
+            <h4>ルートパラメータへのアクセス</h4>
+            <pre><code class="language-html">&lt;!-- User.vue --&gt;
+&lt;script setup&gt;
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// URLが /user/123 の場合、route.params.id は "123"
+console.log(route.params.id)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;ユーザーID: {{ $route.params.id }}&lt;/h1&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>クエリパラメータへのアクセス</h4>
+            <pre><code class="language-html">&lt;!-- Search.vue --&gt;
+&lt;script setup&gt;
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// URLが /search?q=vue&sort=desc の場合
+console.log(route.query.q)     // "vue"
+console.log(route.query.sort)  // "desc"
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;検索結果: {{ $route.query.q }}&lt;/h1&gt;
+    &lt;p&gt;並び順: {{ $route.query.sort || 'デフォルト' }}&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>パラメータの変更を監視</h4>
+            <p>
+                同じコンポーネントを再利用しながらパラメータが変更された場合、コンポーネントは再マウントされません。パラメータの変更を監視するには、watchを使用します。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// コンポーネントのマウント時とパラメータが変更されたときに実行
+function fetchUserData() {
+  const userId = route.params.id
+  console.log(`ユーザーID ${userId} のデータを取得中...`)
+  // ユーザーデータをフェッチするAPI呼び出し
+}
+
+// 初期ロード
+fetchUserData()
+
+// パラメータの変更を監視
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    fetchUserData()
+  }
+)
+&lt;/script&gt;</code></pre>
+
+            <h3>6. ルートガード</h3>
+            <p>
+                ルートガードは、特定のルートへのナビゲーションを制御するための仕組みです。ユーザー認証や権限チェックなどの用途に使用できます。
+            </p>
+            
+            <h4>グローバルガード</h4>
+            <pre><code class="language-javascript">// router/index.js
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+// グローバル前処理ガード
+router.beforeEach((to, from, next) => {
+  // ナビゲーションを実行するには next() を呼び出す
+  // ナビゲーションを中止するには next(false) を呼び出す
+  // 別のルートにリダイレクトするには next('/login') または next({ name: 'Login' }) を呼び出す
+  
+  // 例: ログイン必須ルートの保護
+  const isAuthenticated = localStorage.getItem('token')
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  
+  if (requiresAuth && !isAuthenticated) {
+    next('/login')
+  } else {
+    next()
+  }
+})
+
+// グローバル解決ガード
+router.beforeResolve((to, from, next) => {
+  // ルートコンポーネントがロードされた後、
+  // ナビゲーションが確定する直前に呼び出される
+  console.log('beforeResolve')
+  next()
+})
+
+// グローバル後処理フック
+router.afterEach((to, from) => {
+  // ナビゲーションが完了した後に呼び出される
+  // next 関数はない
+  console.log(`${from.path} から ${to.path} へナビゲーション完了`)
+})</code></pre>
+
+            <h4>ルート単位のガード</h4>
+            <pre><code class="language-javascript">const routes = [
+  {
+    path: '/admin',
+    component: Admin,
+    beforeEnter: (to, from, next) => {
+      // ルート単位の前処理ガード
+      const isAdmin = checkAdminStatus()
+      
+      if (isAdmin) {
+        next()
+      } else {
+        next('/not-authorized')
+      }
+    }
+  }
+]</code></pre>
+
+            <h4>コンポーネント内ガード</h4>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
+
+// コンポーネントが現在のルートから離れる前に呼び出される
+onBeforeRouteLeave((to, from, next) => {
+  const answer = window.confirm('変更内容が保存されていません。このページを離れますか？')
+  if (answer) {
+    next()
+  } else {
+    next(false)
+  }
+})
+
+// パラメータが変更されたときなど、同じコンポーネントを再利用する場合に呼び出される
+onBeforeRouteUpdate((to, from, next) => {
+  // 例: データを再フェッチする
+  console.log('ルートが更新されました')
+  next()
+})
+&lt;/script&gt;</code></pre>
+
+            <h4>メタフィールド</h4>
+            <p>
+                ルート定義にメタフィールドを追加して、ルートに関連する追加情報を格納できます。
+            </p>
+            <pre><code class="language-javascript">const routes = [
+  {
+    path: '/admin',
+    component: Admin,
+    meta: {
+      requiresAuth: true,
+      role: 'admin'
+    }
+  }
+]</code></pre>
+            <p>
+                メタフィールドは、ルートガードなどでアクセスできます。
+            </p>
+            <pre><code class="language-javascript">router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiredRole = to.matched.find(record => record.meta.role)?.meta.role
+  
+  if (requiresAuth) {
+    const isAuthenticated = checkAuth()
+    const userRole = getUserRole()
+    
+    if (!isAuthenticated) {
+      next('/login')
+    } else if (requiredRole && userRole !== requiredRole) {
+      next('/not-authorized')
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})</code></pre>
+
+            <h3>7. ルートのトランジション</h3>
+            <p>
+                Vue.jsのトランジション機能を使用して、ルート間の切り替え効果を追加できます。
+            </p>
+            <pre><code class="language-html">&lt;!-- App.vue --&gt;
+&lt;template&gt;
+  &lt;div id="app"&gt;
+    &lt;transition name="fade" mode="out-in"&gt;
+      &lt;router-view /&gt;
+    &lt;/transition&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style&gt;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>ルート別のトランジション</h4>
+            <p>
+                特定のルートに対して異なるトランジションを適用することもできます。
+            </p>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;div id="app"&gt;
+    &lt;router-view v-slot="{ Component, route }"&gt;
+      &lt;transition :name="route.meta.transition || 'fade'"&gt;
+        &lt;component :is="Component" /&gt;
+      &lt;/transition&gt;
+    &lt;/router-view&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+            <pre><code class="language-javascript">const routes = [
+  {
+    path: '/about',
+    component: About,
+    meta: {
+      transition: 'slide'
+    }
+  }
+]</code></pre>
+            <pre><code class="language-css">.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s;
+}
+
+.slide-enter-from {
+  transform: translateX(100%);
+}
+
+.slide-leave-to {
+  transform: translateX(-100%);
+}</code></pre>
+
+            <h3>8. Vue Routerの高度な機能</h3>
+            
+            <h4>スクロール位置の制御</h4>
+            <p>
+                ルーターインスタンスを作成するときに、<code>scrollBehavior</code>オプションを指定することで、ナビゲーション後のスクロール位置を制御できます。
+            </p>
+            <pre><code class="language-javascript">const router = createRouter({
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // 戻る/進むボタンでナビゲーションした場合
+    if (savedPosition) {
+      return savedPosition
+    }
+    
+    // ハッシュがあるルートの場合はその要素までスクロール
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth'
+      }
+    }
+    
+    // デフォルトではページの先頭にスクロール
+    return { top: 0 }
+  }
+})</code></pre>
+
+            <h4>ナビゲーションフェイルの処理</h4>
+            <pre><code class="language-javascript">import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// Promise チェーンを使用
+router.push('/admin')
+  .then(() => {
+    // ナビゲーション成功
+    console.log('ナビゲーション成功')
+  })
+  .catch(error => {
+    // ナビゲーション失敗
+    console.error('ナビゲーション失敗:', error)
+  })
+
+// または await を使用
+async function navigate() {
+  try {
+    await router.push('/admin')
+    console.log('ナビゲーション成功')
+  } catch (error) {
+    console.error('ナビゲーション失敗:', error)
+  }
+}</code></pre>
+
+            <h4>ナビゲーションの変更を監視</h4>
+            <pre><code class="language-javascript">// 監視の登録
+const unwatch = router.beforeEach(() => {
+  console.log('ナビゲーション開始')
+})
+
+// 監視の解除
+unwatch()</code></pre>
+
+            <h4>動的ルーティング</h4>
+            <p>
+                アプリケーションの実行中にルートを追加または削除できます。
+            </p>
+            <pre><code class="language-javascript">// ルートの追加
+router.addRoute({
+  path: '/dynamic',
+  name: 'Dynamic',
+  component: () => import('@/views/Dynamic.vue')
+})
+
+// 名前付きルートの追加
+router.addRoute('User', {
+  path: 'settings',
+  name: 'UserSettings',
+  component: () => import('@/views/UserSettings.vue')
+})
+
+// ルートの削除（同じ名前を持つルートを追加するか、以下のメソッドを使用）
+const removeRoute = router.addRoute(newRoute)
+removeRoute() // 追加したルートを削除
+
+// 名前を使用してルートを削除
+router.removeRoute('Dynamic')
+
+// すべてのルートをリセット
+router.hasRoute('Dynamic') // ルートが存在するかチェック
+router.getRoutes() // 現在のルート一覧を取得</code></pre>
+
+            <h3>9. HTML5 History モードとハッシュモード</h3>
+            <p>
+                Vue Routerには、2つの動作モードがあります。
+            </p>
+            
+            <h4>HTML5 History モード</h4>
+            <p>
+                デフォルトモードで、URLにハッシュを含まない綺麗なURLを使用します。
+            </p>
+            <pre><code class="language-javascript">// 例: /about
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})</code></pre>
+            <p>
+                このモードでは、サーバー側の設定が必要です。すべてのURLリクエストをindex.htmlにフォールバックさせる必要があります。
+            </p>
+            <pre><code class="language-javascript">// server.js (Node.js + Express)
+const express = require('express')
+const app = express()
+const path = require('path')
+
+// 静的ファイルを配信
+app.use(express.static(path.join(__dirname, 'dist')))
+
+// すべてのリクエストをindex.htmlにリダイレクト
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
+
+app.listen(3000)</code></pre>
+
+            <h4>ハッシュモード</h4>
+            <p>
+                ハッシュモードは、URLのハッシュ部分を使用してルーティングを行います。サーバー側の設定が不要ですが、SEOには適していません。
+            </p>
+            <pre><code class="language-javascript">// 例: /#/about
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes
+})</code></pre>
+
+            <h3>10. 実践的な例：認証システム</h3>
+            <p>
+                Vue Routerを使用して、認証システムを実装する方法を見てみましょう。
+            </p>
+
+            <h4>ルート設定</h4>
+            <pre><code class="language-javascript">// src/router/index.js
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '@/views/Home.vue'
+import Login from '@/views/Login.vue'
+import Dashboard from '@/views/Dashboard.vue'
+import Profile from '@/views/Profile.vue'
+import NotFound from '@/views/NotFound.vue'
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+    meta: {
+      guest: true // ゲストのみがアクセス可能
+    }
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: {
+      requiresAuth: true // 認証が必要
+    }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    meta: {
+      requiresAuth: true // 認証が必要
+    }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+// グローバルガードで認証状態をチェック
+router.beforeEach((to, from, next) => {
+  // 認証が必要なルートかチェック
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  // ゲスト専用ルートかチェック
+  const isGuestRoute = to.matched.some(record => record.meta.guest)
+  
+  // 認証状態を取得（実際のアプリでは適切な認証管理を使用）
+  const isAuthenticated = localStorage.getItem('token') !== null
+  
+  if (requiresAuth && !isAuthenticated) {
+    // 認証が必要なのに認証されていない場合はログインページへ
+    next({
+      name: 'Login',
+      query: { redirect: to.fullPath } // リダイレクト用のクエリパラメータを設定
+    })
+  } else if (isGuestRoute && isAuthenticated) {
+    // ゲスト専用ルートに認証済みユーザーがアクセスした場合はダッシュボードへ
+    next({ name: 'Dashboard' })
+  } else {
+    // それ以外は通常通り次のルートへ
+    next()
+  }
+})
+
+export default router</code></pre>
+
+            <h4>ログインコンポーネント</h4>
+            <pre><code class="language-html">&lt;!-- src/views/Login.vue --&gt;
+&lt;script setup&gt;
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+
+const username = ref('')
+const password = ref('')
+const error = ref('')
+const loading = ref(false)
+
+// ログイン処理
+async function login() {
+  if (!username.value || !password.value) {
+    error.value = 'ユーザー名とパスワードを入力してください'
+    return
+  }
+  
+  error.value = ''
+  loading.value = true
+  
+  try {
+    // APIログイン処理（ダミー）
+    // 実際のアプリでは、実際のAPIを呼び出す
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // ダミーバリデーション
+    if (username.value === 'admin' && password.value === 'password') {
+      // ログイン成功
+      const token = 'dummy-token-' + Date.now()
+      localStorage.setItem('token', token)
+      
+      // リダイレクト
+      const redirectPath = route.query.redirect || '/dashboard'
+      router.push(redirectPath)
+    } else {
+      // ログイン失敗
+      error.value = 'ユーザー名またはパスワードが正しくありません'
+    }
+  } catch (err) {
+    console.error(err)
+    error.value = 'ログイン中にエラーが発生しました'
+  } finally {
+    loading.value = false
+  }
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="login-container"&gt;
+    &lt;h1&gt;ログイン&lt;/h1&gt;
+    
+    &lt;form @submit.prevent="login" class="login-form"&gt;
+      &lt;div v-if="error" class="error-message"&gt;{{ error }}&lt;/div&gt;
+      
+      &lt;div class="form-group"&gt;
+        &lt;label for="username"&gt;ユーザー名&lt;/label&gt;
+        &lt;input
+          id="username"
+          v-model="username"
+          type="text"
+          :disabled="loading"
+          placeholder="ユーザー名を入力"
+          required
+        &gt;
+      &lt;/div&gt;
+      
+      &lt;div class="form-group"&gt;
+        &lt;label for="password"&gt;パスワード&lt;/label&gt;
+        &lt;input
+          id="password"
+          v-model="password"
+          type="password"
+          :disabled="loading"
+          placeholder="パスワードを入力"
+          required
+        &gt;
+      &lt;/div&gt;
+      
+      &lt;button
+        type="submit"
+        :disabled="loading"
+        class="login-button"
+      &gt;
+        {{ loading ? 'ログイン中...' : 'ログイン' }}
+      &lt;/button&gt;
+      
+      &lt;div class="hint"&gt;
+        &lt;small&gt;ヒント: username = "admin", password = "password"&lt;/small&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.login-button {
+  padding: 10px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-button:disabled {
+  background-color: #95d5b7;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #ff4c4c;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff2f2;
+  border: 1px solid #ffdddd;
+  border-radius: 4px;
+}
+
+.hint {
+  margin-top: 15px;
+  text-align: center;
+  color: #666;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>ナビゲーションバー</h4>
+            <pre><code class="language-html">&lt;!-- src/components/Navbar.vue --&gt;
+&lt;script setup&gt;
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// 認証状態のチェック
+const isAuthenticated = computed(() => {
+  return localStorage.getItem('token') !== null
+})
+
+// ログアウト処理
+function logout() {
+  localStorage.removeItem('token')
+  router.push('/login')
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;nav class="navbar"&gt;
+    &lt;div class="navbar-brand"&gt;
+      &lt;router-link to="/"&gt;Vue Router デモ&lt;/router-link&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="navbar-menu"&gt;
+      &lt;router-link to="/" exact-active-class="active"&gt;ホーム&lt;/router-link&gt;
+      
+      &lt;template v-if="isAuthenticated"&gt;
+        &lt;router-link to="/dashboard" active-class="active"&gt;ダッシュボード&lt;/router-link&gt;
+        &lt;router-link to="/profile" active-class="active"&gt;プロフィール&lt;/router-link&gt;
+        &lt;a href="#" @click.prevent="logout" class="logout-link"&gt;ログアウト&lt;/a&gt;
+      &lt;/template&gt;
+      
+      &lt;template v-else&gt;
+        &lt;router-link to="/login" active-class="active"&gt;ログイン&lt;/router-link&gt;
+      &lt;/template&gt;
+    &lt;/div&gt;
+  &lt;/nav&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar-brand a {
+  font-size: 20px;
+  font-weight: bold;
+  color: #42b983;
+  text-decoration: none;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 15px;
+}
+
+.navbar-menu a {
+  color: #333;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.navbar-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+.navbar-menu a.active {
+  background-color: #42b983;
+  color: white;
+}
+
+.logout-link {
+  cursor: pointer;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>ダッシュボードコンポーネント</h4>
+            <pre><code class="language-html">&lt;!-- src/views/Dashboard.vue --&gt;
+&lt;template&gt;
+  &lt;div class="dashboard"&gt;
+    &lt;h1&gt;ダッシュボード&lt;/h1&gt;
+    &lt;p&gt;ようこそ！認証されたユーザー専用ページです。&lt;/p&gt;
+    
+    &lt;div class="dashboard-content"&gt;
+      &lt;div class="dashboard-card"&gt;
+        &lt;h3&gt;統計&lt;/h3&gt;
+        &lt;p&gt;アクティブユーザー: 1,234&lt;/p&gt;
+        &lt;p&gt;総訪問数: 5,678&lt;/p&gt;
+      &lt;/div&gt;
+      
+      &lt;div class="dashboard-card"&gt;
+        &lt;h3&gt;最近のアクティビティ&lt;/h3&gt;
+        &lt;ul&gt;
+          &lt;li&gt;プロフィールを更新しました&lt;/li&gt;
+          &lt;li&gt;新しいプロジェクトを作成しました&lt;/li&gt;
+          &lt;li&gt;チームメンバーを招待しました&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.dashboard {
+  padding: 20px;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dashboard-card {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  color: #42b983;
+  margin-top: 0;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 5px;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>アプリケーションのルートコンポーネント</h4>
+            <pre><code class="language-html">&lt;!-- src/App.vue --&gt;
+&lt;script setup&gt;
+import Navbar from '@/components/Navbar.vue'
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div id="app"&gt;
+    &lt;Navbar /&gt;
+    
+    &lt;div class="content"&gt;
+      &lt;transition name="fade" mode="out-in"&gt;
+        &lt;router-view /&gt;
+      &lt;/transition&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style&gt;
+/* グローバルスタイル */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+.content {
+  padding: 20px;
+}
+
+/* トランジション効果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+&lt;/style&gt;</code></pre>
+
+            <h3>11. Vue Routerのベストプラクティス</h3>
+            <p>
+                Vue Routerを効果的に使用するためのベストプラクティスを紹介します。
+            </p>
+            
+            <ul>
+                <li><strong>ルート定義を整理する</strong>：大規模なアプリケーションでは、ルート定義を機能ごとにモジュール化することを検討しましょう。</li>
+                <li><strong>遅延ローディングを活用する</strong>：必要なときだけコンポーネントをロードすることで、初期ロード時間を短縮できます。</li>
+                <li><strong>名前付きルートを使用する</strong>：ハードコードされたURLよりも、名前付きルートを使用することで、URLが変更されても参照を更新する必要がなくなります。</li>
+                <li><strong>メタフィールドを活用する</strong>：ルートに関連するメタデータを格納するために、メタフィールドを使用しましょう。</li>
+                <li><strong>ナビゲーション関連のロジックをコンポーザブル関数に抽出する</strong>：複雑なナビゲーションロジックは、再利用可能なコンポーザブル関数に抽出することを検討しましょう。</li>
+                <li><strong>適切なナビゲーションガードを選択する</strong>：グローバル、ルート単位、コンポーネント内のガードを適切に使い分けましょう。</li>
+                <li><strong>エラー処理を忘れない</strong>：ナビゲーションが失敗する可能性を考慮して、適切なエラー処理を実装しましょう。</li>
+            </ul>
+
+            <h4>モジュール化されたルート設定の例</h4>
+            <pre><code class="language-javascript">// src/router/modules/auth.js
+import Login from '@/views/auth/Login.vue'
+import Register from '@/views/auth/Register.vue'
+import ForgotPassword from '@/views/auth/ForgotPassword.vue'
+
+export default [
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+    meta: { guest: true }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
+    meta: { guest: true }
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPassword,
+    meta: { guest: true }
+  }
+]
+
+// src/router/modules/admin.js
+export default [
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('@/views/admin/AdminDashboard.vue'),
+    meta: { requiresAuth: true, role: 'admin' },
+    children: [
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import('@/views/admin/Users.vue')
+      },
+      {
+        path: 'settings',
+        name: 'AdminSettings',
+        component: () => import('@/views/admin/Settings.vue')
+      }
+    ]
+  }
+]
+
+// src/router/index.js
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '@/views/Home.vue'
+import NotFound from '@/views/NotFound.vue'
+
+// モジュールのインポート
+import authRoutes from './modules/auth'
+import adminRoutes from './modules/admin'
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  // スプレッド構文でモジュールを展開
+  ...authRoutes,
+  ...adminRoutes,
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router</code></pre>
+
+            <h4>ナビゲーションロジックのコンポーザブル関数例</h4>
+            <pre><code class="language-javascript">// src/composables/useAuth.js
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+export function useAuth() {
+  const router = useRouter()
+  const token = ref(localStorage.getItem('token'))
+  
+  const isAuthenticated = computed(() => token.value !== null)
+  
+  function login(newToken) {
+    token.value = newToken
+    localStorage.setItem('token', newToken)
+  }
+  
+  function logout() {
+    token.value = null
+    localStorage.removeItem('token')
+    router.push('/login')
+  }
+  
+  function requireAuth(to) {
+    if (!isAuthenticated.value) {
+      router.push({
+        name: 'Login',
+        query: { redirect: to }
+      })
+      return false
+    }
+    return true
+  }
+  
+  return {
+    token,
+    isAuthenticated,
+    login,
+    logout,
+    requireAuth
+  }
+}</code></pre>
+
+            <h3>12. まとめ</h3>
+            <p>
+                本章では、Vue Routerを使用して単一ページアプリケーション（SPA）の画面遷移を実装する方法について学びました。ルートの定義、ナビゲーションの実装、パラメータの受け渡し、ルートガードなどの重要な概念について理解を深めました。
+            </p>
+            <p>
+                また、HTML5 Historyモードとハッシュモードの違い、ルートのトランジション効果、高度なルーティング機能についても学びました。認証システムの実装例を通じて、実際のアプリケーションでVue Routerをどのように使用するかも理解しました。
+            </p>
+            <p>
+                Vue Routerは、Vue.jsアプリケーションでページ間のナビゲーションを実装するための強力なツールです。適切に使用することで、ユーザーフレンドリーで高速なSPAを構築できます。
+            </p>
+            <p>
+                次の章では、Piniaを使用した状態管理について学びます。
+            </p>
+        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

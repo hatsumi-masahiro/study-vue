@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第2章: オブジェクト (連想配列) と配列操作</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">    
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第2章: オブジェクト (連想配列) と配列操作</h1>
+        </div>
+    </header>
+    <div class="container">
+
+        <section id="chapter2">
+            <h2 id="chapter2" class="chapter-heading">第2章: オブジェクト (連想配列) と配列操作</h2>
+
+            <h3>概要</h3>
+            <p>JavaScriptにおけるオブジェクト（連想配列とも呼ばれる）と配列は、データを扱う上で最も重要なデータ構造です。特に配列の<code>map</code>、<code>filter</code>、<code>reduce</code>などのメソッドは、モダンなJavaScript開発で頻繁に使用されます。これらのメソッドを使いこなすことで、コードをより簡潔に、宣言的に書くことができるようになります。
+            </p>
+
+            <h3>オブジェクト（連想配列）</h3>
+            <p>JavaScriptのオブジェクトは、キーと値のペアを格納する連想配列として機能します。キーには文字列またはSymbol、値には任意のデータ型（プリミティブ値、関数、オブジェクトなど）を使用できます。</p>
+
+            <pre><code class="language-javascript">
+// オブジェクトの作成と操作
+const person = {
+    name: "田中太郎",
+    age: 28,
+    isStudent: false,
+    skills: ["JavaScript", "HTML", "CSS"],
+    address: {
+        city: "東京",
+        postalCode: "100-0001"
+    },
+    greet: function () {
+        return `こんにちは、${this.name}です。`;
+    }
+};
+
+// オブジェクトのプロパティへのアクセス
+console.log(person.name);            // "田中太郎"
+console.log(person["age"]);          // 28（ブラケット記法）
+console.log(person.skills[0]);       // "JavaScript"
+console.log(person.address.city);    // "東京"
+console.log(person.greet());         // "こんにちは、田中太郎です。"
+
+// プロパティの追加・変更・削除
+person.job = "エンジニア";           // 新しいプロパティの追加
+person.age = 29;                     // 既存プロパティの変更
+delete person.isStudent;             // プロパティの削除
+
+// オブジェクトのキーと値の取得
+const keys = Object.keys(person);    // ["name", "age", "skills", "address", "greet", "job"]
+const values = Object.values(person); // ["田中太郎", 29, Array(3), Object, function, "エンジニア"]
+
+// オブジェクトのイテレーション（反復処理）
+for (const key in person) {
+    if (typeof person[key] !== 'function') { // メソッドを除外
+        console.log(`${key}: ${person[key]}`);
+    }
+}
+
+// オブジェクトのコピーとマージ
+const personCopy = Object.assign({}, person); // 浅いコピー
+const merged = { ...person, hobby: "読書" };  // スプレッド構文を使用したオブジェクトのマージ
+</code></pre>
+
+            <h3>配列操作メソッド</h3>
+            <p>ES6以降のJavaScriptでは、配列を操作するための便利なメソッドが多数用意されています。特に<code>map</code>、<code>filter</code>、<code>reduce</code>などの関数型プログラミングスタイルのメソッドは、データ変換のパイプラインを構築する上で非常に強力です。
+            </p>
+
+            <h4>map() メソッド</h4>
+            <p><code>map()</code>メソッドは、配列の各要素に対して関数を実行し、その結果から新しい配列を作成します。</p>
+
+            <pre><code class="language-javascript">// 配列の各要素を2倍にする
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(num => num * 2);
+console.log(doubled); // [2, 4, 6, 8, 10]
+
+// オブジェクト配列から特定のプロパティだけ抽出
+const users = [
+    { id: 1, name: "Alice", age: 25 },
+    { id: 2, name: "Bob", age: 30 },
+    { id: 3, name: "Charlie", age: 35 }
+];
+const names = users.map(user => user.name);
+console.log(names); // ["Alice", "Bob", "Charlie"]
+
+// インデックスも使用する場合
+const withIndex = numbers.map((num, index) => `インデックス${index}: ${num}`);
+console.log(withIndex); // ["インデックス0: 1", "インデックス1: 2", ...]
+</code></pre>
+
+            <h4>filter() メソッド</h4>
+            <p><code>filter()</code>メソッドは、与えられた条件に一致する要素だけを抽出して新しい配列を作成します。</p>
+
+            <pre><code class="language-javascript">// 偶数のみをフィルタリング
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const evenNumbers = numbers.filter(num => num % 2 === 0);
+console.log(evenNumbers); // [2, 4, 6, 8, 10]
+
+// 特定の条件に一致するオブジェクトをフィルタリング
+const users = [
+    { name: "Alice", age: 25, isActive: true },
+    { name: "Bob", age: 30, isActive: false },
+    { name: "Charlie", age: 35, isActive: true }
+];
+const activeUsers = users.filter(user => user.isActive);
+console.log(activeUsers); // [{ name: "Alice"... }, { name: "Charlie"... }]
+
+// 複数条件でのフィルタリング
+const adults = users.filter(user => user.age >= 30 && user.isActive);
+console.log(adults); // [{ name: "Charlie", age: 35, isActive: true }]
+</code></pre>
+
+            <h4>reduce() メソッド</h4>
+            <p><code>reduce()</code>メソッドは、配列の各要素に対して関数を実行し、単一の結果値を生成します。累積計算や配列からオブジェクトへの変換など、様々な用途に使用できます。</p>
+
+            <pre><code class="language-javascript">// 配列の要素の合計を計算
+const numbers = [1, 2, 3, 4, 5];
+const sum = numbers.reduce((accumulator, current) => accumulator + current, 0);
+console.log(sum); // 15
+
+// 最大値を見つける
+const max = numbers.reduce((max, current) => (current > max ? current : max), numbers[0]);
+console.log(max); // 5
+
+// オブジェクト配列からIDをキーとするオブジェクトに変換
+const users = [
+    { id: 1, name: "Alice" },
+    { id: 2, name: "Bob" },
+    { id: 3, name: "Charlie" }
+];
+const userMap = users.reduce((acc, user) => {
+    acc[user.id] = user;
+    return acc;
+}, {});
+console.log(userMap);
+// { 
+//   1: { id: 1, name: "Alice" }, 
+//   2: { id: 2, name: "Bob" }, 
+//   3: { id: 3, name: "Charlie" } 
+// }
+
+// グループ化の例
+const people = [
+    { name: "Alice", age: 25, department: "開発" },
+    { name: "Bob", age: 30, department: "マーケティング" },
+    { name: "Charlie", age: 35, department: "開発" },
+    { name: "Dave", age: 40, department: "マーケティング" }
+];
+const byDepartment = people.reduce((acc, person) => {
+    // 部署がまだキーとして存在しない場合は空の配列を作成
+    if (!acc[person.department]) {
+        acc[person.department] = [];
+    }
+    // 該当する部署の配列に人を追加
+    acc[person.department].push(person);
+    return acc;
+}, {});
+console.log(byDepartment);
+// {
+//   "開発": [{ name: "Alice", ... }, { name: "Charlie", ... }],
+//   "マーケティング": [{ name: "Bob", ... }, { name: "Dave", ... }]
+// }
+</code></pre>
+
+            <h4>その他の便利な配列メソッド</h4>
+            <p>map、filter、reduce以外にも、ES6+では多くの便利な配列メソッドが提供されています。</p>
+
+            <pre><code class="language-javascript">
+const numbers = [1, 2, 3, 4, 5];
+
+// forEach - 各要素に対して関数を実行（戻り値なし）
+numbers.forEach(num => console.log(num * 2)); // 2, 4, 6, 8, 10 （配列は変更されない）
+
+// find - 条件に一致する最初の要素を返す
+const firstEven = numbers.find(num => num % 2 === 0);
+console.log(firstEven); // 2
+
+// some - 少なくとも1つの要素が条件を満たすかチェック
+const hasEven = numbers.some(num => num % 2 === 0);
+console.log(hasEven); // true
+
+// every - すべての要素が条件を満たすかチェック
+const allEven = numbers.every(num => num % 2 === 0);
+console.log(allEven); // false
+
+// includes - 特定の要素が含まれているかチェック
+console.log(numbers.includes(3)); // true
+
+// flat - ネストした配列を平坦化
+const nested = [1, [2, 3], [4, [5, 6]]];
+console.log(nested.flat());    // [1, 2, 3, 4, [5, 6]]
+console.log(nested.flat(2));   // [1, 2, 3, 4, 5, 6]
+
+// flatMap - map後にflatを実行
+const pairs = [1, 2, 3];
+const pairsAndDoubles = pairs.flatMap(num => [num, num * 2]);
+console.log(pairsAndDoubles); // [1, 2, 2, 4, 3, 6]
+</code></pre>
+
+            <h3>実践的な例：配列メソッドの連鎖</h3>
+            <p>複数の配列メソッドを連鎖させることで、データ変換パイプラインを構築できます。</p>
+
+            <pre><code class="language-javascript">
+const transactions = [
+    { id: 1, type: "購入", amount: 5000, category: "食料品" },
+    { id: 2, type: "売却", amount: 10000, category: "投資" },
+    { id: 3, type: "購入", amount: 2000, category: "衣料品" },
+    { id: 4, type: "購入", amount: 15000, category: "家電" },
+    { id: 5, type: "売却", amount: 3000, category: "投資" }
+];
+
+// 購入トランザクションの合計金額を計算
+const totalPurchases = transactions
+    .filter(trans => trans.type === "購入")        // 購入タイプのみフィルタリング
+    .map(trans => trans.amount)                    // 金額だけを抽出
+    .reduce((total, amount) => total + amount, 0); // 合計を計算
+
+console.log(totalPurchases); // 22000
+
+// カテゴリ別の合計金額を計算
+const totalsByCategory = transactions.reduce((acc, trans) => {
+    // カテゴリがまだキーとして存在しない場合は初期化
+    if (!acc[trans.category]) {
+        acc[trans.category] = 0;
+    }
+    // 該当するカテゴリの合計に金額を加算
+    acc[trans.category] += trans.amount;
+    return acc;
+}, {});
+
+console.log(totalsByCategory);
+// {
+//   "食料品": 5000,
+//   "投資": 13000,
+//   "衣料品": 2000,
+//   "家電": 15000
+// }
+</code></pre>
+
+            <h3>まとめ</h3>
+            <p>オブジェクト（連想配列）と配列操作メソッドは、モダンJavaScriptプログラミングの要です。特に<code>map</code>、<code>filter</code>、<code>reduce</code>を使いこなすことで、命令型から宣言型のプログラミングスタイルに移行でき、コードがより簡潔で読みやすくなります。これらのメソッドはReactやVueなどのフレームワークでも頻繁に使用されるため、しっかりと理解しておくことが重要です。
+            </p>
+        </section>
+
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第5章: データバインディング & 条件分岐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第5章: データバインディング & 条件分岐</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter5">
+            <h2 id="chapter5" class="chapter-heading">第5章: データバインディング & 条件分岐</h2>
+
+            <h3>概要</h3>
+            <p>
+                本章では、Vue.jsのデータバインディングと条件分岐について学びます。データバインディングを使用してJavaScriptの状態とDOMを連携させる方法、条件分岐を使用して要素の表示・非表示を制御する方法について詳しく理解します。
+            </p>
+            
+            <h3>1. データバインディングの基本</h3>
+            <p>
+                データバインディングとは、JavaScriptの状態（データ）とDOM（HTML要素）を連携させるメカニズムです。Vue.jsでは、さまざまな方法でデータバインディングを実装できます。
+            </p>
+            
+            <h4>テキスト補間（マスタッシュ構文）</h4>
+            <p>
+                最も基本的なデータバインディングは、「Mustache構文」（二重中括弧 <code>{{ }}</code>）を使用したテキスト補間です。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const message = ref('こんにちは、Vue!')
+const userName = ref('ゲスト')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;p&gt;メッセージ: {{ message }}&lt;/p&gt;
+  &lt;p&gt;ようこそ、{{ userName }}さん&lt;/p&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                二重中括弧内では、シンプルなJavaScript式も使用できます：
+            </p>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;p&gt;{{ message.split('').reverse().join('') }}&lt;/p&gt;
+  &lt;p&gt;{{ userName.toUpperCase() }}&lt;/p&gt;
+  &lt;p&gt;1 + 1 = {{ 1 + 1 }}&lt;/p&gt;
+  &lt;p&gt;三項演算子: {{ userName === 'ゲスト' ? 'ログインしていません' : 'ログイン済み' }}&lt;/p&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                注意点：
+            </p>
+            <ul>
+                <li>テンプレート内の式は単一の式に限られます（if文やfor文などの複雑な制御構文は使用できません）</li>
+                <li>テンプレート内の式はサンドボックス化されているため、ユーザー定義のグローバル変数へのアクセスは制限されています</li>
+            </ul>
+
+            <h4>v-textディレクティブ</h4>
+            <p>
+                <code>v-text</code>ディレクティブを使用すると、要素のテキストコンテンツを設定できます。これは<code>{{ }}</code>構文の代替手段として使用できます。
+            </p>
+            <pre><code class="language-html">&lt;span v-text="message"&gt;&lt;/span&gt;
+
+&lt;!-- 上記は以下と同等 --&gt;
+&lt;span&gt;{{ message }}&lt;/span&gt;</code></pre>
+
+            <h4>v-htmlディレクティブ</h4>
+            <p>
+                <code>v-html</code>ディレクティブを使用すると、要素の<code>innerHTML</code>を設定できます。これにより、HTML文字列をレンダリングできます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const rawHtml = ref('&lt;span style="color: red"&gt;これは赤色のテキストです&lt;/span&gt;')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;p&gt;Using mustaches: {{ rawHtml }}&lt;/p&gt;
+  &lt;p&gt;Using v-html: &lt;span v-html="rawHtml"&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                <strong>重要な注意点：</strong> <code>v-html</code>を使用する際は、XSS（クロスサイトスクリプティング）攻撃のリスクに注意してください。信頼できないコンテンツには絶対に使用しないでください。ユーザー入力から生成されたHTMLは常にサニタイズしてください。
+            </p>
+
+            <h3>2. 属性バインディング</h3>
+            <p>
+                <code>v-bind</code>ディレクティブを使用すると、HTML属性をJavaScriptの式にバインドできます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const imageUrl = ref('/images/logo.png')
+const buttonId = ref('submit-button')
+const isButtonDisabled = ref(false)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- 基本的な属性バインディング --&gt;
+  &lt;img v-bind:src="imageUrl" alt="ロゴ"&gt;
+  
+  &lt;!-- 短縮構文 --&gt;
+  &lt;img :src="imageUrl" alt="ロゴ"&gt;
+  
+  &lt;!-- 複数の属性をバインド --&gt;
+  &lt;button :id="buttonId" :disabled="isButtonDisabled"&gt;送信&lt;/button&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                <code>v-bind</code>は非常によく使われるため、短縮構文（<code>:</code>）を使用することが一般的です。
+            </p>
+
+            <h4>動的属性名</h4>
+            <p>
+                Vue 3では、動的な属性名のバインディングもサポートされています。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const attributeName = ref('title')
+const attributeValue = ref('これはツールチップです')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button :[attributeName]="attributeValue"&gt;ホバーしてみてください&lt;/button&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>クラスとスタイルのバインディング</h4>
+            <p>
+                クラスとスタイルのバインディングは、Vue.jsで特別に拡張されています。
+            </p>
+            
+            <h5>クラスバインディング</h5>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+// オブジェクト構文
+const isActive = ref(true)
+const hasError = ref(false)
+
+// 配列構文
+const activeClass = ref('active')
+const errorClass = ref('text-danger')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- オブジェクト構文: キーがクラス名、値が真偽値 --&gt;
+  &lt;div :class="{ active: isActive, 'text-danger': hasError }"&gt;
+    クラスバインディング（オブジェクト構文）
+  &lt;/div&gt;
+  
+  &lt;!-- 配列構文 --&gt;
+  &lt;div :class="[activeClass, errorClass]"&gt;
+    クラスバインディング（配列構文）
+  &lt;/div&gt;
+  
+  &lt;!-- 条件付きクラス（配列内の三項演算子） --&gt;
+  &lt;div :class="[isActive ? activeClass : '', hasError ? errorClass : '']"&gt;
+    条件付きクラスバインディング
+  &lt;/div&gt;
+  
+  &lt;!-- 配列内のオブジェクト --&gt;
+  &lt;div :class="[{ active: isActive }, errorClass]"&gt;
+    複合クラスバインディング
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h5>スタイルバインディング</h5>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref, reactive } from 'vue'
+
+// オブジェクト構文
+const activeColor = ref('red')
+const fontSize = ref(30)
+
+// オブジェクト参照
+const styleObject = reactive({
+  color: 'blue',
+  fontSize: '20px',
+  backgroundColor: '#f0f0f0'
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- オブジェクト構文（キャメルケース） --&gt;
+  &lt;div :style="{ color: activeColor, fontSize: fontSize + 'px' }"&gt;
+    スタイルバインディング（オブジェクト構文）
+  &lt;/div&gt;
+  
+  &lt;!-- オブジェクト構文（ケバブケース、引用符が必要） --&gt;
+  &lt;div :style="{ 'font-size': fontSize + 'px' }"&gt;
+    スタイルバインディング（ケバブケース）
+  &lt;/div&gt;
+  
+  &lt;!-- オブジェクト参照 --&gt;
+  &lt;div :style="styleObject"&gt;
+    スタイルオブジェクト参照
+  &lt;/div&gt;
+  
+  &lt;!-- 配列構文（複数のスタイルオブジェクトを適用） --&gt;
+  &lt;div :style="[{ color: activeColor }, styleObject]"&gt;
+    スタイルバインディング（配列構文）
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                Vue.jsは自動的にベンダープレフィックスを必要とするCSSプロパティを検出し、適切なプレフィックスを追加します。
+            </p>
+
+            <h3>3. 条件付きレンダリング</h3>
+            <p>
+                条件付きレンダリングを使用すると、条件に基づいて要素の表示・非表示を制御できます。
+            </p>
+            
+            <h4>v-if、v-else-if、v-else</h4>
+            <p>
+                <code>v-if</code>ディレクティブを使用すると、条件に基づいて要素を条件付きでレンダリングできます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const type = ref('A')
+const isAuthenticated = ref(false)
+const userRole = ref('user')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;v-if の例&lt;/h2&gt;
+    
+    &lt;div v-if="type === 'A'"&gt;
+      タイプ A
+    &lt;/div&gt;
+    &lt;div v-else-if="type === 'B'"&gt;
+      タイプ B
+    &lt;/div&gt;
+    &lt;div v-else-if="type === 'C'"&gt;
+      タイプ C
+    &lt;/div&gt;
+    &lt;div v-else&gt;
+      タイプ A/B/C ではありません
+    &lt;/div&gt;
+    
+    &lt;h2&gt;認証状態に基づく表示&lt;/h2&gt;
+    
+    &lt;div v-if="isAuthenticated"&gt;
+      &lt;p&gt;ログイン済みです&lt;/p&gt;
+      
+      &lt;div v-if="userRole === 'admin'"&gt;
+        管理者向けコンテンツ
+      &lt;/div&gt;
+      &lt;div v-else-if="userRole === 'editor'"&gt;
+        編集者向けコンテンツ
+      &lt;/div&gt;
+      &lt;div v-else&gt;
+        一般ユーザー向けコンテンツ
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div v-else&gt;
+      &lt;p&gt;ログインしていません&lt;/p&gt;
+      &lt;button @click="isAuthenticated = true"&gt;ログイン&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                <code>v-if</code>は「真の条件付きレンダリング」です。条件がfalseの場合、要素は完全にDOMから削除されます。
+            </p>
+
+            <h4>テンプレートでのv-if</h4>
+            <p>
+                複数の要素を条件付きでレンダリングする場合は、<code>&lt;template&gt;</code>要素を使用できます。
+            </p>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;template v-if="isAuthenticated"&gt;
+    &lt;h2&gt;プロフィール&lt;/h2&gt;
+    &lt;p&gt;ユーザー名: {{ userName }}&lt;/p&gt;
+    &lt;p&gt;メール: {{ email }}&lt;/p&gt;
+  &lt;/template&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                <code>&lt;template&gt;</code>要素自体はレンダリングされず、その中の要素のみがレンダリングされます。
+            </p>
+
+            <h4>v-show</h4>
+            <p>
+                <code>v-show</code>ディレクティブも条件付きレンダリングに使用できますが、<code>v-if</code>とは動作が異なります。
+            </p>
+            <pre><code class="language-html">&lt;template&gt;
+  &lt;h2&gt;v-show の例&lt;/h2&gt;
+  &lt;div v-show="isAuthenticated"&gt;
+    認証済みユーザーのみに表示されるコンテンツ
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                <code>v-show</code>は、要素が常にDOMに存在し、CSSの<code>display</code>プロパティを切り替えるだけです。
+            </p>
+
+            <h4>v-ifとv-showの違い</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ディレクティブ</th>
+                        <th>初期レンダリングコスト</th>
+                        <th>切り替えコスト</th>
+                        <th>使用ケース</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>v-if</code></td>
+                        <td>条件がfalseの場合、レンダリングされない（低コスト）</td>
+                        <td>要素の作成/破棄が必要（高コスト）</td>
+                        <td>条件が実行時に変更されない場合や、頻繁に切り替えない場合</td>
+                    </tr>
+                    <tr>
+                        <td><code>v-show</code></td>
+                        <td>常にレンダリングされる（高コスト）</td>
+                        <td>CSSの切り替えのみ（低コスト）</td>
+                        <td>頻繁に切り替える場合（トグルスイッチなど）</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4. リストレンダリングの基礎</h3>
+            <p>
+                <code>v-for</code>ディレクティブを使用すると、配列やオブジェクトに基づいて要素のリストをレンダリングできます。この詳細は次の章で学びますが、ここでは簡単な例を紹介します。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const items = ref(['りんご', 'バナナ', 'オレンジ'])
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;ul&gt;
+    &lt;li v-for="(item, index) in items" :key="index"&gt;
+      {{ index }}: {{ item }}
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>5. フォームの入力バインディング</h3>
+            <p>
+                <code>v-model</code>ディレクティブを使用すると、フォーム入力要素とデータを双方向バインディングできます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const message = ref('')
+const checked = ref(false)
+const selected = ref('')
+const multiSelected = ref([])
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;テキスト入力&lt;/h2&gt;
+    &lt;input v-model="message" placeholder="メッセージを入力"&gt;
+    &lt;p&gt;メッセージ: {{ message }}&lt;/p&gt;
+    
+    &lt;h2&gt;複数行テキスト&lt;/h2&gt;
+    &lt;textarea v-model="message" placeholder="複数行メッセージ"&gt;&lt;/textarea&gt;
+    &lt;p style="white-space: pre-line"&gt;{{ message }}&lt;/p&gt;
+    
+    &lt;h2&gt;チェックボックス&lt;/h2&gt;
+    &lt;input type="checkbox" id="checkbox" v-model="checked"&gt;
+    &lt;label for="checkbox"&gt;{{ checked ? '選択済み' : '未選択' }}&lt;/label&gt;
+    
+    &lt;h2&gt;セレクトボックス（単一選択）&lt;/h2&gt;
+    &lt;select v-model="selected"&gt;
+      &lt;option disabled value=""&gt;選択してください&lt;/option&gt;
+      &lt;option&gt;りんご&lt;/option&gt;
+      &lt;option&gt;バナナ&lt;/option&gt;
+      &lt;option&gt;オレンジ&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;p&gt;選択: {{ selected }}&lt;/p&gt;
+    
+    &lt;h2&gt;セレクトボックス（複数選択）&lt;/h2&gt;
+    &lt;select v-model="multiSelected" multiple&gt;
+      &lt;option&gt;りんご&lt;/option&gt;
+      &lt;option&gt;バナナ&lt;/option&gt;
+      &lt;option&gt;オレンジ&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;p&gt;選択: {{ multiSelected }}&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h4>v-modelの修飾子</h4>
+            <p>
+                <code>v-model</code>には、入力の振る舞いを調整するための修飾子があります。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref } from 'vue'
+
+const message = ref('')
+const age = ref(null)
+const trimmed = ref('')
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;.lazy修飾子&lt;/h2&gt;
+    &lt;!-- 入力イベントではなく、changeイベント後に同期 --&gt;
+    &lt;input v-model.lazy="message"&gt;
+    &lt;p&gt;{{ message }}&lt;/p&gt;
+    
+    &lt;h2&gt;.number修飾子&lt;/h2&gt;
+    &lt;!-- 入力を数値として自動的に型変換 --&gt;
+    &lt;input v-model.number="age" type="number"&gt;
+    &lt;p&gt;年齢: {{ age }}, 型: {{ typeof age }}&lt;/p&gt;
+    
+    &lt;h2&gt;.trim修飾子&lt;/h2&gt;
+    &lt;!-- 入力の前後の空白を自動的に削除 --&gt;
+    &lt;input v-model.trim="trimmed"&gt;
+    &lt;p&gt;トリミング後: "{{ trimmed }}"&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>6. 計算プロパティと条件分岐の組み合わせ</h3>
+            <p>
+                計算プロパティを使用して、複雑な条件分岐ロジックをテンプレートから分離できます。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref, computed } from 'vue'
+
+const score = ref(75)
+
+// 計算プロパティを使用して成績を決定
+const grade = computed(() => {
+  if (score.value >= 90) return 'A'
+  if (score.value >= 80) return 'B'
+  if (score.value >= 70) return 'C'
+  if (score.value >= 60) return 'D'
+  return 'F'
+})
+
+// 計算プロパティを使用して色を決定
+const gradeColor = computed(() => {
+  switch (grade.value) {
+    case 'A': return 'green'
+    case 'B': return 'blue'
+    case 'C': return 'orange'
+    case 'D': return 'red'
+    default: return 'gray'
+  }
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;成績計算&lt;/h2&gt;
+    &lt;p&gt;
+      &lt;label for="score"&gt;点数: &lt;/label&gt;
+      &lt;input id="score" v-model.number="score" type="number" min="0" max="100"&gt;
+    &lt;/p&gt;
+    
+    &lt;p :style="{ color: gradeColor }"&gt;
+      成績: {{ grade }}
+    &lt;/p&gt;
+    
+    &lt;p v-if="grade === 'A'"&gt;
+      素晴らしい！よく頑張りました！
+    &lt;/p&gt;
+    &lt;p v-else-if="grade === 'B' || grade === 'C'"&gt;
+      良い成績です。もう少し頑張りましょう！
+    &lt;/p&gt;
+    &lt;p v-else&gt;
+      次回はもっと勉強しましょう。
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>7. 実践的な例: シンプルなログインフォーム</h3>
+            <p>
+                データバインディングと条件分岐を組み合わせて、シンプルなログインフォームを作成してみましょう。
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+import { ref, computed } from 'vue'
+
+// リアクティブな状態
+const username = ref('')
+const password = ref('')
+const rememberMe = ref(false)
+const isSubmitting = ref(false)
+const loginError = ref(null)
+const isLoggedIn = ref(false)
+const currentUser = ref(null)
+
+// バリデーション
+const isFormValid = computed(() => {
+  return username.value.trim() !== '' && password.value.length >= 6
+})
+
+// ログイン処理（ダミー）
+function login() {
+  if (!isFormValid.value) return
+  
+  // ログイン処理中フラグをセット
+  isSubmitting.value = true
+  loginError.value = null
+  
+  // 非同期処理をシミュレート
+  setTimeout(() => {
+    // ダミーのバリデーション（実際の実装ではAPIリクエストなどを行う）
+    if (username.value === 'admin' && password.value === 'password') {
+      // ログイン成功
+      isLoggedIn.value = true
+      currentUser.value = {
+        username: username.value,
+        role: 'admin'
+      }
+      loginError.value = null
+    } else {
+      // ログイン失敗
+      loginError.value = 'ユーザー名またはパスワードが正しくありません'
+      isLoggedIn.value = false
+      currentUser.value = null
+    }
+    
+    isSubmitting.value = false
+  }, 1000)
+}
+
+// ログアウト処理
+function logout() {
+  isLoggedIn.value = false
+  currentUser.value = null
+  username.value = ''
+  password.value = ''
+  rememberMe.value = false
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div class="login-container"&gt;
+    &lt;h2&gt;{{ isLoggedIn ? 'ようこそ！' : 'ログイン' }}&lt;/h2&gt;
+    
+    &lt;!-- ログインフォーム：ログインしていない場合のみ表示 --&gt;
+    &lt;form v-if="!isLoggedIn" @submit.prevent="login"&gt;
+      &lt;!-- エラーメッセージ --&gt;
+      &lt;div v-if="loginError" class="error-message"&gt;
+        {{ loginError }}
+      &lt;/div&gt;
+      
+      &lt;!-- ユーザー名フィールド --&gt;
+      &lt;div class="form-group"&gt;
+        &lt;label for="username"&gt;ユーザー名&lt;/label&gt;
+        &lt;input
+          id="username"
+          v-model="username"
+          type="text"
+          :disabled="isSubmitting"
+          placeholder="ユーザー名を入力"
+          required
+        &gt;
+      &lt;/div&gt;
+      
+      &lt;!-- パスワードフィールド --&gt;
+      &lt;div class="form-group"&gt;
+        &lt;label for="password"&gt;パスワード&lt;/label&gt;
+        &lt;input
+          id="password"
+          v-model="password"
+          type="password"
+          :disabled="isSubmitting"
+          placeholder="パスワードを入力"
+          required
+        &gt;
+        &lt;small v-show="password.length > 0 && password.length < 6" class="error-message"&gt;
+          パスワードは6文字以上必要です
+        &lt;/small&gt;
+      &lt;/div&gt;
+      
+      &lt;!-- リメンバーミーチェックボックス --&gt;
+      &lt;div class="form-group"&gt;
+        &lt;label class="checkbox-label"&gt;
+          &lt;input
+            type="checkbox"
+            v-model="rememberMe"
+            :disabled="isSubmitting"
+          &gt;
+          ログイン情報を記憶する
+        &lt;/label&gt;
+      &lt;/div&gt;
+      
+      &lt;!-- 送信ボタン --&gt;
+      &lt;div class="form-group"&gt;
+        &lt;button
+          type="submit"
+          :disabled="!isFormValid || isSubmitting"
+          class="login-button"
+        &gt;
+          {{ isSubmitting ? 'ログイン中...' : 'ログイン' }}
+        &lt;/button&gt;
+      &lt;/div&gt;
+      
+      &lt;!-- ヒント --&gt;
+      &lt;div class="hint"&gt;
+        &lt;small&gt;ヒント: username = "admin", password = "password"&lt;/small&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+    
+    &lt;!-- ログイン後の表示 --&gt;
+    &lt;div v-else class="welcome-container"&gt;
+      &lt;p&gt;ようこそ、&lt;strong&gt;{{ currentUser.username }}&lt;/strong&gt; さん！&lt;/p&gt;
+      &lt;p v-if="currentUser.role === 'admin'"&gt;管理者権限があります。&lt;/p&gt;
+      &lt;button @click="logout" class="logout-button"&gt;ログアウト&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+}
+
+.checkbox-label input {
+  margin-right: 8px;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.login-button,
+.logout-button {
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.login-button:hover,
+.logout-button:hover {
+  background-color: #36a073;
+}
+
+.login-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #ff4c4c;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.hint {
+  margin-top: 15px;
+  text-align: center;
+  color: #666;
+}
+
+.welcome-container {
+  text-align: center;
+}
+&lt;/style&gt;
+
+</code></pre>
+
+            <h3>8. ディレクティブの修飾子</h3>
+            <p>
+                Vue.jsのディレクティブには、特別な接尾辞（修飾子）を付けることで、その挙動をカスタマイズできます。修飾子は <code>.</code> で繋げて指定します。
+            </p>
+            
+            <h4>イベント修飾子</h4>
+            <p>
+                イベントハンドリング（<code>v-on</code> または <code>@</code>）では、以下のような修飾子が使用できます：
+            </p>
+            <pre><code class="language-html">&lt;!-- クリックイベントのデフォルト動作を防止 --&gt;
+&lt;a @click.prevent="handleClick"&gt;リンク&lt;/a&gt;
+
+&lt;!-- イベントの伝播を停止 --&gt;
+&lt;div @click="outerClick"&gt;
+  &lt;button @click.stop="innerClick"&gt;ボタン&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- キーイベント修飾子 --&gt;
+&lt;input @keyup.enter="submit"&gt;
+
+&lt;!-- マウスボタン修飾子 --&gt;
+&lt;div @click.right="showContextMenu"&gt;右クリックメニュー&lt;/div&gt;</code></pre>
+
+            <h4>v-bind修飾子</h4>
+            <p>
+                バインディング（<code>v-bind</code> または <code>:</code>）には以下のような修飾子があります：
+            </p>
+
+
+            <pre><code class="language-html">
+                
+&lt;!-- プロパティとして束縛（innerHTML などの DOM プロパティに束縛）--&gt;
+&lt;div :text-content.prop="message"&gt;&lt;/div&gt;
+
+&lt;!-- 両方向バインディング（v-model の代替） --&gt;
+&lt;input :value.sync="message"&gt;
+</code></pre>
+<h3>9. Vue.jsディレクティブの省略記法一覧</h3>
+<p>
+    Vue.jsでは、頻繁に使用されるディレクティブには省略記法が用意されています。以下の表は、完全な構文と省略記法の対比です。
+</p>
+
+<table class="directive-table">
+    <thead>
+        <tr>
+            <th>機能</th>
+            <th>完全な構文</th>
+            <th>省略記法</th>
+            <th>例</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>属性バインディング</td>
+            <td><code>v-bind:属性名</code></td>
+            <td><code>:属性名</code></td>
+            <td>
+                <code>v-bind:href="url"</code><br>
+                <code>:href="url"</code>
+            </td>
+        </tr>
+        <tr>
+            <td>イベントバインディング</td>
+            <td><code>v-on:イベント名</code></td>
+            <td><code>@イベント名</code></td>
+            <td>
+                <code>v-on:click="handleClick"</code><br>
+                <code>@click="handleClick"</code>
+            </td>
+        </tr>
+        <tr>
+            <td>スロット</td>
+            <td><code>v-slot:スロット名</code></td>
+            <td><code>#スロット名</code></td>
+            <td>
+                <code>v-slot:header</code><br>
+                <code>#header</code>
+            </td>
+        </tr>
+        <tr>
+            <td>動的な属性バインディング</td>
+            <td><code>v-bind:[動的属性名]</code></td>
+            <td><code>:[動的属性名]</code></td>
+            <td>
+                <code>v-bind:[attrName]="value"</code><br>
+                <code>:[attrName]="value"</code>
+            </td>
+        </tr>
+        <tr>
+            <td>動的なイベントバインディング</td>
+            <td><code>v-on:[動的イベント名]</code></td>
+            <td><code>@[動的イベント名]</code></td>
+            <td>
+                <code>v-on:[eventName]="handler"</code><br>
+                <code>@[eventName]="handler"</code>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+    省略記法を使用すると、テンプレートはより簡潔になり、読みやすくなります。特に<code>v-bind</code>と<code>v-on</code>は非常によく使われるため、それらの省略記法を覚えておくと効率的にコーディングできます。
+</p>
+
+<h3>10. まとめ</h3>
+<p>
+    本章では、Vue.jsのデータバインディングと条件分岐について学びました。マスタッシュ構文（<code>{{ }}</code>）を使用したテキスト補間、<code>v-bind</code>を使用した属性バインディング、<code>v-if</code>/<code>v-else</code>/<code>v-show</code>を使用した条件付きレンダリング、<code>v-model</code>を使用したフォーム入力バインディングなど、Vue.jsの基本的なディレクティブについて理解しました。
+</p>
+<p>
+    また、計算プロパティと条件分岐を組み合わせた実践的な例や、リアルなログインフォームの実装例を通じて、これらの概念がどのように連携するかも学びました。さらに、よく使用されるディレクティブの省略記法についても確認し、効率的なコーディングのためのヒントを得ました。
+</p>
+<p>
+    次の章では、リストレンダリングとイベントハンドリングについて詳しく学びます。
+</p>
+        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

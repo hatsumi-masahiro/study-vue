@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第10章: TypeScript 導入ガイド</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第10章: TypeScript 導入ガイド</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter10">
+            <h2 id="chapter10" class="chapter-heading">第10章: TypeScript 導入ガイド</h2>
+
+            <h3>概要</h3>
+            <p>
+                TypeScriptはJavaScriptにデータの型付けを追加した言語で、Microsoftによって開発されました。Vue.jsプロジェクトでTypeScriptを導入することで、コードの品質向上、バグの早期発見、IDEのコード補完機能強化など多くのメリットが得られます。Vue 3はTypeScriptでゼロから書き直されており、型のサポートが大幅に改善されています。この章では、Vue.jsプロジェクトにTypeScriptを導入する方法と基本的な使い方について解説します。
+            </p>
+
+            <h3>1. TypeScriptとは</h3>
+            <p>
+                TypeScriptはJavaScriptの上位集合（スーパーセット）で、静的型付けや型推論などの機能を追加しています。これにより、開発時にエラーを早期に発見でき、コードの可読性や保守性が向上します。すべてのJavaScriptコードは有効なTypeScriptコードですが、TypeScriptはさらに型定義や型注釈などの機能を提供します。
+            </p>
+
+            <h3>2. Vue.jsプロジェクトでTypeScriptを設定する</h3>
+            <p>
+                既存のVue.jsプロジェクトにTypeScriptを導入する場合と、最初からTypeScriptを使ってプロジェクトを作成する場合の2つのパターンがあります。
+            </p>
+
+            <h4>2.1 新規プロジェクトでTypeScriptを使用する</h4>
+            <pre><code class="language-bash">npm create vue@latest my-vue-ts-app
+
+# プロジェクト作成時の質問で、TypeScriptを選択:
+# ✓ Add TypeScript? Yes
+</code></pre>
+
+            <h4>2.2 既存プロジェクトにTypeScriptを追加する</h4>
+            <pre><code class="language-bash"># TypeScriptと関連パッケージをインストール
+npm install -D typescript @vue/tsconfig @types/node
+</code></pre>
+
+            <p>次に、プロジェクトルートに<code>tsconfig.json</code>ファイルを作成します：</p>
+
+            <pre><code class="language-json">{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "strict": true
+  }
+}
+</code></pre>
+
+            <h3>3. Vue ComponentでTypeScriptを使用する</h3>
+            <p>Vue 3では、Composition APIとTypeScriptの相性が非常に良いです。以下の例で基本的な使い方を見てみましょう。</p>
+
+            <h4>3.1 Script Setup with TypeScript</h4>
+            <pre><code class="language-html">&lt;script setup lang="ts"&gt;
+import { ref, computed } from 'vue'
+
+// 型注釈を使用した変数定義
+const message = ref&lt;string&gt;('Hello TypeScript')
+const count = ref&lt;number&gt;(0)
+
+// 型推論も可能（明示的な型注釈なし）
+const doubleCount = computed(() => count.value * 2)
+
+// 関数に型を定義
+function increment(): void {
+  count.value++
+}
+
+// インターフェースの定義
+interface User {
+  id: number
+  name: string
+  email?: string // オプショナルプロパティ
+}
+
+// インターフェースを使用
+const user = ref&lt;User&gt;({
+  id: 1,
+  name: '山田太郎'
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;{{ message }}&lt;/h1&gt;
+    &lt;p&gt;Count: {{ count }}&lt;/p&gt;
+    &lt;p&gt;Double: {{ doubleCount }}&lt;/p&gt;
+    &lt;button @click="increment"&gt;Increment&lt;/button&gt;
+    
+    &lt;div&gt;
+      &lt;h2&gt;User Info&lt;/h2&gt;
+      &lt;p&gt;ID: {{ user.id }}&lt;/p&gt;
+      &lt;p&gt;Name: {{ user.name }}&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>4. PropsとEmitsの型定義</h3>
+            <p>
+                コンポーネント間の通信では、PropsとEmitsに型を定義することで安全なデータのやり取りが可能になります。
+            </p>
+
+            <h4>4.1 Propsの型定義</h4>
+            <pre><code class="language-html">&lt;script setup lang="ts"&gt;
+// definePropsに型を定義する方法
+const props = defineProps&lt;{
+  title: string
+  likes?: number
+  isPublished: boolean
+  commentIds: number[]
+  author: {
+    name: string
+    email: string
+  }
+}&gt;()
+
+// またはインターフェースを使用
+interface Author {
+  name: string
+  email: string
+}
+
+interface PostProps {
+  title: string
+  likes?: number
+  isPublished: boolean
+  commentIds: number[]
+  author: Author
+}
+
+// 上記のインターフェースを使用
+const propsWithInterface = defineProps&lt;PostProps&gt;()
+&lt;/script&gt;</code></pre>
+
+            <h4>4.2 Emitsの型定義</h4>
+            <pre><code class="language-html">&lt;script setup lang="ts"&gt;
+// defineEmitsに型を定義
+const emit = defineEmits&lt;{
+  (e: 'change', id: number): void
+  (e: 'update', value: string): void
+}&gt;()
+
+// 使用例
+function handleChange(id: number) {
+  emit('change', id)
+}
+
+function handleUpdate(value: string) {
+  emit('update', value)
+}
+&lt;/script&gt;</code></pre>
+
+            <h3>5. TypeScriptでのReactive Stateの型管理</h3>
+            <p>TypeScriptではリアクティブなデータの型を明示的に定義できます。</p>
+
+            <pre><code class="language-html">&lt;script setup lang="ts"&gt;
+import { reactive, ref, computed } from 'vue'
+
+// refを使う場合
+const count = ref&lt;number&gt;(0)
+const message = ref&lt;string&gt;('Hello')
+const items = ref&lt;string[]&gt;([])
+
+// reactiveを使う場合
+interface User {
+  id: number
+  name: string
+  email: string
+  isActive: boolean
+}
+
+const user = reactive&lt;User&gt;({
+  id: 1,
+  name: '山田太郎',
+  email: 'yamada@example.com',
+  isActive: true
+})
+
+// computedプロパティの型推論
+const userName = computed(() => user.name.toUpperCase())
+// 戻り値の型は自動的にstring型として推論される
+&lt;/script&gt;</code></pre>
+
+            <h3>6. TypeScriptでのVueルーターの使用</h3>
+            <p>Vue Routerを使用する際も型の恩恵を受けることができます。</p>
+
+            <pre><code class="language-typescript">// router/index.ts
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
+import AboutView from '../views/AboutView.vue'
+
+// ルート定義に型を追加
+const routes: Array&lt;RouteRecordRaw&gt; = [
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
+  },
+  {
+    path: '/about',
+    name: 'about',
+    component: AboutView
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes
+})
+
+export default router</code></pre>
+
+            <p>コンポーネント内でのルーターの使用：</p>
+
+            <pre><code class="language-html">&lt;script setup lang="ts"&gt;
+import { useRouter, useRoute } from 'vue-router'
+
+// 型付きルーターとルートパラメータ
+const router = useRouter()
+const route = useRoute()
+
+// IDパラメータを取得（型安全）
+const id = route.params.id as string
+
+// ルーターのメソッドを使用
+function navigateToHome() {
+  router.push({ name: 'home' })
+}
+
+function navigateToUser(userId: number) {
+  router.push({ name: 'user', params: { id: userId.toString() } })
+}
+&lt;/script&gt;</code></pre>
+
+            <h3>7. TypeScriptでのPiniaの使用</h3>
+            <p>Piniaは最初からTypeScriptをサポートしており、型安全な状態管理を実現できます。</p>
+
+            <pre><code class="language-typescript">// stores/counter.ts
+import { defineStore } from 'pinia'
+
+// インターフェースでストアの状態の型を定義
+interface CounterState {
+  count: number
+  name: string
+}
+
+export const useCounterStore = defineStore('counter', {
+  state: (): CounterState => ({
+    count: 0,
+    name: 'Counter'
+  }),
+  getters: {
+    doubleCount(): number {
+      return this.count * 2
+    }
+  },
+  actions: {
+    increment() {
+      this.count++
+    },
+    updateName(name: string) {
+      this.name = name
+    }
+  }
+})
+</code></pre>
+
+            <p>コンポーネント内でのPiniaストアの使用：</p>
+
+            <pre><code class="language-html">&lt;script setup lang="ts"&gt;
+import { useCounterStore } from '@/stores/counter'
+import { storeToRefs } from 'pinia'
+
+// ストアを使用
+const counterStore = useCounterStore()
+
+// storeToRefsで状態をリアクティブに分解
+const { count, name } = storeToRefs(counterStore)
+
+// アクションを使用
+function handleIncrement() {
+  counterStore.increment()
+}
+
+function updateStoreName(newName: string) {
+  counterStore.updateName(newName)
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h2&gt;{{ name }}: {{ count }}&lt;/h2&gt;
+    &lt;p&gt;Double: {{ counterStore.doubleCount }}&lt;/p&gt;
+    &lt;button @click="handleIncrement"&gt;Increment&lt;/button&gt;
+    &lt;input v-model="name" placeholder="Store name" /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+            <h3>8. TypeScriptのユーティリティタイプ</h3>
+            <p>
+                TypeScriptには便利なユーティリティタイプが用意されており、これらを活用することでより柔軟な型定義が可能になります。
+            </p>
+
+            <pre><code class="language-typescript">// よく使われるユーティリティタイプの例
+
+// Partial: すべてのプロパティをオプショナルにする
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+function updateUser(userId: number, userUpdate: Partial&lt;User&gt;) {
+  // userUpdateはUserの一部のプロパティだけを含む可能性がある
+}
+
+// Pick: 特定のプロパティだけを選択
+type UserBasicInfo = Pick&lt;User, 'id' | 'name'&gt;
+// UserBasicInfo = { id: number; name: string }
+
+// Omit: 特定のプロパティを除外
+type UserWithoutEmail = Omit&lt;User, 'email'&gt;
+// UserWithoutEmail = { id: number; name: string }
+
+// Record: キーと値の型を指定
+type UserRoles = Record&lt;string, boolean&gt;
+const roles: UserRoles = {
+  admin: true,
+  editor: false
+}
+</code></pre>
+
+            <h3>9. 型の拡張と継承</h3>
+            <p>
+                TypeScriptでは、既存の型を拡張したり継承したりすることができます。
+            </p>
+
+            <pre><code class="language-typescript">// インターフェースの拡張
+interface BaseUser {
+  id: number
+  name: string
+}
+
+interface AdminUser extends BaseUser {
+  role: 'admin'
+  permissions: string[]
+}
+
+// 交差型（Intersection Types）
+type Employee = {
+  employeeId: string
+  department: string
+}
+
+type EmployeeUser = BaseUser & Employee
+// EmployeeUser = { id: number; name: string; employeeId: string; department: string }
+</code></pre>
+
+            <h3>10. 実践的なTips</h3>
+            <p>
+                Vue.jsでTypeScriptを使う上で役立つヒントをいくつか紹介します。
+            </p>
+
+            <h4>10.1 型定義ファイル（.d.ts）</h4>
+            <p>
+                カスタム型定義ファイルを作成して、プロジェクト全体で使用できる型を定義できます。
+            </p>
+
+            <pre><code class="language-typescript">// src/types/index.d.ts
+export interface User {
+  id: number
+  name: string
+  email: string
+  role: 'admin' | 'user' | 'guest'
+}
+
+export interface Post {
+  id: number
+  title: string
+  content: string
+  authorId: number
+  created: Date
+}</code></pre>
+
+            <h4>10.2 環境変数の型定義</h4>
+            <p>
+                Viteの環境変数を型安全にするには、環境変数の宣言ファイルを作成します。
+            </p>
+
+            <pre><code class="language-typescript">// env.d.ts
+/// &lt;reference types="vite/client" /&gt;
+
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string
+  readonly VITE_APP_TITLE: string
+  // その他の環境変数
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}</code></pre>
+
+            <h4>10.3 Vue Componentのタイプチェック</h4>
+            <p>
+                コンポーネントの実装が正しいかを型チェックするために、TypeScriptの厳格モードを有効にすることをお勧めします。
+            </p>
+
+            <pre><code class="language-json">// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}</code></pre>
+
+            <h3>まとめ</h3>
+            <p>
+                TypeScriptはVue.jsプロジェクトに型安全性をもたらし、コードの品質と保守性を向上させます。この章では、Vue.jsプロジェクトでのTypeScriptの基本的な使い方を紹介しました。実際のプロジェクトでは、徐々に型定義を導入していくことで、段階的にTypeScriptの恩恵を受けることができます。Vue 3とComposition APIはTypeScriptとの相性が良いため、両者を組み合わせることで、より堅牢なアプリケーション開発が可能になります。
+            </p>
+
+            <h3>演習問題</h3>
+            <ol>
+                <li>既存のVueコンポーネントをTypeScriptに変換してみましょう。</li>
+                <li>Propsに複雑な型定義を追加し、そのProps型を使用するコンポーネントを作成してください。</li>
+                <li>PiniaストアをTypeScriptで実装し、それを使用するコンポーネントを作成してください。</li>
+                <li>ユーティリティタイプを使って、既存の型から新しい型を作成する例を3つ考えてください。</li>
+            </ol>
+        </section>
+        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

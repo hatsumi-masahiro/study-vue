@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第7章: クラス構文とオブジェクト指向</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第7章: クラス構文とオブジェクト指向</h1>
+        </div>
+    </header>
+    <div class="container">
+
+        <section id="chapter7">
+            <h2 id="chapter7" class="chapter-heading">第7章: クラス構文とオブジェクト指向</h2>
+
+            <h3>概要</h3>
+            <p>ES6で追加された<code>class</code>構文により、JavaScriptでもクラスベースの記法でオブジェクト指向プログラミングが可能になりました。従来はプロトタイプ継承を用いてオブジェクトの雛形を作っていましたが、<code>class</code>構文はこれを抽象化し、他の言語に近い記法でコンストラクタやメソッド、継承（<code>extends</code>）を記述できます。
+            </p>
+            <p>JavaScriptのクラスはシンタックスシュガーであり、内部的にはプロトタイプチェーンを利用した仕組みです。しかし開発者は<code>class Foo { ... }</code>と書くだけでクラスを定義でき、<code>new Foo()</code>でインスタンスを生成できます。クラスにはコンストラクタ<code>constructor</code>メソッドや、プロトタイプメソッド（クラス内に定義したメソッド）が含まれます。さらに<code>extends</code>キーワードでクラスを継承し、<code>super</code>呼び出しで親クラスのコンストラクタやメソッドを呼ぶことができます。
+            </p>
+
+            <h3>コードと解説</h3>
+            <p>JavaScriptにおけるクラスと継承の例を示します。<code>Person</code>クラスを定義し、それを継承した<code>Student</code>クラスを作成します。</p>
+
+            <pre><code class="language-javascript">class Person {
+constructor(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+greet() {
+    console.log(`こんにちは、${this.name}です。`);
+}
+
+
+// Personクラスを継承したStudentクラス
+class Student extends Person {
+    constructor(name, age, grade) {
+        super(name, age);      // 親クラスのコンストラクタを呼び出し
+        this.grade = grade;
+    }
+}
+
+study() {
+    console.log(`${this.name}は勉強しています。`);
+}
+
+const alice = new Person("Alice", 30);
+alice.greet();   // "こんにちは、Aliceです。"
+
+const bob = new Student("Bob", 20, "A");
+bob.greet();    // "こんにちは、Bobです。" （親クラスのメソッドを利用）
+bob.study();    // "Bobは勉強しています。"</code></pre>
+
+            <p><strong>解説:</strong>
+                上記の<code>Person</code>クラスは、<code>constructor</code>で名前と年齢を受け取りプロパティ<code>name</code>,
+                <code>age</code>に代入しています。<code>greet()</code>メソッドはインスタンスの<code>name</code>を使って挨拶を表示する機能です。<code>Student</code>クラスは<code>Person</code>を<code>extends</code>しており、新たに<code>grade</code>（成績や学年などを表す）プロパティと<code>study()</code>メソッドを追加しています。<code>Student</code>のコンストラクタでは<code>super(name, age)</code>を呼び出して親<code>Person</code>の初期化を行った後、自身の<code>grade</code>をセットしています。
+            </p>
+            <p>生成した<code>bob</code>（Studentインスタンス）は、<code>Person</code>から継承した<code>greet()</code>メソッドと、自身で持つ<code>study()</code>メソッドの両方が利用可能です。このように、クラス構文を使うことで継承関係を簡潔に表現でき、オブジェクト指向のパターン（継承による機能拡張など）をJavaScriptで実践しやすくなります。
+            </p>
+            <p>TypeScript版では各プロパティやメソッドに型情報を付与しています。たとえば<code>name: string;</code>と宣言することで<code>name</code>プロパティは文字列型であることが明示され、誤った型の値を代入しようとするとコンパイルエラーになります。クラスの構文自体はJavaScriptと同様ですが、このような型チェックが加わることでより堅牢なコードを書くことができます。
+            </p>
+        </section>
+
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

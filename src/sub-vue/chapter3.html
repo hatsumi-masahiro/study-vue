@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3章: プロジェクト構成の理解</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第3章: プロジェクト構成の理解</h1>
+        </div>
+    </header>
+    <div class="container">
+        <section id="chapter3">
+            <h2 id="chapter3" class="chapter-heading">第3章: プロジェクト構成の理解</h2>
+
+            <h3>概要</h3>
+            <p>
+                本章では、前章で作成したVue.jsプロジェクトの構成を詳しく理解します。Viteで生成されたプロジェクトの各ファイルとディレクトリの役割、Vueの単一ファイルコンポーネント（SFC）の構造、そしてプロジェクト設定ファイルについて学びます。
+            </p>
+            
+            <h3>1. プロジェクトディレクトリ構造</h3>
+            <p>
+                Viteで生成したVueプロジェクトの基本的なディレクトリ構造を再確認し、各部分の役割を詳しく見ていきましょう：
+            </p>
+            <pre><code class="language-plaintext">my-vue-app/
+├── node_modules/     # インストールされた依存関係パッケージ
+├── public/           # 静的アセット（処理なしでそのままコピーされる）
+├── src/              # ソースコード
+│   ├── assets/       # コンパイル/処理されるアセット
+│   ├── components/   # 再利用可能なVueコンポーネント
+│   ├── App.vue       # アプリケーションのルートコンポーネント
+│   └── main.js       # アプリケーションのエントリーポイント
+├── .gitignore        # Gitで無視するファイルの設定
+├── index.html        # HTMLエントリーポイント
+├── package.json      # プロジェクトの依存関係と設定
+├── package-lock.json # 依存関係のバージョン固定用
+├── vite.config.js    # Viteの設定ファイル
+└── README.md         # プロジェクトの説明</code></pre>
+
+            <h3>2. 主要ディレクトリとファイルの役割</h3>
+            
+            <h4>node_modules/</h4>
+            <p>
+                このディレクトリには、<code>npm install</code>コマンドでインストールした全ての依存関係が格納されています。このディレクトリは<code>.gitignore</code>に登録されており、通常はGitリポジトリにコミットされません。
+            </p>
+
+            <h4>public/</h4>
+            <p>
+                ビルド時に処理されず、そのままコピーされる静的ファイルを置くディレクトリです。例えば、ファビコン（favicon.ico）、robots.txt、静的画像などを配置します。このディレクトリに配置したファイルは、コードからは「/」をルートとして参照できます。
+            </p>
+            <pre><code class="language-html">&lt;!-- 例：public/logo.png にあるファイルを参照 --&gt;
+&lt;img src="/logo.png" alt="Logo"&gt;</code></pre>
+
+            <h4>src/</h4>
+            <p>
+                アプリケーションのソースコードを配置するメインディレクトリです。開発のほとんどはここで行います。
+            </p>
+
+            <h5>src/assets/</h5>
+            <p>
+                ビルド時に処理される画像、スタイルシート、フォントなどのアセットファイルを格納します。例えば、Sassファイル、モジュールCSSファイル、SVGなどです。このディレクトリ内のファイルは、importを使用して参照されます。
+            </p>
+            <pre><code class="language-javascript">// 例：CSSをインポート
+import './assets/main.css'
+
+// 例：画像をインポート
+import logo from './assets/logo.png'</code></pre>
+
+            <h5>src/components/</h5>
+            <p>
+                再利用可能なVueコンポーネント（.vueファイル）を格納するディレクトリです。ボタン、フォーム、カードなどのUIコンポーネントを作成し、他のコンポーネントやページから再利用できます。
+            </p>
+
+            <h5>src/App.vue</h5>
+            <p>
+                アプリケーションのルートコンポーネントです。すべてのページとコンポーネントは、最終的にこのコンポーネント内でレンダリングされます。
+            </p>
+
+            <h5>src/main.js</h5>
+            <p>
+                アプリケーションのエントリーポイントです。Vueインスタンスを作成し、グローバルなプラグインやコンポーネントを登録し、アプリケーションをDOMにマウントします。
+            </p>
+            
+            <h4>index.html</h4>
+            <p>
+                プロジェクトのルートにあるHTMLファイルです。Viteは、このファイルをビルドプロセスのエントリーポイントとして使用します。このファイルには、Vueアプリケーションがマウントされる<code>div</code>要素と、main.jsへのスクリプト参照が含まれています。
+            </p>
+
+            <h4>package.json</h4>
+            <p>
+                プロジェクトの依存関係、スクリプト、およびメタデータを管理するファイルです。このファイルには、アプリケーションの構築、テスト、起動に必要なスクリプトとパッケージが記述されています。
+            </p>
+            <pre><code class="language-json">{
+  "name": "my-vue-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.5"
+  }
+}</code></pre>
+            <p>
+                主なスクリプトの説明：
+            </p>
+            <ul>
+                <li><code>npm run dev</code>：開発サーバーを起動します</li>
+                <li><code>npm run build</code>：プロダクション用のビルドを生成します</li>
+                <li><code>npm run preview</code>：ビルド後のプロダクションバージョンをプレビューします</li>
+            </ul>
+
+            <h4>vite.config.js</h4>
+            <p>
+                Viteの設定ファイルです。プラグインの追加、ビルドオプションのカスタマイズ、エイリアスの設定などを行うことができます。
+            </p>
+            <pre><code class="language-javascript">import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [vue()],
+})</code></pre>
+
+            <h3>3. 単一ファイルコンポーネント（SFC）の構造</h3>
+            <p>
+                Vueの単一ファイルコンポーネント（.vueファイル）は、HTML、JavaScript、CSSを1つのファイルにカプセル化したものです。これにより、コンポーネントベースの開発が容易になり、関連するコードを1箇所にまとめることができます。
+            </p>
+            <p>
+                .vueファイルの基本構造を見てみましょう：
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+// JavaScriptコード（Composition API）
+import { ref, computed } from 'vue'
+
+// リアクティブな状態
+const count = ref(0)
+
+// 算出プロパティ
+const doubleCount = computed(() => count.value * 2)
+
+// メソッド
+function increment() {
+  count.value++
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- HTMLテンプレート --&gt;
+  &lt;div class="container"&gt;
+    &lt;h1&gt;カウンター: {{ count }}&lt;/h1&gt;
+    &lt;p&gt;2倍の値: {{ doubleCount }}&lt;/p&gt;
+    &lt;button @click="increment"&gt;増やす&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+/* スコープ付きCSS */
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  color: #42b983;
+}
+
+button {
+  background-color: #42b983;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+&lt;/style&gt;</code></pre>
+
+            <h4>&lt;script setup&gt;</h4>
+            <p>
+                Vue 3のComposition APIを使用するための構文です。<code>setup</code>属性を追加することで、スクリプト内のコードが自動的にVueコンポーネントの<code>setup()</code>関数内で実行されます。これにより、コードがより簡潔になります。
+            </p>
+            <p>
+                この部分では、以下のような処理を行います：
+            </p>
+            <ul>
+                <li>必要なVueの関数やコンポーネントのインポート</li>
+                <li>リアクティブな状態の宣言（<code>ref</code>や<code>reactive</code>を使用）</li>
+                <li>算出プロパティの定義（<code>computed</code>を使用）</li>
+                <li>ライフサイクルフックの登録（<code>onMounted</code>などを使用）</li>
+                <li>メソッドの定義</li>
+            </ul>
+
+            <h4>&lt;template&gt;</h4>
+            <p>
+                コンポーネントのHTMLテンプレートを定義する部分です。ここでは、以下のような機能を使用できます：
+            </p>
+            <ul>
+                <li>データバインディング（<code>{{ 変数名 }}</code>）</li>
+                <li>ディレクティブ（<code>v-if</code>、<code>v-for</code>、<code>v-bind</code>、<code>v-on</code>など）</li>
+                <li>コンポーネントの入れ子</li>
+                <li>スロット</li>
+            </ul>
+
+            <h4>&lt;style&gt;</h4>
+            <p>
+                コンポーネントのスタイルを定義する部分です。<code>scoped</code>属性を追加すると、そのスタイルはこのコンポーネントのみに適用され、他のコンポーネントには影響しません。
+            </p>
+            <p>
+                また、CSSプリプロセッサを使用することもできます：
+            </p>
+            <pre><code class="language-html">&lt;style lang="scss" scoped&gt;
+// SCSSを使用
+$primary-color: #42b983;
+
+.container {
+  h1 {
+    color: $primary-color;
+  }
+}
+&lt;/style&gt;</code></pre>
+
+            <h3>4. main.jsファイルの詳細</h3>
+            <p>
+                main.jsファイルは、Vueアプリケーションのエントリーポイントです。ここで、Vueアプリケーションを初期化し、必要なプラグインやグローバルコンポーネントを登録します。
+            </p>
+            <pre><code class="language-javascript">import { createApp } from 'vue'
+import App from './App.vue'
+
+// スタイルのインポート
+import './assets/main.css'
+
+// Vueアプリケーションの作成
+const app = createApp(App)
+
+// プラグインの登録（例）
+// import router from './router'
+// app.use(router)
+
+// グローバルコンポーネントの登録（例）
+// import BaseButton from './components/BaseButton.vue'
+// app.component('BaseButton', BaseButton)
+
+// グローバルプロパティの設定（例）
+// app.config.globalProperties.$http = axios
+
+// アプリケーションのマウント
+app.mount('#app')</code></pre>
+            <p>
+                <code>createApp</code>関数を使用してVueアプリケーションを作成し、<code>mount</code>メソッドを使用してDOMにマウントします。その間に、プラグインやグローバルコンポーネントを登録することができます。
+            </p>
+
+            <h3>5. Vueコンポーネントの命名規則</h3>
+            <p>
+                Vueコンポーネントの命名には、いくつかの規則があります：
+            </p>
+            <ul>
+                <li><strong>PascalCase</strong>：コンポーネントファイル名はPascalCase（例：<code>HelloWorld.vue</code>）を使用します</li>
+                <li><strong>複数の単語</strong>：単一の単語を避け、複数の単語を組み合わせることを推奨（例：<code>TodoItem.vue</code>、<code>UserProfile.vue</code>）</li>
+                <li><strong>Base/App/The接頭辞</strong>：基本コンポーネントには「Base」、アプリケーション固有のコンポーネントには「App」、単一インスタンスのコンポーネントには「The」という接頭辞を付けることが推奨されています（例：<code>BaseButton.vue</code>、<code>AppSidebar.vue</code>、<code>TheHeader.vue</code>）</li>
+            </ul>
+
+            <h3>6. プロジェクト構造のベストプラクティス</h3>
+            <p>
+                大規模なVueプロジェクトでは、以下のようなディレクトリ構造が推奨されています：
+            </p>
+            <pre><code class="language-plaintext">src/
+├── assets/          # 静的アセット
+├── components/      # 共通コンポーネント
+│   ├── base/        # 基本UI要素（BaseButton、BaseInput等）
+│   ├── layout/      # レイアウト関連（TheHeader、TheSidebar等）
+│   └── ui/          # 特定のUI要素（DataTable、UserCard等）
+├── composables/     # 再利用可能なComposition関数
+├── views/           # ページコンポーネント
+├── router/          # ルーティング設定
+├── stores/          # Pinia/Vuexストア
+├── services/        # APIサービス
+├── utils/           # ユーティリティ関数
+├── App.vue          # ルートコンポーネント
+└── main.js          # エントリーポイント</code></pre>
+            <p>
+                このようなディレクトリ構造によって、コードの整理と保守が容易になります。プロジェクトの規模に応じて、必要なディレクトリを追加していくことが重要です。
+            </p>
+
+            <h3>7. Vueコンポーネントのインポートとエクスポート</h3>
+            <p>
+                Vueコンポーネントを別のコンポーネントで使用するには、インポートして登録する必要があります。Composition API（<code>&lt;script setup&gt;</code>）での例を見てみましょう：
+            </p>
+            <pre><code class="language-html">&lt;script setup&gt;
+// 子コンポーネントのインポート
+import HelloWorld from './components/HelloWorld.vue'
+import BaseButton from './components/base/BaseButton.vue'
+
+// propsの定義
+defineProps({
+  title: String,
+  message: {
+    type: String,
+    required: true,
+    default: 'デフォルトメッセージ'
+  }
+})
+
+// イベントの定義
+const emit = defineEmits(['update', 'submit'])
+
+// イベントの発火
+function handleSubmit() {
+  emit('submit', { success: true })
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;{{ title }}&lt;/h1&gt;
+    &lt;HelloWorld :msg="message" /&gt;
+    &lt;BaseButton @click="handleSubmit"&gt;送信&lt;/BaseButton&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+            <p>
+                <code>&lt;script setup&gt;</code>を使用すると、インポートしたコンポーネントは自動的に登録され、テンプレート内で直接使用できます。また、<code>defineProps</code>と<code>defineEmits</code>を使用して、propsとイベントを定義します。
+            </p>
+
+            <h3>まとめ</h3>
+            <p>
+                本章では、Vueプロジェクトの構成について詳しく学びました。プロジェクトのディレクトリ構造、各ファイルの役割、単一ファイルコンポーネントの構造、コンポーネントの命名規則、そしてプロジェクト構造のベストプラクティスについて理解を深めました。
+            </p>
+            <p>
+                次の章では、Vue.jsの基本的な機能である「Hello World」とリアクティブシステムについて学びます。
+            </p>
+        </section>        <a href="../02.Vue学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>

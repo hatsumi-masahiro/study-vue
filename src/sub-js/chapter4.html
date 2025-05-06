@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第4章: テンプレートリテラル (テンプレート文字列)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>第4章: テンプレートリテラル (テンプレート文字列)</h1>
+        </div>
+    </header>
+    <div class="container">
+
+
+
+        <section id="chapter4">
+            <h2 id="chapter4" class="chapter-heading">第4章: テンプレートリテラル (テンプレート文字列)</h2>
+
+            <h3>概要</h3>
+            <p>テンプレートリテラルはバッククォート(<code>`</code>)で囲んで記述する新しい文字列リテラルの表記法です。ES6以前は文字列結合に<code>+</code>演算子を使ったり、改行に<code>\n</code>を埋め込む必要がありました。テンプレートリテラルを使うと、文字列中に<code>${変数や式}</code>を埋め込んで展開したり、複数行の文字列をそのままコード上に表現したりできます。これにより、可読性が高く柔軟な文字列操作が可能になりました。
+            </p>
+
+            <h3>コードと解説</h3>
+            <p>JavaScriptにおけるテンプレートリテラルの例です。従来の文字列結合と比較しながら、変数埋め込みや複数行文字列の表現方法を示します。</p>
+
+            <pre><code class="language-javascript">// 従来の文字列結合
+const name = "Dave";
+const age = 40;
+console.log("名前は" + name + "、年齢は" + age + "歳です。"); 
+// -> 名前はDave、年齢は40歳です。
+
+// テンプレートリテラルを用いた文字列埋め込み
+console.log(`名前は${name}、年齢は${age}歳です。`); 
+// -> 名前はDave、年齢は40歳です。
+
+// 複数行の文字列を含むテンプレートリテラル
+const multiline = `バッククォートで囲むと
+改行もそのまま文字列内に表現できます。`;
+console.log(multiline);
+/* -> バッククォートで囲むと
+  改行もそのまま文字列内に表現できます。 */</code></pre>
+
+            <p><strong>解説:</strong>
+                テンプレートリテラルでは<code>${ ... }</code>の中にJavaScriptの式を書き、その評価結果を文字列中に埋め込むことができます。上の例では<code>name</code>や<code>age</code>といった変数を埋め込んでおり、従来のように<code>+</code>で文字列連結するコードと比べて格段に読みやすくなっています。
+            </p>
+            <p>また、バッククォートで囲んだ中では改行をそのまま含めることができるため、複数行にわたる長い文字列や、整形されたテキストをコード中に直接表現することが可能です。例えば上記<code>multiline</code>の例では、改行やスペースも文字列リテラルに組み込まれています。このように、テンプレートリテラルは単なる文字列結合の糖衣構文に留まらず、コード中に文字列フォーマットを直感的に記述できる強力な機能です。
+            </p>
+        </section>
+        <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+
+</html>
