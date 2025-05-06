@@ -54,7 +54,7 @@ console.log(sumAll(5, 10));      // 15</code></pre>
         <p>オブジェクトに対する<code>{...obj1, ...obj2}</code>も同様に、<code>obj1</code>と<code>obj2</code>のプロパティを併せ持つ新しいオブジェクトを生成します。重複するプロパティ（上記例では<code>b</code>）がある場合、後ろに記述したオブジェクトの値で上書きされます。これにより、オブジェクトのマージや特定プロパティの上書きコピーといった操作が容易に実現できます。</p>
         <p>関数定義での<code>...numbers</code>はレストパラメータを表し、呼び出し時に渡された任意個数の引数が配列<code>numbers</code>にまとまります。上記<code>sumAll</code>関数は、この<code>numbers</code>配列の全要素を合計して返しています。<code>sumAll(1,2,3,4)</code>のように呼び出すと、<code>numbers</code>は<code>[1,2,3,4]</code>となり、その合計<code>10</code>を返します。レストパラメータにより、関数側では配列処理の形で実装を書けるため、可変個の引数を扱うロジックがシンプルになります。</p>
     </section>
-  <a href="../01.モダンJavaScript学習教材.html" class="toc-link">目次に戻る</a>
+  <a href="../01.js-basic.html" class="toc-link">目次に戻る</a>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
