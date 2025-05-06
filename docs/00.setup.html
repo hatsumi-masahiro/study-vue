@@ -1,10 +1,9 @@
-
-        <hr><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>モダンJavaScript学習教材</title>
+    <title>JavaScriptモダン開発環境セットアップガイド</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
         :root {
@@ -183,6 +182,15 @@
             background-color: var(--secondary-color);
         }
 
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -200,8 +208,8 @@
                 padding: 2rem 0;
             }
         }
-    <!-- スクロールに対応したアンカーリンク位置調整 -->
-    <style>
+        
+        /* スクロールに対応したアンカーリンク位置調整 */
         html {
             scroll-behavior: smooth; /* スムーズスクロール */
             scroll-padding-top: 80px; /* アンカーリンクのずれを調整 */
@@ -216,848 +224,397 @@
 <body>
     <header>
         <div class="container">
-            <h1>JavaScriptモダン開発 学習教材</h1>
-            <p>この教材では、古いHTML5時代のJavaScriptに触れたことがある初学者を対象に、現代のJavaScript (ES6以降) の重要ポイントを網羅します。将来的にVueやReactといったフレームワークを用いた開発を見据え、モダンJavaScriptの文法、非同期処理、モジュールシステム、そしてVitestによるテスト手法の基本を学習します。</p>
+            <h1>JavaScriptモダン開発環境セットアップガイド</h1>
+            <p>このガイドでは、「JavaScriptモダン開発 学習教材」を実践するための環境セットアップ手順を説明します。Node.jsとnpmのインストール方法、プロジェクトの初期化、サンプルコードの実行方法などについて解説します。</p>
         </div>
     </header>
 
     <div class="container">
-</strong> – <em>バッククォート文字列による文字列補間 (約15分)</em></li>
-                <li><strong>スプレッド構文とレストパラメータ</strong> – <em>配列・オブジェクト展開と可変長引数の扱い (約30分)</em></li>
-                <li><strong>分割代入 (デストラクチャリング)</strong> – <em>配列・オブジェクトからの値の取り出し (約30分)</em></li>
-                <li><strong>クラス構文とオブジェクト指向</strong> – <em>ES6のクラス構文と継承の基礎 (約45分)</em></li>
-                <li><strong>モジュールシステム (ES ModulesとCommonJS)</strong> – <em>import/exportによるモジュール化と従来のCommonJSとの違い (約30分)</em></li>
-                <li><strong>非同期処理とPromise</strong> – <em>Promiseによる非同期処理の書き方とチェイニング (約30分)</em></li>
-                <li><strong>async/awaitによる非同期処理の改善</strong> – <em>Async関数とawaitでPromiseを扱いやすく (約20分)</em></li>
-                <li><strong>Vitestによるテストの基本</strong> – <em>テストフレームワークVitestの使い方とサンプルテスト (約30分)</em></li>
+        <div class="chapter-list" id="toc">
+            <h2>目次</h2>
+            <ol>
+                <li><a href="#section1"><strong>Node.jsとnpmのインストール</strong></a> – <em>開発環境の基本となるツールの導入 (約10分)</em></li>
+                <li><a href="#section8"><strong>開発をサポートするツール</strong></a> – <em>Visual Studio Codeと拡張機能の紹介 (約10分)</em></li>
+                <li><a href="#section2"><strong>プロジェクトの初期化</strong></a> – <em>npm initによるpackage.jsonの作成 (約5分)</em></li>
+                <li><a href="#section3"><strong>必要なパッケージのインストール</strong></a> – <em>開発に必要なライブラリの追加 (約5分)</em></li>
+                <li><a href="#section4"><strong>サンプルコードの実行方法</strong></a> – <em>nodeコマンドによるJSファイルの実行と対話型モード (約10分)</em></li>
+                <li><a href="#section5"><strong>ES Modulesの使用</strong></a> – <em>モダンなモジュールシステムの設定と利用 (約15分)</em></li>
+                <li><a href="#section6"><strong>TypeScriptの設定</strong></a> – <em>静的型付け言語環境の構築 (約20分)</em></li>
+                <li><a href="#section7"><strong>Vitestによるテスト環境</strong></a> – <em>単体テスト環境の準備と実行 (約15分)</em></li>
+                <li><a href="#section9"><strong>トラブルシューティング</strong></a> – <em>よくある問題とその解決法 (約10分)</em></li>
             </ol>
-            <a href="#toc" class="toc-link">目次へ移動</a>
         </div>
 
-        <section id="chapter1">
-            <h2 id="chapter1" class="chapter-heading">第1章: 変数宣言 (let/const) とスコープ</h2>
+        <section id="section1">
+            <h2 id="section1" class="chapter-heading">1. Node.jsとnpmのインストール</h2>
 
-            <h3>概要</h3>
-            <p>ES6では変数宣言に<code>let</code>と<code>const</code>が導入され、従来の<code>var</code>に代わって推奨されます。<code>let</code>と<code>const</code>はブロックスコープ（<code>{ }</code>で囲まれた範囲）を持ち、<code>var</code>のように関数全体やグローバルにまで変数が漏れません。また、<code>let</code>変数は宣言より前にはアクセスできず、一時的デッドゾーン(TDZ)と呼ばれる状態になります。<code>const</code>は<code>let</code>と同様にブロックスコープですが、再代入ができない点が異なります。一度<code>const</code>で値を設定すると、同じ変数名で別の値を代入し直すとエラーになります。ただし、<code>const</code>で宣言したオブジェクトや配列の「中身」は変更可能であることに注意が必要です。</p>
+            <h3>Windows/macOS/Linux</h3>
+            <ol>
+                <li><a href="https://nodejs.org/" target="_blank">Node.js公式サイト</a>にアクセス</li>
+                <li>LTS（Long Term Support）バージョンをダウンロード（推奨）</li>
+                <li>インストーラーを実行し、指示に従ってインストール</li>
+            </ol>
 
-            <h3>コードと解説</h3>
-            <p>まずはJavaScriptにおける<code>var</code>と<code>let/const</code>の挙動の違いを確認しましょう。</p>
+            <h3>インストールの確認</h3>
+            <p>ターミナル（コマンドプロンプト）を開き、以下のコマンドを実行してインストールを確認します：</p>
 
-            <pre><code class="language-javascript">// varとletのスコープの違い
-function scopeTest() {
-  if (true) {
-    var x = 1;
-    let y = 2;
-  }
-  console.log(x); // 1 （varで宣言したxは関数スコープなのでここでも参照可能）
-  console.log(y); // ReferenceError: y is not defined （letで宣言したyはブロックスコープなのでブロック外では未定義）
-}
-scopeTest();
+            <pre><code class="language-bash">node -v  # Node.jsのバージョンを表示
+npm -v   # npmのバージョンを表示</code></pre>
 
-// constの再代入禁止
-const PI = 3.14;
-PI = 3.15; // エラー: const変数には再代入できない
-
-// constで宣言したオブジェクトの中身は変更可能
-const user = { name: "Alice", age: 25 };
-user.age = 26;       // プロパティの変更は可能
-user = { name: "Bob", age: 30 }; // エラー: user自体を別のオブジェクトに再割り当てすることはできない</code></pre>
-
-
-
-            <p><strong>解説:</strong> 上記のコードでは、<code>var</code>で宣言した<code>x</code>は関数<code>scopeTest</code>内であればブロックを越えて参照できます。一方<code>let</code>で宣言した<code>y</code>はそのブロック内でのみ有効で、ブロックの外に出ると存在しなくなるため<code>ReferenceError</code>が発生します。<code>let</code>と<code>const</code>はこのようにブロック単位のスコープを作るため、例えばループ内で<code>let</code>を使うと各反復で変数が新しく作られ直し、意図しない値の共有を防げます。</p>
-            <p>また、<code>const</code>は再代入不可であるものの、オブジェクトや配列の内容までは不変にするわけではありません。上記例では<code>user</code>オブジェクトのプロパティ<code>age</code>を変更すること自体はエラーになりません（オブジェクトの参照自体は同じままだからです）。しかし<code>user</code>に別のオブジェクトを代入し直そうとするとエラーになります。このように、<code>const</code>は「変数への再代入を禁止する」キーワードだと理解しましょう。実務では、「再代入しない変数は全て<code>const</code>を使い、そうでなければ<code>let</code>を使う」というコーディングスタイルが一般的です。</p>
+            <p>上記のコマンドでバージョン番号が表示されれば、インストールは成功しています。</p>
+            
+            <div class="note">
+                <p><strong>Note:</strong> Node.jsのLTSバージョンを使用することをお勧めします。最新バージョンではなく、安定版（LTS）を選ぶことで、互換性の問題を避けられます。</p>
+            </div>
         </section>
 
         <hr>
 
-        <section id="chapter2">
-          <h2 id="chapter2" class="chapter-heading">第2章: オブジェクト (連想配列) と配列操作</h2>
+        <section id="section2">
+            <h2 id="section2" class="chapter-heading">2. プロジェクトの初期化</h2>
 
-          <h3>概要</h3>
-          <p>JavaScriptにおけるオブジェクト（連想配列とも呼ばれる）と配列は、データを扱う上で最も重要なデータ構造です。特に配列の<code>map</code>、<code>filter</code>、<code>reduce</code>などのメソッドは、モダンなJavaScript開発で頻繁に使用されます。これらのメソッドを使いこなすことで、コードをより簡潔に、宣言的に書くことができるようになります。</p>
+            <p>任意のディレクトリにプロジェクトフォルダを作成し、npm initコマンドでプロジェクトを初期化します。</p>
 
-          <h3>オブジェクト（連想配列）</h3>
-          <p>JavaScriptのオブジェクトは、キーと値のペアを格納する連想配列として機能します。キーには文字列またはSymbol、値には任意のデータ型（プリミティブ値、関数、オブジェクトなど）を使用できます。</p>
+            <pre><code class="language-bash"># プロジェクトディレクトリを作成して移動
+mkdir js-modern-tutorial
+cd js-modern-tutorial
 
-          <pre><code class="language-javascript">// オブジェクトの作成と操作
-const person = {
-name: "田中太郎",
-age: 28,
-isStudent: false,
-skills: ["JavaScript", "HTML", "CSS"],
-address: {
-  city: "東京",
-  postalCode: "100-0001"
-},
-greet: function() {
-  return `こんにちは、${this.name}です。`;
-}
-};
+# プロジェクトの初期化（対話形式でpackage.jsonを作成）
+npm init
 
-// オブジェクトのプロパティへのアクセス
-console.log(person.name);            // "田中太郎"
-console.log(person["age"]);          // 28（ブラケット記法）
-console.log(person.skills[0]);       // "JavaScript"
-console.log(person.address.city);    // "東京"
-console.log(person.greet());         // "こんにちは、田中太郎です。"
+# または、デフォルト設定で初期化する場合
+npm init -y</code></pre>
 
-// プロパティの追加・変更・削除
-person.job = "エンジニア";           // 新しいプロパティの追加
-person.age = 29;                     // 既存プロパティの変更
-delete person.isStudent;             // プロパティの削除
-
-// オブジェクトのキーと値の取得
-const keys = Object.keys(person);    // ["name", "age", "skills", "address", "greet", "job"]
-const values = Object.values(person); // ["田中太郎", 29, Array(3), Object, function, "エンジニア"]
-
-// オブジェクトのイテレーション（反復処理）
-for (const key in person) {
-if (typeof person[key] !== 'function') { // メソッドを除外
-  console.log(`${key}: ${person[key]}`);
-}
-}
-
-// オブジェクトのコピーとマージ
-const personCopy = Object.assign({}, person); // 浅いコピー
-const merged = { ...person, hobby: "読書" };  // スプレッド構文を使用したオブジェクトのマージ
-</code></pre>
-
-          <h3>配列操作メソッド</h3>
-          <p>ES6以降のJavaScriptでは、配列を操作するための便利なメソッドが多数用意されています。特に<code>map</code>、<code>filter</code>、<code>reduce</code>などの関数型プログラミングスタイルのメソッドは、データ変換のパイプラインを構築する上で非常に強力です。</p>
-
-          <h4>map() メソッド</h4>
-          <p><code>map()</code>メソッドは、配列の各要素に対して関数を実行し、その結果から新しい配列を作成します。</p>
-
-          <pre><code class="language-javascript">// 配列の各要素を2倍にする
-const numbers = [1, 2, 3, 4, 5];
-const doubled = numbers.map(num => num * 2);
-console.log(doubled); // [2, 4, 6, 8, 10]
-
-// オブジェクト配列から特定のプロパティだけ抽出
-const users = [
-{ id: 1, name: "Alice", age: 25 },
-{ id: 2, name: "Bob", age: 30 },
-{ id: 3, name: "Charlie", age: 35 }
-];
-const names = users.map(user => user.name);
-console.log(names); // ["Alice", "Bob", "Charlie"]
-
-// インデックスも使用する場合
-const withIndex = numbers.map((num, index) => `インデックス${index}: ${num}`);
-console.log(withIndex); // ["インデックス0: 1", "インデックス1: 2", ...]
-</code></pre>
-
-          <h4>filter() メソッド</h4>
-          <p><code>filter()</code>メソッドは、与えられた条件に一致する要素だけを抽出して新しい配列を作成します。</p>
-
-          <pre><code class="language-javascript">// 偶数のみをフィルタリング
-const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const evenNumbers = numbers.filter(num => num % 2 === 0);
-console.log(evenNumbers); // [2, 4, 6, 8, 10]
-
-// 特定の条件に一致するオブジェクトをフィルタリング
-const users = [
-{ name: "Alice", age: 25, isActive: true },
-{ name: "Bob", age: 30, isActive: false },
-{ name: "Charlie", age: 35, isActive: true }
-];
-const activeUsers = users.filter(user => user.isActive);
-console.log(activeUsers); // [{ name: "Alice"... }, { name: "Charlie"... }]
-
-// 複数条件でのフィルタリング
-const adults = users.filter(user => user.age >= 30 && user.isActive);
-console.log(adults); // [{ name: "Charlie", age: 35, isActive: true }]
-</code></pre>
-
-          <h4>reduce() メソッド</h4>
-          <p><code>reduce()</code>メソッドは、配列の各要素に対して関数を実行し、単一の結果値を生成します。累積計算や配列からオブジェクトへの変換など、様々な用途に使用できます。</p>
-
-          <pre><code class="language-javascript">// 配列の要素の合計を計算
-const numbers = [1, 2, 3, 4, 5];
-const sum = numbers.reduce((accumulator, current) => accumulator + current, 0);
-console.log(sum); // 15
-
-// 最大値を見つける
-const max = numbers.reduce((max, current) => (current > max ? current : max), numbers[0]);
-console.log(max); // 5
-
-// オブジェクト配列からIDをキーとするオブジェクトに変換
-const users = [
-{ id: 1, name: "Alice" },
-{ id: 2, name: "Bob" },
-{ id: 3, name: "Charlie" }
-];
-const userMap = users.reduce((acc, user) => {
-acc[user.id] = user;
-return acc;
-}, {});
-console.log(userMap);
-// { 
-//   1: { id: 1, name: "Alice" }, 
-//   2: { id: 2, name: "Bob" }, 
-//   3: { id: 3, name: "Charlie" } 
-// }
-
-// グループ化の例
-const people = [
-{ name: "Alice", age: 25, department: "開発" },
-{ name: "Bob", age: 30, department: "マーケティング" },
-{ name: "Charlie", age: 35, department: "開発" },
-{ name: "Dave", age: 40, department: "マーケティング" }
-];
-const byDepartment = people.reduce((acc, person) => {
-// 部署がまだキーとして存在しない場合は空の配列を作成
-if (!acc[person.department]) {
-  acc[person.department] = [];
-}
-// 該当する部署の配列に人を追加
-acc[person.department].push(person);
-return acc;
-}, {});
-console.log(byDepartment);
-// {
-//   "開発": [{ name: "Alice", ... }, { name: "Charlie", ... }],
-//   "マーケティング": [{ name: "Bob", ... }, { name: "Dave", ... }]
-// }
-</code></pre>
-
-          <h4>その他の便利な配列メソッド</h4>
-          <p>map、filter、reduce以外にも、ES6+では多くの便利な配列メソッドが提供されています。</p>
-
-          <pre><code class="language-javascript">const numbers = [1, 2, 3, 4, 5];
-
-// forEach - 各要素に対して関数を実行（戻り値なし）
-numbers.forEach(num => console.log(num * 2)); // 2, 4, 6, 8, 10 （配列は変更されない）
-
-// find - 条件に一致する最初の要素を返す
-const firstEven = numbers.find(num => num % 2 === 0);
-console.log(firstEven); // 2
-
-// some - 少なくとも1つの要素が条件を満たすかチェック
-const hasEven = numbers.some(num => num % 2 === 0);
-console.log(hasEven); // true
-
-// every - すべての要素が条件を満たすかチェック
-const allEven = numbers.every(num => num % 2 === 0);
-console.log(allEven); // false
-
-// includes - 特定の要素が含まれているかチェック
-console.log(numbers.includes(3)); // true
-
-// flat - ネストした配列を平坦化
-const nested = [1, [2, 3], [4, [5, 6]]];
-console.log(nested.flat());    // [1, 2, 3, 4, [5, 6]]
-console.log(nested.flat(2));   // [1, 2, 3, 4, 5, 6]
-
-// flatMap - map後にflatを実行
-const pairs = [1, 2, 3];
-const pairsAndDoubles = pairs.flatMap(num => [num, num * 2]);
-console.log(pairsAndDoubles); // [1, 2, 2, 4, 3, 6]
-</code></pre>
-
-          <h3>実践的な例：配列メソッドの連鎖</h3>
-          <p>複数の配列メソッドを連鎖させることで、データ変換パイプラインを構築できます。</p>
-
-          <pre><code class="language-javascript">const transactions = [
-{ id: 1, type: "購入", amount: 5000, category: "食料品" },
-{ id: 2, type: "売却", amount: 10000, category: "投資" },
-{ id: 3, type: "購入", amount: 2000, category: "衣料品" },
-{ id: 4, type: "購入", amount: 15000, category: "家電" },
-{ id: 5, type: "売却", amount: 3000, category: "投資" }
-];
-
-// 購入トランザクションの合計金額を計算
-const totalPurchases = transactions
-.filter(trans => trans.type === "購入")        // 購入タイプのみフィルタリング
-.map(trans => trans.amount)                    // 金額だけを抽出
-.reduce((total, amount) => total + amount, 0); // 合計を計算
-
-console.log(totalPurchases); // 22000
-
-// カテゴリ別の合計金額を計算
-const totalsByCategory = transactions.reduce((acc, trans) => {
-// カテゴリがまだキーとして存在しない場合は初期化
-if (!acc[trans.category]) {
-  acc[trans.category] = 0;
-}
-// 該当するカテゴリの合計に金額を加算
-acc[trans.category] += trans.amount;
-return acc;
-}, {});
-
-console.log(totalsByCategory);
-// {
-//   "食料品": 5000,
-//   "投資": 13000,
-//   "衣料品": 2000,
-//   "家電": 15000
-// }
-</code></pre>
-
-          <h3>まとめ</h3>
-          <p>オブジェクト（連想配列）と配列操作メソッドは、モダンJavaScriptプログラミングの要です。特に<code>map</code>、<code>filter</code>、<code>reduce</code>を使いこなすことで、命令型から宣言型のプログラミングスタイルに移行でき、コードがより簡潔で読みやすくなります。これらのメソッドはReactやVueなどのフレームワークでも頻繁に使用されるため、しっかりと理解しておくことが重要です。</p>
-      </section>
-
-      
-        <section id="chapter2">
-            <h2 id="chapter3" class="chapter-heading">第3章: アロー関数 (Arrow Functions)</h2>
-
-            <h3>概要</h3>
-            <p>アロー関数はES6で導入された新しい関数の記法で、<code>() => { ... }</code>という簡潔な構文を持ちます。アロー関数を使用すると、無名関数をより短い表記で書けるだけでなく、<code>this</code>の扱いが従来の関数と異なる点も重要です。通常の<code>function</code>で定義した関数は呼び出し方によって<code>this</code>の値が変わりますが、アロー関数は自身が<code>this</code>を持たず、囲んでいる外側のスコープの<code>this</code>値を引き継ぎます。この性質を「<em>レキシカル（詞法的）な<code>this</code>束縛</em>」と呼び、コールバック関数内で<code>this</code>を使う際に便利です。一方で、オブジェクトのメソッドをアロー関数で定義すると意図した<code>this</code>を参照できない（グローバル<code>this</code>を参照してしまう）ため注意が必要です。</p>
-            <p>アロー関数の基本的な使い方として、引数が1つの場合は括弧<code>()</code>を省略でき、関数本体が単一の式であれば<code>return</code>を明示せずその式の値が返されます。以下のコード例で通常の関数との違いを確認します。</p>
-
-            <h3>コードと解説</h3>
-            <p>JavaScriptにおけるアロー関数の例を示します。配列の要素を2倍にする処理を通常の無名関数とアロー関数で比較し、また<code>this</code>の挙動の違いをオブジェクトのメソッド定義で確認します。</p>
-
-            <pre><code class="language-javascript">// 配列の各要素を2倍にする: 通常の無名関数 vs アロー関数
-const numbers = [1, 2, 3];
-const doubled1 = numbers.map(function(x) {
-  return x * 2;
-});
-const doubled2 = numbers.map(x => x * 2);
-
-console.log(doubled1); // [2, 4, 6]
-console.log(doubled2); // [2, 4, 6]
-
-// オブジェクトのメソッドにおけるthisの違い
-const user = {
-  name: "Carol",
-  // 通常の関数でメソッド定義
-  greetNormal: function() {
-    console.log("Hello, " + this.name);
-  },
-  // アロー関数でメソッド定義
-  greetArrow: () => {
-    console.log("Hello, " + this.name);
-  }
-};
-
-user.greetNormal(); // "Hello, Carol"
-user.greetArrow();  // "Hello, undefined"（アロー関数は自身にthisがなく、外側のthis＝グローバルを参照するため）</code></pre>
-
-
-
-            <p><strong>解説:</strong> 最初の配列の例では、<code>Array.map</code>に渡す無名関数をアロー関数で簡潔に書けることが分かります。<code>doubled1</code>と<code>doubled2</code>はいずれも同じ結果になりますが、アロー関数版では<code>function</code>や<code>return</code>を省略できています。このように、アロー関数はコールバック関数を記述する際にコード量を減らし見通しを良くします。</p>
-            <p>後半の<code>user</code>オブジェクトの例では、<code>greetNormal</code>は通常の関数として定義しており、呼び出し元オブジェクト<code>user</code>を<code>this</code>として扱います。一方<code>greetArrow</code>はアロー関数で定義したため<code>this</code>を自身で持たず、外側のスコープ（グローバルスコープ）の<code>this</code>を参照しようとします。その結果、<code>user.greetArrow()</code>内の<code>this.name</code>はグローバルオブジェクトの<code>name</code>プロパティを見に行き、<code>undefined</code>となります（上記実行結果では<code>"undefined"</code>が表示）。</p>
-            <p>この違いから、オブジェクトのメソッドやクラスのメソッドを定義する場合は通常の<code>function</code>（もしくはクラス構文であればメソッド構文）を用いるべきであり、アロー関数を用いると<code>this</code>が意図したものにならない点に注意しましょう。逆に、コールバック関数やタイマー処理などで、外側の<code>this</code>をそのまま使いたいケースではアロー関数が便利です。例えば、DOMイベントのハンドラ内部で外のオブジェクトを参照する必要がある場合など、<code>that = this</code>といった変数で<code>this</code>を保存する古いテクニックを使わずに済みます。</p>
+            <p><code>npm init</code>コマンドは対話形式でプロジェクト名やバージョンなどを尋ねてきますが、とりあえず学習用なので<code>npm init -y</code>で全てデフォルト値で進めても構いません。</p>
+            
+            <p>初期化が完了すると、プロジェクトディレクトリに<code>package.json</code>ファイルが作成されます。このファイルにはプロジェクトの基本情報、依存パッケージのリスト、実行スクリプトなどが記録されます。</p>
         </section>
 
         <hr>
 
-        <!-- 残りの章も同様のスタイルでフォーマット... -->
+        <section id="section3">
+            <h2 id="section3" class="chapter-heading">3. 必要なパッケージのインストール</h2>
 
-        <section id="chapter3">
-            <h2 id="chapter3" class="chapter-heading">第4章: テンプレートリテラル (テンプレート文字列)</h2>
+            <p>チュートリアルで使用する主要なパッケージをインストールします。</p>
 
-            <h3>概要</h3>
-            <p>テンプレートリテラルはバッククォート(<code>`</code>)で囲んで記述する新しい文字列リテラルの表記法です。ES6以前は文字列結合に<code>+</code>演算子を使ったり、改行に<code>\n</code>を埋め込む必要がありました。テンプレートリテラルを使うと、文字列中に<code>${変数や式}</code>を埋め込んで展開したり、複数行の文字列をそのままコード上に表現したりできます。これにより、可読性が高く柔軟な文字列操作が可能になりました。</p>
+            <pre><code class="language-bash"># 開発依存パッケージのインストール
+npm install --save-dev vitest
+npm install --save-dev typescript
+npm install --save-dev ts-node
+npm install --save-dev @types/node</code></pre>
 
-            <h3>コードと解説</h3>
-            <p>JavaScriptにおけるテンプレートリテラルの例です。従来の文字列結合と比較しながら、変数埋め込みや複数行文字列の表現方法を示します。</p>
-
-            <pre><code class="language-javascript">// 従来の文字列結合
-const name = "Dave";
-const age = 40;
-console.log("名前は" + name + "、年齢は" + age + "歳です。"); 
-// -> 名前はDave、年齢は40歳です。
-
-// テンプレートリテラルを用いた文字列埋め込み
-console.log(`名前は${name}、年齢は${age}歳です。`); 
-// -> 名前はDave、年齢は40歳です。
-
-// 複数行の文字列を含むテンプレートリテラル
-const multiline = `バッククォートで囲むと
-改行もそのまま文字列内に表現できます。`;
-console.log(multiline);
-/* -> バッククォートで囲むと
-      改行もそのまま文字列内に表現できます。 */</code></pre>
-
-
-
-            <p><strong>解説:</strong> テンプレートリテラルでは<code>${ ... }</code>の中にJavaScriptの式を書き、その評価結果を文字列中に埋め込むことができます。上の例では<code>name</code>や<code>age</code>といった変数を埋め込んでおり、従来のように<code>+</code>で文字列連結するコードと比べて格段に読みやすくなっています。</p>
-            <p>また、バッククォートで囲んだ中では改行をそのまま含めることができるため、複数行にわたる長い文字列や、整形されたテキストをコード中に直接表現することが可能です。例えば上記<code>multiline</code>の例では、改行やスペースも文字列リテラルに組み込まれています。このように、テンプレートリテラルは単なる文字列結合の糖衣構文に留まらず、コード中に文字列フォーマットを直感的に記述できる強力な機能です。</p>
+            <p>インストールが完了すると、<code>package.json</code>の<code>devDependencies</code>セクションに追加されたパッケージが表示され、<code>node_modules</code>ディレクトリが作成されます。</p>
+            
+            <div class="note">
+                <p><strong>Note:</strong> <code>--save-dev</code>（または<code>-D</code>）フラグは、開発時にのみ必要なパッケージを指定するためのものです。本番環境では使用されません。</p>
+            </div>
         </section>
 
         <hr>
 
-        <section id="chapter4">
-            <h2 id="chapter4" class="chapter-heading">第5章: スプレッド構文とレストパラメータ</h2>
+        <section id="section4">
+            <h2 id="section4" class="chapter-heading">4. サンプルコードの実行方法</h2>
 
-            <h3>概要</h3>
-            <p>スプレッド構文（<code>...</code>）は、配列やオブジェクトの要素を展開して別の配列・オブジェクトを作成したり、関数呼び出し時に配列を個々の引数に展開したりする機能です。逆に、関数定義の引数側で<code>...</code>を使うとレストパラメータとなり、可変長の引数を配列として受け取ることができます。スプレッドとレストは見た目は同じ<code>...</code>ですが、使う場所が異なりそれぞれ<strong>展開(spread)</strong>と<strong>収集(rest)</strong>の役割を果たします。</p>
-            <p>スプレッド構文により、複数の配列を結合したりオブジェクトをマージしたりする処理がシンプルに記述できます。レストパラメータを使うと、関数に渡された複数個の引数をまとめて扱うことが可能になります。</p>
+            <h3>JavaScriptファイルの実行</h3>
+            <p>以下のように<code>example.js</code>ファイルを作成してみましょう：</p>
 
-            <h3>コードと解説</h3>
-            <p>JavaScriptでのスプレッド構文とレストパラメータの例です。まず配列やオブジェクトでのスプレッドの使い方を示し、その後関数のレストパラメータの例を示します。</p>
+            <pre><code class="language-javascript">// example.js
+console.log("Hello, Modern JavaScript!");
 
-            <pre><code class="language-javascript">// 配列のスプレッド例: 配列の結合とコピー
-const arr1 = [1, 2, 3];
-const arr2 = [4, 5, 6];
-const combined = [...arr1, ...arr2];
-console.log(combined); // [1, 2, 3, 4, 5, 6]
+// アロー関数のサンプル
+const add = (a, b) => a + b;
+console.log(add(5, 3)); // 8</code></pre>
 
-// スプレッドを使った配列のコピー（新しい配列を生成）
-const copy = [...arr1];
-copy.push(99);
-console.log(arr1);  // [1, 2, 3] （元の配列は変更なし）
-console.log(copy);  // [1, 2, 3, 99] （コピー側のみ変更）
+            <p>このファイルをNode.jsで実行するには：</p>
 
-// オブジェクトのスプレッド例: オブジェクトのマージ
-const obj1 = {a: 1, b: 2};
-const obj2 = {b: 5, c: 6};
-const merged = {...obj1, ...obj2};
-console.log(merged); // { a: 1, b: 5, c: 6 }
-// ※ プロパティbはobj2側で上書き
+            <pre><code class="language-bash">node example.js</code></pre>
 
-// レストパラメータ例: 可変長引数を合計する関数
-function sumAll(...numbers) {
-  return numbers.reduce((sum, n) => sum + n, 0);
-}
-console.log(sumAll(1, 2, 3, 4)); // 10
-console.log(sumAll(5, 10));      // 15</code></pre>
+            <h3>対話型モード（REPL）の使用</h3>
+            <p>Node.jsのREPL（Read-Eval-Print Loop）を使って対話形式でコードを試すこともできます：</p>
 
+            <pre><code class="language-bash">node</code></pre>
 
+            <p>REPLが起動したら、JavaScriptコードを直接入力して実行できます：</p>
 
-            <p><strong>解説:</strong> スプレッド構文<code>...</code>を配列に適用すると、配列内の要素を順に展開します。<code>[...arr1, ...arr2]</code>は配列<code>arr1</code>と<code>arr2</code>の要素をすべて並べた新しい配列を生成します。これにより、<code>concat</code>メソッドを使わず直感的に配列結合ができます。また<code>const copy = [...arr]</code>のように書けば配列のコピー（シャローコピー）が簡単に作れます。</p>
-            <p>オブジェクトに対する<code>{...obj1, ...obj2}</code>も同様に、<code>obj1</code>と<code>obj2</code>のプロパティを併せ持つ新しいオブジェクトを生成します。重複するプロパティ（上記例では<code>b</code>）がある場合、後ろに記述したオブジェクトの値で上書きされます。これにより、オブジェクトのマージや特定プロパティの上書きコピーといった操作が容易に実現できます。</p>
-            <p>関数定義での<code>...numbers</code>はレストパラメータを表し、呼び出し時に渡された任意個数の引数が配列<code>numbers</code>にまとまります。上記<code>sumAll</code>関数は、この<code>numbers</code>配列の全要素を合計して返しています。<code>sumAll(1,2,3,4)</code>のように呼び出すと、<code>numbers</code>は<code>[1,2,3,4]</code>となり、その合計<code>10</code>を返します。レストパラメータにより、関数側では配列処理の形で実装を書けるため、可変個の引数を扱うロジックがシンプルになります。</p>
+            <pre><code class="language-javascript">> const name = "JavaScript";
+undefined
+> console.log(`Hello, ${name}!`);
+Hello, JavaScript!
+undefined
+> [1, 2, 3].map(x => x * 2)
+[ 2, 4, 6 ]</code></pre>
+
+            <p>終了するには <code>.exit</code> または Ctrl+C を2回押します。</p>
+            
+            <div class="note">
+                <p><strong>Tip:</strong> REPLは小さなコード片を素早くテストするのに最適です。複雑なコードはファイルに書いて実行しましょう。</p>
+            </div>
         </section>
 
         <hr>
 
-        <section id="chapter5">
-            <h2 id="chapter5" class="chapter-heading">第6章: 分割代入 (デストラクチャリング)</h2>
+        <section id="section5">
+            <h2 id="section5" class="chapter-heading">5. ES Modulesの使用</h2>
 
-            <h3>概要</h3>
-            <p>分割代入（destructuring assignment）を使うと、配列やオブジェクトから複数の値を一度に取り出して変数に代入することができます。ES6で導入されたこの構文により、従来は個別に値を取り出していた処理を簡潔に書けます。配列に対しては角括弧<code>[]</code>を使い、オブジェクトに対しては波括弧<code>{}</code>を使った構文で対応する位置やキーの値を抽出します。</p>
-            <p>配列の分割代入では、左辺で例えば<code>[a, b]</code>のように書くと、配列の最初の2要素がそれぞれ<code>a</code>と<code>b</code>に代入されます。また<code>[x, ...rest]</code>のように書けば先頭の要素を<code>x</code>に、それ以降全てを<code>rest</code>（レスト要素）としてまとめて配列にできます。オブジェクトの場合は、取り出したいプロパティ名をそのまま左辺に書いて同名の変数に代入できます。別名の変数に代入したい場合は<code>名前: 別名</code>という書き方をします。存在しないプロパティに対してデフォルト値を設定することも可能です。</p>
+            <p>モダンJavaScriptではES Modulesを使用してコードを分割します。以下のようにモジュールを作成して利用できます。</p>
 
-            <h3>コードと解説</h3>
-            <p>JavaScriptでの分割代入の例です。配列から値を取り出すケースと、オブジェクトからプロパティを取り出すケースを順に示します。</p>
+            <h3>ES Modulesの有効化</h3>
+            <p>まず、<code>package.json</code>ファイルに<code>"type": "module"</code>を追加してES Modulesを有効にします：</p>
 
-            <pre><code class="language-javascript">// 配列の分割代入
-const scores = [80, 90, 70, 60];
-const [first, second, ...others] = scores;
-console.log(first);   // 80
-console.log(second);  // 90
-console.log(others);  // [70, 60]
+            <pre><code class="language-json">{
+  "name": "js-modern-tutorial",
+  "version": "1.0.0",
+  "type": "module",
+  // 他の設定...
+}</code></pre>
 
-// オブジェクトの分割代入
-const userInfo = { id: 501, name: "Eve", age: 28 };
-const { id, name, age } = userInfo;
-console.log(name); // "Eve"
-console.log(age);  // 28
+            <h3>モジュールの作成と使用</h3>
+            <p>次に、モジュールを作成します：</p>
 
-// オブジェクト分割代入: 別名とデフォルト値
-const { id: userId, name: userName, nickname = "名無し" } = userInfo;
-console.log(userId);   // 501
-console.log(userName); // "Eve"
-console.log(nickname); // "名無し" （userInfoにnicknameプロパティが無いのでデフォルト値適用）</code></pre>
+            <pre><code class="language-javascript">// math.js - モジュールファイル
+export const PI = 3.14159;
 
-            <p>次にTypeScriptで同じ内容を示します。型情報として配列の要素型やオブジェクトのプロパティ型を指定しています。</p>
-
-            <pre><code class="language-typescript">const scores: number[] = [80, 90, 70, 60];
-const [first, second, ...others]: [number, number, ...number[]] = scores;
-console.log(first);   // 80
-console.log(second);  // 90
-console.log(others);  // [70, 60]
-
-interface UserInfo { id: number; name: string; age: number; nickname?: string; }
-const userInfo: UserInfo = { id: 501, name: "Eve", age: 28 };
-const { id, name, age }: UserInfo = userInfo;
-console.log(name); // "Eve"
-console.log(age);  // 28
-
-const { id: userId, name: userName, nickname = "名無し" }: UserInfo = userInfo;
-console.log(userId);   // 501
-console.log(userName); // "Eve"
-console.log(nickname); // "名無し"</code></pre>
-
-            <p><strong>解説:</strong> 配列<code>scores</code>に対する<code>[first, second, ...others]</code>という分割代入により、<code>scores[0]</code>が<code>first</code>に、<code>scores[1]</code>が<code>second</code>にそれぞれ代入され、残りの要素<code>[70, 60]</code>が<code>others</code>配列にまとめられます。これにより、一度の代入で複数の変数に値を割り当てることができます。</p>
-            <p>オブジェクト<code>userInfo</code>に対する<code>{ id, name, age }</code>の分割代入では、右辺オブジェクトの<code>id</code>, <code>name</code>, <code>age</code>プロパティの値が同名の変数<code>id</code>, <code>name</code>, <code>age</code>にそれぞれ取り出されています。次の例では、<code>id: userId</code>と記述することで<code>id</code>プロパティの値を<code>userId</code>という変数に代入しています。同様に<code>name</code>は<code>userName</code>という別名変数に、存在しない<code>nickname</code>プロパティにはデフォルト値<code>"名無し"</code>を与えて<code>nickname</code>変数に代入しています。このように、分割代入を用いるとオブジェクトから必要な値を抜き出しつつ、自由に変数名を付けたり初期値を設定したりできます。</p>
-        </section>
-
-        <hr>
-
-        <section id="chapter6">
-            <h2 id="chapter6" class="chapter-heading">第7章: クラス構文とオブジェクト指向</h2>
-
-            <h3>概要</h3>
-            <p>ES6で追加された<code>class</code>構文により、JavaScriptでもクラスベースの記法でオブジェクト指向プログラミングが可能になりました。従来はプロトタイプ継承を用いてオブジェクトの雛形を作っていましたが、<code>class</code>構文はこれを抽象化し、他の言語に近い記法でコンストラクタやメソッド、継承（<code>extends</code>）を記述できます。</p>
-            <p>JavaScriptのクラスはシンタックスシュガーであり、内部的にはプロトタイプチェーンを利用した仕組みです。しかし開発者は<code>class Foo { ... }</code>と書くだけでクラスを定義でき、<code>new Foo()</code>でインスタンスを生成できます。クラスにはコンストラクタ<code>constructor</code>メソッドや、プロトタイプメソッド（クラス内に定義したメソッド）が含まれます。さらに<code>extends</code>キーワードでクラスを継承し、<code>super</code>呼び出しで親クラスのコンストラクタやメソッドを呼ぶことができます。</p>
-
-            <h3>コードと解説</h3>
-            <p>JavaScriptにおけるクラスと継承の例を示します。<code>Person</code>クラスを定義し、それを継承した<code>Student</code>クラスを作成します。</p>
-
-            <pre><code class="language-javascript">class Person {
-  constructor(name, age) {
-    this.name = name;
-    this.age = age;
-  }
-
-  greet() {
-    console.log(`こんにちは、${this.name}です。`);
-  }
+export function add(a, b) {
+  return a + b;
 }
 
-// Personクラスを継承したStudentクラス
-class Student extends Person {
-  constructor(name, age, grade) {
-    super(name, age);      // 親クラスのコンストラクタを呼び出し
-    this.grade = grade;
-  }
-
-  study() {
-    console.log(`${this.name}は勉強しています。`);
-  }
+export function multiply(a, b) {
+  return a * b;
 }
-
-const alice = new Person("Alice", 30);
-alice.greet();   // "こんにちは、Aliceです。"
-
-const bob = new Student("Bob", 20, "A");
-bob.greet();    // "こんにちは、Bobです。" （親クラスのメソッドを利用）
-bob.study();    // "Bobは勉強しています。"</code></pre>
-
-
-
-            <p><strong>解説:</strong> 上記の<code>Person</code>クラスは、<code>constructor</code>で名前と年齢を受け取りプロパティ<code>name</code>, <code>age</code>に代入しています。<code>greet()</code>メソッドはインスタンスの<code>name</code>を使って挨拶を表示する機能です。<code>Student</code>クラスは<code>Person</code>を<code>extends</code>しており、新たに<code>grade</code>（成績や学年などを表す）プロパティと<code>study()</code>メソッドを追加しています。<code>Student</code>のコンストラクタでは<code>super(name, age)</code>を呼び出して親<code>Person</code>の初期化を行った後、自身の<code>grade</code>をセットしています。</p>
-            <p>生成した<code>bob</code>（Studentインスタンス）は、<code>Person</code>から継承した<code>greet()</code>メソッドと、自身で持つ<code>study()</code>メソッドの両方が利用可能です。このように、クラス構文を使うことで継承関係を簡潔に表現でき、オブジェクト指向のパターン（継承による機能拡張など）をJavaScriptで実践しやすくなります。</p>
-            <p>TypeScript版では各プロパティやメソッドに型情報を付与しています。たとえば<code>name: string;</code>と宣言することで<code>name</code>プロパティは文字列型であることが明示され、誤った型の値を代入しようとするとコンパイルエラーになります。クラスの構文自体はJavaScriptと同様ですが、このような型チェックが加わることでより堅牢なコードを書くことができます。</p>
-        </section>
-
-        <hr>
-
-        <section id="chapter7">
-            <h2 id="chapter7" class="chapter-heading">第8章: モジュールシステム (ES Modules と CommonJS)</h2>
-
-            <h3>概要</h3>
-            <p>JavaScriptにおけるモジュールとは、コードをファイル単位などで分割し、必要な部分をインポート(import)・エクスポート(export)できる仕組みです。ES6では<strong>ES Modules (ESM)</strong>と呼ばれる標準モジュールシステムが導入され、<code>import</code>/<code>export</code>文が使えるようになりました。それ以前から、Node.jsでは<code>require</code>関数と<code>module.exports</code>を使うCommonJSと呼ばれるモジュールシステムが使われており、現在も双方が存在しています。</p>
-            <p>ES Modulesでは<code>import</code>/<code>export</code>構文によりモジュール間で関数や変数をやり取りします。一方、CommonJSでは<code>require()</code>でモジュールを読み込み、<code>module.exports</code>で外部に公開します。技術的な違いとして、CommonJSはモジュールを同期的にロードしますが、ESMでは基本的に非同期にモジュールを読み込みます。またブラウザではESMがネイティブにサポートされているのに対し、CommonJSモジュールをそのまま読み込むことはできず、Webpackなどのバンドラを使って束ねる必要があります。</p>
-            <p>Node.js環境でも近年はESMがサポートされており、<code>.mjs</code>拡張子や<code>package.json</code>に<code>"type": "module"</code>を指定することで<code>import</code>/<code>export</code>が使えます。新規プロジェクトではES Modulesの使用が推奨されており、既存のCommonJSとの相互運用も可能ですが、モジュールの種類を混在させる際には注意が必要です。</p>
-
-            <h3>コードと解説</h3>
-            <p>まずES Modulesの例として、モジュールを二つ用意し、一方で変数や関数を<code>export</code>し、他方で<code>import</code>して利用します（ブラウザ環境で実行する場合、<code>&lt;script type="module"&gt;</code>タグ内で動作します）。</p>
-
-            <pre><code class="language-javascript">/*** utils.js - モジュールファイル ***/
-export const pi = 3.14159;
-export function circleArea(radius) {
-  return pi * radius * radius;
-}
-
-/*** main.js - エントリポイント ***/
-import { pi, circleArea } from "./utils.js";
-
-console.log(pi);                // 3.14159
-console.log(circleArea(5));     // 78.53975
 
 // デフォルトエクスポートの例
-// utils.js 側で: export default function greet() { ... }
-// main.js 側で: import greet from "./utils.js";</code></pre>
+export default function subtract(a, b) {
+  return a - b;
+}</code></pre>
 
-            <p>次に、Node.jsで従来使われていたCommonJSの書き方の例を示します。<code>require</code>と<code>module.exports</code>を用いて同様の機能を実現しています。</p>
+            <p>このモジュールを別のファイルからインポートして使用します：</p>
 
-            <pre><code class="language-javascript">/*** utils.cjs ***/
-const pi = 3.14159;
-function circleArea(radius) {
-  return pi * radius * radius;
-}
-// 複数の値をモジュールの外に公開
-module.exports = { pi, circleArea };
+            <pre><code class="language-javascript">// app.js - メインファイル
+import subtract, { PI, add, multiply } from './math.js';
 
-/*** main.cjs ***/
-const { pi, circleArea } = require("./utils.cjs");
+console.log(`円周率: ${PI}`);
+console.log(`5 + 3 = ${add(5, 3)}`);
+console.log(`4 * 6 = ${multiply(4, 6)}`);
+console.log(`10 - 7 = ${subtract(10, 7)}`);</code></pre>
 
-console.log(pi);            // 3.14159
-console.log(circleArea(5)); // 78.53975</code></pre>
+            <p>実行するには：</p>
 
-
-
-            <p><strong>解説:</strong> ES Modules形式では、<code>utils.js</code>で<code>export</code>された定数<code>pi</code>や関数<code>circleArea</code>を、<code>main.js</code>側で<code>import</code>によって読み込んで使用しています。このとき、読み込む側では<code>import { 名前 }</code>で対応する名前を指定します。デフォルトエクスポートを使った場合（例ではコメントで記載）、<code>import 任意の名前 from "..."</code>という書式で読み込みます。ES Modulesではこれら<code>import</code>文はファイル先頭で静的に記述され、モジュールを非同期にロードします。</p>
-            <p>CommonJS形式では、<code>utils.cjs</code>側で<code>module.exports = { pi, circleArea };</code>とまとめてエクスポートし、<code>main.cjs</code>側で<code>require("./utils.cjs")</code>により同期的にモジュールをロードしています。CommonJSの<code>require</code>は関数呼び出しなので任意の場所で実行できる一方、ES Modulesの<code>import</code>はファイルロード時に行われる点が異なります。また、上記の例では拡張子<code>.cjs</code>を使用していますが、Node.jsでESMを使う場合には<code>.mjs</code>拡張子にするか、<code>package.json</code>でモジュールタイプを指定する必要があります。</p>
-            <p>まとめると、</p>
-            <ul>
-                <li>ES Modules (ESM): <code>import</code>/<code>export</code>を使用。モジュールは非同期ロード。ブラウザとNode.js(設定有)で使用可能。新規プロジェクトで推奨。</li>
-                <li>CommonJS (CJS): <code>require</code>/<code>module.exports</code>を使用。モジュールは同期ロード。Node.jsでデフォルト使用。ブラウザでは直接使用不可（バンドラが必要）。</li>
-            </ul>
-            <p>現在では多くの場合ES Modulesを使う方向に統一されつつありますが、Node.jsの既存環境や一部ツールではCommonJSが根強く残っています。両者の違いを理解しつつ、必要に応じて変換や互換性設定を行うことで、モダンなモジュール構成で開発を進めることができます。</p>
+            <pre><code class="language-bash">node app.js</code></pre>
+            
+            <div class="note">
+                <p><strong>Note:</strong> CommonJSの<code>require()</code>とES Modulesの<code>import</code>は混在させずに、どちらかに統一することをお勧めします。本チュートリアルではES Modulesを使用します。</p>
+            </div>
         </section>
 
         <hr>
 
-        <section id="chapter8">
-            <h2 id="chapter8" class="chapter-heading">第9章: 非同期処理とPromise</h2>
+        <section id="section6">
+            <h2 id="section6" class="chapter-heading">6. TypeScriptの設定</h2>
 
-            <h3>概要</h3>
-            <p>JavaScriptは基本的にシングルスレッドで実行されるため、長時間かかる処理やI/O待ちの処理を行う際には非同期処理の仕組みが重要になります。ES6で標準化された<strong>Promise</strong>オブジェクトは、非同期処理の完了や失敗を表現するためのオブジェクトです。Promiseを使うと、コールバック関数地獄（いわゆる「Callback Hell」）を回避し、読みやすい非同期コードを書くことができます。</p>
-            <p>Promiseオブジェクトは最初は「保留（pending）」状態ですが、処理が完了すると「fulfilled（履行）」状態になり結果の値を保持します。エラーが起きれば「rejected（拒否）」状態になりエラー理由を保持します。Promiseには<code>.then()</code>メソッドと<code>.catch()</code>メソッドが用意されており、成功時の処理と失敗時の処理をそれぞれチェーン（連結）して書くことが可能です。</p>
-            <p>本章では、Promiseの基本的な使い方として、新たにPromiseを作成する方法と、既存の非同期関数から返されるPromiseを扱う方法を学びます。</p>
+            <p>TypeScriptを使用するための設定を行います。</p>
 
-            <h3>コードと解説</h3>
-            <p>JavaScriptでPromiseを使用する例を示します。<code>fetchData</code>という擬似的な非同期関数を作り、1秒後にデータを返すようにしてみます。そのPromiseを<code>.then</code>で受け取り、結果を処理します。</p>
+            <h3>tsconfig.jsonの作成</h3>
+            <p>以下のコマンドでTypeScriptの設定ファイル<code>tsconfig.json</code>を生成します：</p>
 
-            <pre><code class="language-javascript">function fetchData() {
-  return new Promise((resolve, reject) => {
-    console.log("データ取得中...");
-    setTimeout(() => {
-      const success = true;  // 成功/失敗を決めるフラグ
-      if (success) {
-        resolve({ message: "データ取得成功", data: [1, 2, 3] });
-      } else {
-        reject(new Error("データ取得失敗"));
-      }
-    }, 1000);
-  });
+            <pre><code class="language-bash">npx tsc --init</code></pre>
+
+            <p>生成された<code>tsconfig.json</code>を以下のように編集すると良いでしょう：</p>
+
+            <pre><code class="language-json">{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "strict": true,
+    "outDir": "./dist",
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts"]
+}</code></pre>
+
+            <h3>TypeScriptファイルの作成と実行</h3>
+            <p>TypeScriptファイルを作成してみましょう：</p>
+
+            <pre><code class="language-typescript">// src/example.ts
+function greet(name: string): string {
+  return `Hello, ${name}!`;
 }
 
-// Promiseを利用した非同期処理の実行
-fetchData()
-  .then(result => {
-    console.log(result.message);       // "データ取得成功"
-    console.log(result.data);          // [1, 2, 3]
-  })
-  .catch(error => {
-    console.error(error);              // エラー時はこちらが実行される
-  })
-  .finally(() => {
-    console.log("非同期処理が完了しました。");
-  });</code></pre>
+console.log(greet("TypeScript"));
 
+// 配列操作の例
+const numbers: number[] = [1, 2, 3, 4, 5];
+const doubled: number[] = numbers.map((n: number) => n * 2);
+console.log(doubled); // [2, 4, 6, 8, 10]</code></pre>
 
+            <p>TypeScriptファイルを直接実行するには<code>ts-node</code>を使います：</p>
 
-            <p><strong>解説:</strong> <code>fetchData</code>関数では<code>new Promise(...)</code>を返しています。コンストラクタに渡した関数は「executor（実行者）」と呼ばれ、<code>resolve</code>と<code>reject</code>という2つのコールバックを引数に取ります。非同期処理が成功した際には<code>resolve(結果)</code>を呼び出し、失敗した際には<code>reject(エラー)</code>を呼び出します。上記では<code>setTimeout</code>で1秒待った後、<code>success</code>フラグに応じて成功ならオブジェクトを<code>resolve</code>し、失敗ならエラーメッセージを<code>reject</code>しています。</p>
-            <p><code>fetchData()</code>の呼び出し側では、返されたPromiseに対して<code>.then()</code>で成功時の処理、<code>.catch()</code>で失敗時の処理、<code>.finally()</code>で最終的に常に行いたい処理を指定しています。<code>.then()</code>の中の<code>result</code>は<code>resolve</code>で渡された値（ここでは<code>{ message: ..., data: ... }</code>オブジェクト）が渡ってきます。一方<code>.catch()</code>の<code>error</code>には<code>reject</code>で渡された<code>Error</code>オブジェクトが渡ります。<code>.finally()</code>は成功・失敗に関わらず一度だけ実行されるブロックですので、後処理などに利用できます。</p>
-            <p>なお、Promiseチェーンでは<code>.then</code>を続けて書くことで非同期処理の結果を次の<code>.then</code>に渡していくこともできます。例えば<code>.then(result => { return 加工した新しい結果; })</code>のように<code>return</code>すると、新たなPromiseとして次の<code>.then</code>に渡されます。この仕組みにより、非同期処理を順序立てて書き進めることができます。</p>
+            <pre><code class="language-bash">npx ts-node src/example.ts</code></pre>
+
+            <p>コンパイルしてからJavaScriptとして実行する場合：</p>
+
+            <pre><code class="language-bash"># TypeScriptをJavaScriptにコンパイル
+npx tsc
+
+# 生成されたJavaScriptを実行
+node dist/example.js</code></pre>
+            
+            <div class="note">
+                <p><strong>Tip:</strong> <code>tsc --watch</code>または<code>ts-node-dev</code>を使用すると、ファイルの変更を監視して自動的に再コンパイル・再実行できます。</p>
+            </div>
         </section>
 
         <hr>
 
-        <section id="chapter9">
-            <h2 id="chapter9" class="chapter-heading">第10章: async/await による非同期処理の改善</h2>
+        <section id="section7">
+            <h2 id="section7" class="chapter-heading">7. Vitestによるテスト環境</h2>
 
-            <h3>概要</h3>
-            <p>ES2017では、Promiseをさらに扱いやすくするために<code>async</code>/<code>await</code>構文が導入されました。<code>async</code>関数の中で<code>await</code>式を使うと、Promiseの完了を待ってその結果を取得するまで関数の実行を一時停止し、まるで同期処理のように非同期処理を書けます。</p>
-            <p><code>async</code>を付けた関数は常にPromiseを返すようになります（関数内部で暗黙的にPromiseが生成されます）。<code>await</code>はそのPromiseが解決されるまで待ち、解決値を返します。<code>await</code>は<code>async</code>関数の中でしか使用できない制約がありますが、その代わり<code>async</code>関数内では直列的なコードで非同期処理を順序よく書くことが可能です。</p>
-            <p>本章では、前章で書いたPromiseの例を<code>async/await</code>を用いた書き方に書き換えてみます。</p>
+            <p>Vitestを使ってテストを書き、実行する手順を説明します。</p>
 
-            <h3>コードと解説</h3>
-            <p>JavaScriptで<code>async/await</code>を使った例を示します。先ほどの<code>fetchData</code>（Promiseを返す関数）をそのまま利用し、<code>async</code>関数内で<code>await</code>しています。</p>
-
-            <pre><code class="language-javascript">async function processData() {
-  try {
-    console.log("データ取得開始");
-    const result = await fetchData();   // fetchData()のPromiseが解決するまで待機
-    console.log(result.message);        // "データ取得成功"
-    console.log(result.data);           // [1, 2, 3]
-    // ここでresultを使った後続の処理が書ける
-  } catch (error) {
-    console.error("エラーが発生しました:", error);
-  } finally {
-    console.log("非同期処理が終了（async/await）");
+            <h3>package.jsonにテストスクリプトを追加</h3>
+            <pre><code class="language-json">{
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
   }
-}
+}</code></pre>
 
-processData();  // async関数はPromiseを返すが、ここでは即時実行</code></pre>
-
-
-
-            <p><strong>解説:</strong> <code>async function processData()</code>と宣言することで、この関数は必ずPromiseを返すようになります。実際には関数がreturnで値（または何も）返した場合、その値で解決するPromiseが戻り、エラーが発生してcatchされなかった場合はrejectされたPromiseが返ります。<code>await fetchData()</code>の行では、前章で定義した<code>fetchData()</code>の完了を待ち、その結果<code>result</code>に代入します。<code>await</code>している間、非同期処理が完了するまで<code>processData</code>関数の実行は一時停止し、完了後に次の行に進みます。</p>
-            <p>この間JavaScript全体の実行がブロックされるわけではなく、他のイベントループは回っています。<code>await</code>はあくまで<code>processData</code>関数内の流れを一時停止するものです。そのため、<code>async/await</code>を使っても非同期処理であることに変わりはなく、内部ではPromiseが動いています。</p>
-            <p><code>try...catch</code>構文を用いることで、<code>await</code>した呼び出しでエラー（Promiseのreject）が発生した場合に<code>catch</code>ブロックで捕捉できます。<code>.then().catch()</code>チェーンの場合と同様に、例外処理を行えるわけです。<code>finally</code>ブロックも用いることができ、Promiseの<code>.finally</code>と同様の役割を果たします。</p>
-            <p>このように<code>async/await</code>を使うことで、Promiseチェーンで書いていた非同期処理をより直感的な手続き型のコードに変換できます。特に複数の非同期処理を順番に行う場合や、条件分岐を交えながら非同期処理を記述する場合に、<code>async/await</code>は可読性と保守性を向上させます。</p>
-        </section>
-
-        <hr>
-
-        <section id="chapter10">
-            <h2 id="chapter10" class="chapter-heading">第11章: Vitestによるテストの基本</h2>
-
-            <h3>概要</h3>
-            <p>ソフトウェアの品質を保つためには単体テスト(unit test)が重要です。JavaScript/TypeScriptでのテストフレームワークとしてはJestなどが有名ですが、ここではViteエコシステム向けに開発された<strong>Vitest</strong>を使用します。Vitestは高速なビルドツールであるViteに統合された次世代のテストフレームワークで、Jestと互換性のあるAPIを提供します。そのため、Jestで使われる<code>describe</code>や<code>test/it</code>、<code>expect</code>といった関数を利用してテストを書くことができます。</p>
-            <p>Vitestを使うことで、VueやReactの開発環境(Viteベース)とシームレスに統合されたテスト実行が可能です。本章では、Vitestをプロジェクトに導入し、ごく基本的なテストを書いて実行する手順を学びます。</p>
-            <p>Vitestの導入は<code>npm install -D vitest</code>で行い、<code>package.json</code>の<code>"scripts"</code>に<code>"test": "vitest"</code>を追加しておくと<code>npm run test</code>でテストを実行できます。テストファイル名は通常<code>*.test.js</code>や<code>*.spec.ts</code>といった形式にし、ソースコードと分けて配置します。</p>
-
-            <h3>コードと解説</h3>
-            <p>それでは、簡単な関数とそのテストを書いてみましょう。例として、二つの数値の和を返す関数<code>sum</code>を作成し、それが正しく動作することをテストします。</p>
-
-            <pre><code class="language-javascript">/*** sum.js ***/
+            <h3>テスト対象のモジュールとテストファイルの作成</h3>
+            <pre><code class="language-javascript">// src/utils.js または src/utils.ts (TypeScriptの場合)
 export function sum(a, b) {
   return a + b;
 }
 
-/*** sum.test.js ***/
-import { test, expect } from 'vitest';
-import { sum } from './sum.js';
+export function multiply(a, b) {
+  return a * b;
+}</code></pre>
 
-test('1 + 2 は 3 を返す', () => {
+            <pre><code class="language-javascript">// tests/utils.test.js または tests/utils.test.ts (TypeScriptの場合)
+import { expect, test } from 'vitest';
+import { sum, multiply } from '../src/utils';
+
+test('sum関数は2つの数値を加算する', () => {
   expect(sum(1, 2)).toBe(3);
+  expect(sum(-1, 1)).toBe(0);
+  expect(sum(0, 0)).toBe(0);
+});
+
+test('multiply関数は2つの数値を乗算する', () => {
+  expect(multiply(2, 3)).toBe(6);
+  expect(multiply(0, 5)).toBe(0);
+  expect(multiply(-2, -3)).toBe(6);
 });</code></pre>
 
+            <h3>テストの実行</h3>
+            <pre><code class="language-bash"># 一度だけテストを実行
+npm test
 
-
-            <p><strong>解説:</strong> <code>sum.js</code> (および <code>sum.ts</code>) では、単純に二つの引数を加算して返す関数<code>sum</code>を定義・エクスポートしています。対応するテストファイルでは<code>import</code>により<code>sum</code>関数を読み込み、<code>test</code>関数を使ってテストケースを定義しています。<code>test</code>関数の第一引数はテストの説明（文字列）、第二引数はテスト本体の関数です。</p>
-            <p>本体内では<code>expect(sum(1, 2)).toBe(3)</code>と書いており、<code>sum(1,2)</code>の結果が<code>3</code>であることをアサート（断言）しています。<code>toBe</code>は厳密な等価比較（<code>===</code>相当）で期待値と比較するマッチャーです。他にも<code>toEqual</code>（オブジェクトの内容比較）や<code>toContain</code>（配列や文字列に要素が含まれるか）など様々なマッチャー関数があります。</p>
-            <p>Vitestを実行すると、このテストが走り、もし期待通り<code>sum(1,2)</code>が<code>3</code>を返せばテストはパスします。仮に実装や期待値が異なればテストは失敗し、どの部分が想定と違ったか報告されます。上記のテストケース程度であれば一瞬で実行が完了し、Vitestは結果をターミナル上に以下のように出力します：</p>
-
+# または、ファイル変更を監視して自動的にテストを再実行
+npm run test:watch</code></pre>
+            
             <div class="note">
-                <pre><code class="language-text">✓ sum.test.js (1)
-  ✓ 1 + 2 は 3 を返す
-
-Test Files  1 passed (1)
-      Tests  1 passed (1)
-   Start at  10:00:00
-   Duration  312ms</code></pre>
+                <p><strong>Tip:</strong> テストファイルは<code>*.test.js</code>や<code>*.spec.js</code>という命名規則に従うと、Vitestが自動的に検出します。</p>
             </div>
-
-            <p>このように、テストが成功するとグリーン（✓）で表示され、失敗すると詳細なエラーメッセージとともに赤色で表示されます。VitestはJestと互換性が高いため、既存のJest向け知識（<code>describe</code>ブロックでテストをグループ化する、<code>beforeEach</code>で事前処理を行う等）もそのまま活かせます。</p>
-            <p>テストコード自体もTypeScriptで記述できるため、開発中に型のミスがあればテストを書く段階で検出できます。VitestはViteのプロジェクトに組み込みやすく、ホットリロード的にテストを実行し直す機能も提供されています。まずは簡単な関数のテストから始めて、徐々にコンポーネント単位のテストやモックの使い方などに広げていきましょう。</p>
         </section>
 
         <hr>
 
-        <section id="chapter11">
-            <h2 id="chapter12" class="chapter-heading">第12章: TypeScriptとは？</h2>
+        <section id="section8">
+            <h2 id="section8" class="chapter-heading">8. 開発をサポートするツール</h2>
 
-            <h3>概要</h3>
-            <p>TypeScriptはMicrosoftによって開発された、JavaScriptに静的型付けを追加したプログラミング言語です。TypeScriptはJavaScriptの「スーパーセット」であり、JavaScriptの全ての機能を継承しながら、型システムや追加の言語機能を提供します。TypeScriptで書かれたコードは、コンパイル時に一般的なJavaScriptに変換されるため、ブラウザやNode.jsなどのJavaScript実行環境で動作します。</p>
+            <p>効率的な開発のためのツールとして、Visual Studio Codeの使用をお勧めします。</p>
 
-            <h3>JavaScriptとTypeScriptの比較</h3>
-            <p>JavaScriptとTypeScriptの主な違いを見ていきましょう：</p>
-
-            <div class="note">
-                <h4>主な違い</h4>
-                <ul>
-                    <li><strong>型システム</strong>：TypeScriptの最大の特徴は静的型システムです。変数、関数のパラメータ、戻り値などに型を定義できます。</li>
-                    <li><strong>コンパイル処理</strong>：JavaScriptは直接実行されますが、TypeScriptは先にJavaScriptにコンパイルされる必要があります。</li>
-                    <li><strong>開発時のエラー検出</strong>：TypeScriptは型チェックにより、実行前にコードの潜在的な問題を検出できます。</li>
-                    <li><strong>ツールのサポート</strong>：型情報のおかげで、IDEの入力補完や型ヒントなどが強化されます。</li>
-                </ul>
-            </div>
-
-            <h3>TypeScriptの型システム</h3>
-            <p>TypeScriptの型システムを見てみましょう。以下のJavaScriptコードをTypeScriptに変換する例を示します：</p>
-
-            <h4>JavaScript vs TypeScript</h4>
-
-            <pre><code class="language-javascript">// JavaScript版
-function greet(name) {
-  return "Hello, " + name + "!";
-}
-
-const user = {
-  name: "Alice",
-  age: 30
-};
-
-console.log(greet(user.name));  // "Hello, Alice!"
-console.log(greet(123));        // "Hello, 123!" - 警告なし
-</code></pre>
-
-            <pre><code class="language-typescript">// TypeScript版
-function greet(name: string): string {
-  return "Hello, " + name + "!";
-}
-
-interface User {
-  name: string;
-  age: number;
-}
-
-const user: User = {
-  name: "Alice",
-  age: 30
-};
-
-console.log(greet(user.name));  // "Hello, Alice!"
-console.log(greet(123));        // エラー: 型 'number' の引数を型 'string' のパラメーターに割り当てることはできません。
-</code></pre>
-
-            <p>上記の例では、TypeScript版では以下のような型指定を行っています：</p>
+            <h3>Visual Studio Code</h3>
+            <p><a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a>（VS Code）は、Microsoft社が開発した無料の高機能コードエディタです。JavaScriptとTypeScript開発に特に最適化されており、以下の理由から強くお勧めします：</p>
+            
             <ul>
-                <li><code>name: string</code> - 関数のパラメータが文字列型であることを指定</li>
-                <li><code>function greet(...): string</code> - 関数の戻り値が文字列型であることを指定</li>
-                <li><code>interface User</code> - ユーザーオブジェクトの形状を定義するインターフェース</li>
-                <li><code>const user: User</code> - 変数userがUser型であることを指定</li>
+                <li>IntelliSenseによる強力なコード補完</li>
+                <li>定義へのジャンプなどのコードナビゲーション機能</li>
+                <li>組み込みのターミナル</li>
+                <li>Gitとの統合</li>
+                <li>デバッグ機能</li>
+                <li>豊富な拡張機能</li>
             </ul>
 
-            <h3>TypeScriptの利点</h3>
-            <ol>
-                <li><strong>型安全性</strong>：コンパイル時に型エラーを発見できるため、実行時エラーのリスクが減少します。</li>
-                <li><strong>コードの自己文書化</strong>：型定義がコードの理解を助け、関数やオブジェクトの使用方法が明確になります。</li>
-                <li><strong>リファクタリングの安全性</strong>：型チェックにより、大規模なコード変更時の影響範囲が把握しやすくなります。</li>
-                <li><strong>IDEサポートの向上</strong>：コード補完、定義へのジャンプ、リネームなどの機能が強化されます。</li>
-                <li><strong>大規模プロジェクトへの適応性</strong>：チームでの開発や大規模アプリケーション開発において、保守性が向上します。</li>
-            </ol>
+            <h3>Visual Studio Codeの拡張機能</h3>
+            <p>VS Codeの機能を拡張するために、以下の拡張機能をインストールすることをお勧めします：</p>
+            <ul>
+                <li><strong>ESLint</strong> - コード品質チェック</li>
+                <li><strong>Prettier</strong> - コードフォーマッタ</li>
+                <li><strong>JavaScript (ES6) code snippets</strong> - コードスニペット</li>
+                <li><strong>Path Intellisense</strong> - ファイルパスの補完</li>
+                <li><strong>Error Lens</strong> - エラー・警告の強調表示</li>
+                <li><strong>Live Server</strong> - 静的ファイルをローカルサーバーで提供</li>
+                <li><strong>GitLens</strong> - Gitの機能強化</li>
+                <li><strong>Debugger for Chrome</strong> - ブラウザデバッグ連携</li>
+            </ul>
 
-            <h3>TypeScriptの基本的な型</h3>
-            <pre><code class="language-typescript">// 基本的な型
-let isDone: boolean = false;       // 真偽値型
-let decimal: number = 6;           // 数値型
-let color: string = "blue";        // 文字列型
-let list: number[] = [1, 2, 3];    // 配列型
-let tuple: [string, number] = ["hello", 10]; // タプル型
+            <div class="note">
+                <p><strong>Tip:</strong> 拡張機能をインストールするには、VS Codeの左側のサイドバーにある拡張機能アイコンをクリックし、検索ボックスに拡張機能名を入力します。または<code>Ctrl+Shift+X</code>（macOSでは<code>Cmd+Shift+X</code>）でも拡張機能メニューを開けます。</p>
+            </div>
 
-// any型（型チェックを回避する特殊な型）
-let notSure: any = 4;
-notSure = "maybe a string";
-notSure = false;
-
-// void型（戻り値がない関数の戻り値型）
-function warnUser(): void {
-  console.log("This is a warning message");
-}
-
-// null と undefined
-let u: undefined = undefined;
-let n: null = null;
-
-// オブジェクト型
-interface Point {
-  x: number;
-  y: number;
-}
-let point: Point = { x: 10, y: 20 };
-
-// ユニオン型（複数の型のいずれかを持つ）
-let id: string | number = 100;
-id = "ID-100"; // OK
-</code></pre>
-
-            <h3>TypeScriptの導入方法</h3>
-            <p>プロジェクトにTypeScriptを導入するには次のようにします：</p>
-            <pre><code class="language-bash"># TypeScriptのインストール
-npm install -g typescript
-
-# 新規プロジェクトの初期化
-tsc --init  # tsconfig.jsonファイルが生成される
-
-# コンパイル
-tsc          # .tsファイルを.jsファイルにコンパイル
-
-# 監視モード（ファイル変更を検知して自動コンパイル）
-tsc --watch
-</code></pre>
-
-            <h3>TypeScriptとJavaScriptの共存</h3>
-            <p>既存のJavaScriptプロジェクトにTypeScriptを段階的に導入することも可能です。<code>.js</code>ファイルと<code>.ts</code>ファイルを混在させることができ、徐々に型を追加していくアプローチを取ることができます。TypeScriptの設定ファイル（<code>tsconfig.json</code>）では、型チェックの厳格さのレベルも調整できます。</p>
-
-            <h3>まとめ</h3>
-            <p>TypeScriptは、JavaScriptに型安全性を追加することで、大規模なアプリケーション開発をより堅牢に、そして効率的にします。本章で学んだTypeScriptの基本概念は、次のステップとしてモダンなフロントエンド開発（React、Vue.js、Angularなど）を学ぶ際に非常に役立つでしょう。もしチームで開発を行ったり、より複雑なアプリケーションを構築したりする場合は、TypeScriptを導入することで多くの恩恵を受けることができます。</p>
+            <h3>VS Codeの設定</h3>
+            <p>VS Codeの設定をカスタマイズするには、<code>Ctrl+,</code>（macOSでは<code>Cmd+,</code>）を押すか、メニューから「File」→「Preferences」→「Settings」を選択します。以下の設定が便利です：</p>
+            
+            <pre><code class="language-json">{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always"
+}</code></pre>
+            
+            <p>これらの設定により、ファイル保存時に自動的にコードがフォーマットされ、ESLintの問題が修正されます。</p>
         </section>
 
-        <section id="conclusion">
-            <h2 id="conclusion" class="chapter-heading">まとめ</h2>
-            <p>以上、全12章にわたりモダンJavaScriptの基礎とTypeScriptの概要について解説しました。本教材で扱った内容は、VueやReactといったフレームワークを学ぶ前提知識として非常に重要です。ブロックスコープやアロー関数といった言語機能から、オブジェクトや配列の操作、非同期処理、モジュール分割、テスト、そしてTypeScriptの基本まで、一通り理解できたでしょうか。実践に移る際は、ここで書いたコードを実際に動かしてみたり、応用例（例えば配列操作やPromiseのさらに高度な使い方）に挑戦してみると知識が定着します。</p>
-            <p>最後に、開発は常に進化しているため新しい機能やツールも登場します。例えばES2020以降にも便利な構文（<code>??</code>や<code>?.</code>といったオプショナルチェイニング演算子など）がありますし、フレームワーク固有の概念も出てきます。しかし、本教材で押さえた基礎力があればそれらにも対応しやすくなるはずです。ぜひ繰り返し復習し、モダンJavaScriptエンジニアへの一歩を踏み出してください。</p>
+        <hr>
+
+        <section id="section9">
+            <h2 id="section9" class="chapter-heading">9. トラブルシューティング</h2>
+
+            <p>よくある問題とその解決策です。</p>
+
+            <h3>「module not found」エラー</h3>
+            <pre><code class="language-text">Error: Cannot find module 'xxx'</code></pre>
+
+            <p>解決策：</p>
+            <ul>
+                <li>パッケージがインストールされているか確認 (<code>npm list xxx</code>)</li>
+                <li>ローカルパスの場合、相対パスが正しいか確認（<code>./</code>または<code>../</code>から始まっているか）</li>
+            </ul>
+
+            <h3>ES Modulesでインポートエラー</h3>
+            <pre><code class="language-text">SyntaxError: Cannot use import statement outside a module</code></pre>
+
+            <p>解決策：</p>
+            <ul>
+                <li><code>package.json</code>に<code>"type": "module"</code>を追加</li>
+                <li>ファイル拡張子<code>.mjs</code>を使用する</li>
+                <li>CommonJSの<code>require()</code>構文を使用する</li>
+            </ul>
+
+            <h3>TypeScriptのコンパイルエラー</h3>
+            <pre><code class="language-text">error TS2307: Cannot find module 'xxx' or its corresponding type declarations.</code></pre>
+
+            <p>解決策：</p>
+            <ul>
+                <li>対応する型定義パッケージをインストール：<code>npm install --save-dev @types/xxx</code></li>
+                <li><code>tsconfig.json</code>の設定を確認（特に<code>moduleResolution</code>と<code>esModuleInterop</code>）</li>
+            </ul>
         </section>
+
+        <hr>
 
         <div class="references">
-            <h2>参考文献</h2>
-            <p>本資料作成にあたり、一部内容についてMDN Web Docs等の信頼できる情報源を参照しています。</p>
+            <h2>まとめ</h2>
+            <p>このセットアップガイドを参考に環境を整えることで、「JavaScriptモダン開発 学習教材」の内容を実際に試しながら学ぶことができます。何か問題があれば、公式ドキュメントやオンラインコミュニティで質問することをお勧めします。</p>
+            <p>Happy Coding!</p>
         </div>
-
-
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
